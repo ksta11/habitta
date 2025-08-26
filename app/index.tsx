@@ -1,11 +1,14 @@
 import { View, Text } from 'react-native'
-
+import { Link } from 'expo-router'
 const index = () => {
   return (
-    <View>
-      <Text>Index content</Text>
-    </View>
+  <View>
+    <Text>Index content</Text>
+    <Link href="/doctor/">View Appointments</Link>
+  </View>
   )
 }
 
 export default index
+
+
