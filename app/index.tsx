@@ -1,12 +1,7 @@
-import { View, Text } from 'react-native'
-import { Link } from 'expo-router'
+import TailwindTest from '../components/TailwindTest'
+
 const index = () => {
-  return (
-  <View>
-    <Text>Index content</Text>
-    <Link href="/doctor/">View Appointments</Link>
-  </View>
-  )
+  return <TailwindTest />
 }
 
 export default index
