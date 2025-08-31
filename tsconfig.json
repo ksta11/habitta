@@ -3,5 +3,17 @@
   "compilerOptions": {
     "strict": true
   },
-  "include": ["nativewind-env.d.ts"]
+  "include": [
+    "nativewind-env.d.ts",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "components/**/*.ts",
+    "components/**/*.tsx",
+    "modules/**/*.ts",
+    "modules/**/*.tsx",
+    "libs/**/*.ts",
+    "libs/**/*.tsx",
+    "contexts/**/*.ts",
+    "contexts/**/*.tsx"
+  ]
 }

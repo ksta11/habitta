@@ -1,12 +1,13 @@
-import { Tabs } from "expo-router"
+import { Stack } from "expo-router"
 import "../global.css"
+import { Drawer } from 'expo-router/drawer';
+
 
 export default function appLayout() {
   return (
-        <Tabs>
-          <Tabs.Screen name="index" options={{ title: "Home" }} />
-
-        </Tabs>
+    <Drawer>
+     
+    </Drawer>
   )
 }
 
