@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, ScrollView, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
-import FormLogin from '../../modules/auth/login/FormLogin';
+import ScreenRegister from '../modules/auth/register/ScreenRegister';
 
-export default function LoginPage() {
+export default function RegisterPage() {
   return (
-    <SafeAreaView className="flex-1 bg-blue-50">
+    <SafeAreaView className="flex-1 bg-green-50">
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
@@ -14,9 +14,8 @@ export default function LoginPage() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View className="flex-1 justify-center px-4 py-8">            
-            {/* Formulario de login usando Atomic Design */}
-            <FormLogin />
+          <View className="flex-1 justify-center px-4 py-8">
+            <ScreenRegister />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
