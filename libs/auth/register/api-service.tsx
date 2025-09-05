@@ -1,7 +1,7 @@
 import { RegisterDTO } from '../../../interfaces/RegisterInterface';
 
 // Configuración de API usando variable de entorno
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://192.168.1.22:3000';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
 
 // Interface para lo que espera el backend
 export interface BackendRegisterPayload {

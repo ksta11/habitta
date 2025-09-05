@@ -1,8 +1,10 @@
 import { Tabs } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function UserTabsLayout() {
   return (
+    <SafeAreaView className="flex-1 bg-white">
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -66,5 +68,6 @@ export default function UserTabsLayout() {
         }}
       />
     </Tabs>
+    </SafeAreaView>
   );
 }
