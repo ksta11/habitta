@@ -12,7 +12,7 @@ export default function Index() {
       // Aquí puedes verificar si hay un token guardado
       // Por ahora redirigimos directamente al login
       setTimeout(() => {
-        router.replace('/login');
+        router.replace('/(owner)/property');
       }, 1000);
     };
 

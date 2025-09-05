@@ -22,6 +22,7 @@ export default function RootLayout() {
       {/* Rutas protegidas */}
       <Stack.Screen name="(user)" />
       <Stack.Screen name="(admin)" />
+      <Stack.Screen name="(owner)" />
       <Stack.Screen name="doctor" />
     </Stack>
   );

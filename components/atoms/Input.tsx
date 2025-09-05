@@ -1,7 +1,8 @@
-import React from 'react';
+ import React from 'react';
 import { TextInput, View, Text } from 'react-native';
 
 interface InputProps {
+  label?: string;
   placeholder?: string;
   value?: string;
   onChangeText?: (text: string) => void;
@@ -11,6 +12,7 @@ interface InputProps {
 }
 
 export default function Input({
+  label,
   placeholder,
   value,
   onChangeText,
@@ -20,8 +22,13 @@ export default function Input({
 }: InputProps) {
   return (
     <View className="mb-4">
+      {label && (
+        <Text className="absolute left-4 top-4 bg-white px-1 text-xs text-gray-500 z-10" style={{transform: [{translateY: -10}]}}>
+          {label}
+        </Text>
+      )}
       <TextInput
-        className={`border-2 rounded-lg px-4 py-3 text-base ${
+        className={`border-2 rounded-lg px-4 py-3 text-base mt-3 ${
           error ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white'
         }`}
         placeholder={placeholder}
