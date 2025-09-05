@@ -1,22 +1,32 @@
-import React, { useState } from 'react';
-import { View, Alert, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Dimensions, TextInput, StatusBar as RNStatusBar, Platform } from 'react-native';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 import { useRouter } from 'expo-router';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
 
 import { loginSchema } from '../../../schemes/LoginSchema';
 import { LoginDTO } from '../../../interfaces/LoginInterface';
-import { authenticationUser } from '../../../libs/auth/login/api-service';
+import { useAuth } from '../../../contexts/AuthContext';
 
-// Importar componentes atómicos y moleculares
-import InputField from '../../../components/molecules/InputField';
-import Button from '../../../components/atoms/Button';
-import Label from '../../../components/atoms/Label';
+const { height } = Dimensions.get('window');
 
 export default function FormLogin() {
   const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const { login } = useAuth();
+  const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      RNStatusBar.setBackgroundColor('#7C3AED', true);
+      RNStatusBar.setBarStyle('light-content', true);
+    }
+  }, []);
 
   const {
     control,
@@ -34,159 +44,230 @@ export default function FormLogin() {
     try {
       setSubmitError(null);
       
-      const result = await authenticationUser(data);
+      console.log("📨 Iniciando proceso de login...");
+      const result = await login(data);
       
-      console.log("Resultado de autenticación:", result);
-
-      if (result.statusCode === 500) {
-        setSubmitError('Error del servidor. Intenta más tarde.');
-        return;
-      }
-
-      if (result.statusCode === 401) {
-        setSubmitError('Credenciales inválidas. Verifica tu email y contraseña.');
-        return;
-      }
-
-      // Verificar si el login fue exitoso
-      if (result.success && result.token) {
-        console.log("✅ Login exitoso, token recibido:", result.token);
-        console.log("👤 Usuario:", result.user);
-        
-        Alert.alert('Éxito', 'Inicio de sesión exitoso', [
-          { 
-            text: 'OK', 
-            onPress: () => {
-              // Aquí puedes decodificar el token y redirigir según el rol
-              // Por ahora, redirigimos a la página de usuario
-              console.log("🚀 Redirigiendo a home de usuario...");
-              router.replace('/(user)/home');
-            }
-          }
-        ]);
-      } else if (result.success && !result.token) {
-        console.log("⚠️ Login exitoso pero sin token:", result);
-        setSubmitError('Error: No se recibió el token de autenticación');
+      if (result.success) {
+        console.log("✅ Login exitoso desde contexto");
+        // La navegación se maneja automáticamente en el contexto
       } else {
+        console.log("❌ Login fallido:", result.message);
         setSubmitError(result.message || 'Error desconocido');
       }
 
     } catch (error) {
-      console.error("Error en el proceso:", error);
+      console.error("❌ Error en el proceso:", error);
       setSubmitError('Error inesperado. Intenta de nuevo.');
     }
   };
 
   return (
-    <View className="bg-white rounded-lg p-6 shadow-lg mx-4">
-      {/* Header */}
-      <View className="mb-8 items-center">
-        <Label 
-          text="¡Bienvenido!" 
-          size="xl" 
-          weight="bold" 
-          variant="default"
-        />
-        <View className="mt-2">
-          <Label 
-            text="Inicia sesión en tu cuenta" 
-            size="md" 
-            variant="default"
+    <View className="flex-1" style={{ backgroundColor: '#7C3AED' }}>
+      <StatusBar style="light" />
+      
+      {/* Header with gradient and decorative circles */}
+      <View 
+        className="relative overflow-hidden"
+        style={{
+          backgroundColor: '#7C3AED',
+          paddingTop: insets.top + 20,
+          paddingBottom: 24,
+          borderBottomLeftRadius: 32,
+          borderBottomRightRadius: 32,
+          minHeight: 320,
+        }}
+      >
+          {/* Decorative circles */}
+          <View 
+            className="absolute rounded-full opacity-10"
+            style={{
+              width: 120,
+              height: 120,
+              backgroundColor: 'white',
+              top: -60,
+              right: -60,
+            }}
           />
-        </View>
-      </View>
+          <View 
+            className="absolute rounded-full opacity-5"
+            style={{
+              width: 96,
+              height: 96,
+              backgroundColor: 'white',
+              top: -30,
+              right: -96,
+            }}
+          />
+          <View 
+            className="absolute rounded-full opacity-10"
+            style={{
+              width: 72,
+              height: 72,
+              backgroundColor: 'white',
+              top: 60,
+              left: -48,
+            }}
+          />
 
-      {/* Tabs de navegación */}
-      <View className="flex-row justify-center mb-6">
-        <View className="w-1/3 pb-4 border-b-2 border-blue-500 items-center">
-          <Label 
-            text="Iniciar Sesión" 
-            size="md" 
-            weight="medium"
-          />
-        </View>
-        <Link href="/register" asChild>
-          <TouchableOpacity className="w-1/3 pb-4 border-b border-gray-200 items-center">
-            <Label 
-              text="Registrarse" 
-              size="md" 
-              weight="medium"
-              variant="default"
-            />
+          {/* Back button */}
+          <TouchableOpacity 
+            className="absolute w-10 h-10 rounded-full items-center justify-center"
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              top: insets.top + 20,
+              left: 16,
+            }}
+            onPress={() => router.back()}
+          >
+            <Ionicons name="chevron-back" size={20} color="white" />
           </TouchableOpacity>
-        </Link>
-      </View>
 
-      {/* Error general */}
-      {submitError && (
-        <View className="mb-4 p-3 bg-red-100 rounded-lg">
-          <Label 
-            text={submitError} 
-            size="sm" 
-            variant="error"
+          {/* Header text */}
+          <View className="absolute left-6 right-6" style={{ bottom: 24 }}>
+            <Text className="text-white text-xl font-bold mb-1 leading-tight">
+              Welcome back to your Account
+            </Text>
+            <Text className="text-white opacity-80 text-sm leading-5">
+              Please fill in the details to access your account.
+            </Text>
+          </View>
+        </View>
+
+      {/* Form container */}
+      <View className="flex-1 bg-gray-50 px-6">
+        <View className="bg-white rounded-3xl p-6 shadow-lg" style={{ marginTop: 20 }}>
+          
+          {/* Error general */}
+          {submitError && (
+            <View className="mb-4 p-3 bg-red-100 rounded-2xl">
+              <Text className="text-red-600 text-sm text-center">{submitError}</Text>
+            </View>
+          )}
+
+          {/* Email Input */}
+          <View className="mb-3">
+            <Text className="text-gray-600 text-sm mb-2 ml-1">Email</Text>
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, value } }) => (
+                <View>
+                  <TextInput
+                    placeholder="tu@email.com"
+                    value={value}
+                    onChangeText={onChange}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    style={{
+                      backgroundColor: '#F9FAFB',
+                      borderRadius: 12,
+                      paddingHorizontal: 16,
+                      paddingVertical: 14,
+                      fontSize: 16,
+                      color: '#1F2937',
+                      borderWidth: 0,
+                    }}
+                    placeholderTextColor="#9CA3AF"
+                  />
+                  {errors.email && (
+                    <Text className="text-red-500 text-xs mt-1 ml-1">
+                      {errors.email.message}
+                    </Text>
+                  )}
+                </View>
+              )}
+            />
+          </View>
+
+          {/* Password Input */}
+          <View className="mb-4">
+            <Text className="text-gray-600 text-sm mb-2 ml-1">Password</Text>
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, value } }) => (
+                <View>
+                  <View className="relative">
+                    <TextInput
+                      placeholder="••••••••"
+                      value={value}
+                      onChangeText={onChange}
+                      secureTextEntry={!showPassword}
+                      style={{
+                        backgroundColor: '#F9FAFB',
+                        borderRadius: 12,
+                        paddingHorizontal: 16,
+                        paddingVertical: 14,
+                        paddingRight: 48,
+                        fontSize: 16,
+                        color: '#1F2937',
+                        borderWidth: 0,
+                      }}
+                      placeholderTextColor="#9CA3AF"
+                    />
+                    <TouchableOpacity
+                      className="absolute right-4"
+                      style={{ top: 14 }}
+                      onPress={() => setShowPassword(!showPassword)}
+                    >
+                      <Ionicons 
+                        name={showPassword ? "eye-off" : "eye"} 
+                        size={20} 
+                        color="#9CA3AF" 
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  {errors.password && (
+                    <Text className="text-red-500 text-xs mt-1 ml-1">
+                      {errors.password.message}
+                    </Text>
+                  )}
+                </View>
+              )}
+            />
+          </View>
+
+          {/* Login Button */}
+          <TouchableOpacity
+            className="w-full rounded-2xl py-4 mb-4"
+            style={{
+              backgroundColor: '#7C3AED',
+              shadowColor: '#7C3AED',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 8,
+              elevation: 8,
+            }}
+            onPress={handleSubmit(onSubmit)}
+            disabled={isSubmitting}
+          >
+            <Text className="text-white text-lg font-semibold text-center">
+              {isSubmitting ? "Signing in..." : "Sign In"}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Register link */}
+          <View className="flex-row justify-center">
+            <Text className="text-gray-600">Don't have an account? </Text>
+            <Link href="/auth/register" asChild>
+              <TouchableOpacity>
+                <Text className="text-purple-600 font-medium">Sign up</Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
+        </View>
+
+        {/* Page indicator */}
+        <View className="flex-row justify-center mt-8 mb-4">
+          <View 
+            className="rounded-full"
+            style={{
+              width: 32,
+              height: 4,
+              backgroundColor: '#D1D5DB',
+            }}
           />
         </View>
-      )}
-
-      {/* Formulario */}
-      <View className="mb-6">
-        {/* Campo Email */}
-        <Controller
-          control={control}
-          name="email"
-          render={({ field: { onChange, value } }) => (
-            <InputField
-              label="Email"
-              placeholder="Ingresa tu email"
-              value={value}
-              onChangeText={onChange}
-              keyboardType="email-address"
-              error={errors.email?.message}
-              required
-            />
-          )}
-        />
-
-        {/* Campo Password */}
-        <Controller
-          control={control}
-          name="password"
-          render={({ field: { onChange, value } }) => (
-            <InputField
-              label="Contraseña"
-              placeholder="Ingresa tu contraseña"
-              value={value}
-              onChangeText={onChange}
-              secureTextEntry
-              error={errors.password?.message}
-              required
-            />
-          )}
-        />
-      </View>
-
-      {/* Botón de submit */}
-      <Button
-        title={isSubmitting ? "Iniciando sesión..." : "Iniciar Sesión"}
-        onPress={handleSubmit(onSubmit)}
-        disabled={isSubmitting}
-        variant="primary"
-        size="lg"
-      />
-
-      {/* Link al registro */}
-      <View className="flex-row justify-center items-center mt-6">
-        <Label text="¿No tienes una cuenta? " size="sm" variant="default" />
-        <Link href="/register" asChild>
-          <TouchableOpacity>
-            <Label 
-              text="Regístrate aquí" 
-              size="sm" 
-              weight="semibold"
-              variant="default"
-            />
-          </TouchableOpacity>
-        </Link>
       </View>
     </View>
   );

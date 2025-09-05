@@ -1,12 +1,7 @@
 import { RegisterDTO } from '../../../interfaces/RegisterInterface';
 
-// Configuración para Expo Go (dispositivo físico):
-const API_BASE_URL = 'http://192.168.1.22:3000'; // Tu IP local actual
-
-// Nota: Cuando usas Expo Go escaneando QR, necesitas:
-// 1. Tu IP local (ya configurada arriba)
-// 2. Que tu backend acepte conexiones desde cualquier IP (0.0.0.0)
-// 3. Que ambos dispositivos estén en la misma red WiFi 
+// Configuración de API usando variable de entorno
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://192.168.1.22:3000';
 
 // Interface para lo que espera el backend
 export interface BackendRegisterPayload {

@@ -1,23 +1,27 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { View } from 'react-native';
+import { useAuth } from '../contexts/AuthContext';
 import Label from '../components/atoms/Label';
 
 export default function Index() {
   const router = useRouter();
+  const { isAuthenticated, isLoading, user } = useAuth();
 
   useEffect(() => {
-    // Verificar si el usuario está autenticado
-    const checkAuthStatus = async () => {
-      // Aquí puedes verificar si hay un token guardado
-      // Por ahora redirigimos directamente al login
-      setTimeout(() => {
-        router.replace('/login');
-      }, 1000);
-    };
-
-    checkAuthStatus();
-  }, []);
+    if (!isLoading) {
+      if (isAuthenticated && user) {
+        // Usuario autenticado, redirigir según el rol
+        const redirectPath = user.role === 'admin' ? '/(admin)/home' : '/(user)/home';
+        console.log('🔄 Usuario autenticado, redirigiendo a:', redirectPath);
+        router.replace(redirectPath);
+      } else {
+        // Usuario no autenticado, ir al login
+        console.log('🔄 Usuario no autenticado, redirigiendo a login');
+        router.replace('/auth/login');
+      }
+    }
+  }, [isLoading, isAuthenticated, user]);
 
   return (
     <View className="flex-1 justify-center items-center bg-blue-50">
