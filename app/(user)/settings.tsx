@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
 import { router } from 'expo-router';
+import { AuthGuard } from '../../middleware/AuthGuard';
 import Label from '../../components/atoms/Label';
 
 export default function SettingsScreen() {
@@ -74,7 +75,8 @@ export default function SettingsScreen() {
   );
 
   return (
-    <ScrollView className="flex-1 bg-gray-50">
+    <AuthGuard requiredRole="user">
+      <ScrollView className="flex-1 bg-gray-50">
       <View className="p-6">
         {/* Header */}
         <View className="mb-6">
@@ -219,5 +221,6 @@ export default function SettingsScreen() {
         </TouchableOpacity>
       </View>
     </ScrollView>
+    </AuthGuard>
   );
 }

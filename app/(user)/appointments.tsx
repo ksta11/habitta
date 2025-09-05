@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, ScrollView, TouchableOpacity } from 'react-native';
+import { AuthGuard } from '../../middleware/AuthGuard';
 import Label from '../../components/atoms/Label';
 import Button from '../../components/atoms/Button';
 
@@ -46,7 +47,8 @@ export default function AppointmentsScreen() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-gray-50">
+    <AuthGuard requiredRole="user">
+      <ScrollView className="flex-1 bg-gray-50">
       <View className="p-6">
         {/* Header */}
         <View className="mb-6">
@@ -185,5 +187,6 @@ export default function AppointmentsScreen() {
         </View>
       </View>
     </ScrollView>
+    </AuthGuard>
   );
 }
