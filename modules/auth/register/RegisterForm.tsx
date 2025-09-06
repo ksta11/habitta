@@ -69,12 +69,12 @@ export default function RegisterForm() {
   };
 
   return (
-    <View className="flex-1" style={{ backgroundColor: '#7C3AED' }}>
+    <View className="flex-1 w-full" style={{ backgroundColor: '#7C3AED' }}>
       <StatusBar style="light" backgroundColor="#7C3AED" translucent={false} />
       
-      {/* Header with gradient and decorative circles */}
+      {/* Header with gradient and decorative circles - Fixed position */}
       <View 
-        className="relative overflow-hidden"
+        className="absolute top-0 left-0 right-0 overflow-hidden w-full z-10"
         style={{
           backgroundColor: '#7C3AED',
           paddingTop: Platform.OS === 'ios' ? insets.top + 20 : 20,
@@ -82,6 +82,8 @@ export default function RegisterForm() {
           borderBottomLeftRadius: 32,
           borderBottomRightRadius: 32,
           minHeight: Platform.OS === 'ios' ? 280 + insets.top : 280,
+          marginTop: Platform.OS === 'ios' ? -94 : -62, // Eliminar completamente el espacio con el header nativo
+          width: '100%', // Asegurar ancho completo
         }}
       >
           {/* Decorative circles */}
@@ -124,7 +126,13 @@ export default function RegisterForm() {
               top: Platform.OS === 'ios' ? insets.top + 20 : 20,
               left: 16,
             }}
-            onPress={() => router.back()}
+            onPress={() => {
+              if (router.canGoBack()) {
+                router.back();
+              } else {
+                router.replace('/');
+              }
+            }}
           >
             <Ionicons name="chevron-back" size={20} color="white" />
           </TouchableOpacity>
@@ -144,7 +152,10 @@ export default function RegisterForm() {
       <ScrollView 
         className="flex-1 bg-gray-50 px-6" 
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 32 }}
+        contentContainerStyle={{ 
+          paddingBottom: 32,
+          paddingTop: Platform.OS === 'ios' ? 240 + insets.top : 240, // Espacio para el header fijo
+        }}
       >
         <View className="bg-white rounded-3xl p-6 shadow-lg" style={{ marginTop: 20 }}>
           
