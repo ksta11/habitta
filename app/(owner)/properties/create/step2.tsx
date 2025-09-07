@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import Input from '../../../../components/atoms/Input';
+import Input from '../../../../components/atoms/InputForm';
 import { useForm } from 'react-hook-form';
 
 export default function CreatePropertyStep2() {
