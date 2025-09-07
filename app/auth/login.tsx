@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import FormLogin from '../../modules/auth/login/FormLogin';
+import FormLogin from '../../modules/auth/login/ScreenLogin';
+import ScreenLogin from '../../modules/auth/login/ScreenLogin';
 
 export default function LoginPage() {
   return (
@@ -14,8 +15,7 @@ export default function LoginPage() {
         showsVerticalScrollIndicator={false}
       >
         <View className="flex-1 justify-center py-8">            
-          {/* Formulario de login usando Atomic Design */}
-          <FormLogin />
+          <ScreenLogin />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

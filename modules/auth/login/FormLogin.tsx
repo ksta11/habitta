@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Dimensions,
-  TextInput,
-  StatusBar as RNStatusBar,
-  Platform,
-} from "react-native";
+import {View,Text,TouchableOpacity,StatusBar as RNStatusBar,Platform} from "react-native";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { useRouter } from "expo-router";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,7 +12,10 @@ import { loginSchema } from "../../../schemes/LoginSchema";
 import { LoginDTO } from "../../../interfaces/LoginInterface";
 import { useAuth } from "../../../contexts/AuthContext";
 
-const { height } = Dimensions.get("window");
+// Atomic Design Components
+import LabeledInput from "../../../components/molecules/LabeledInput";
+import PasswordInput from "../../../components/molecules/PasswordInput";
+import ModernButton from "../../../components/atoms/ModernButton";
 
 export default function FormLogin() {
   const router = useRouter();
@@ -130,7 +125,7 @@ export default function FormLogin() {
             if (router.canGoBack()) {
               router.back();
             } else {
-              router.replace('/auth/login');
+              router.replace("/auth/login");
             }
           }}
         >
@@ -170,105 +165,52 @@ export default function FormLogin() {
 
           {/* Email Input */}
           <View className="mb-3">
-            <Text className="text-gray-600 text-sm mb-2 ml-1">Email</Text>
             <Controller
               control={control}
               name="email"
               render={({ field: { onChange, value } }) => (
-                <View>
-                  <TextInput
-                    placeholder="tu@email.com"
-                    value={value}
-                    onChangeText={onChange}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    style={{
-                      backgroundColor: "#F9FAFB",
-                      borderRadius: 12,
-                      paddingHorizontal: 16,
-                      paddingVertical: 14,
-                      fontSize: 16,
-                      color: "#1F2937",
-                      borderWidth: 0,
-                    }}
-                    placeholderTextColor="#9CA3AF"
-                  />
-                  {errors.email && (
-                    <Text className="text-red-500 text-xs mt-1 ml-1">
-                      {errors.email.message}
-                    </Text>
-                  )}
-                </View>
+                <LabeledInput
+                  label="Email"
+                  placeholder="tu@email.com"
+                  value={value}
+                  onChangeText={onChange}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  error={errors.email?.message}
+                />
               )}
             />
           </View>
 
           {/* Password Input */}
           <View className="mb-4">
-            <Text className="text-gray-600 text-sm mb-2 ml-1">Password</Text>
             <Controller
               control={control}
               name="password"
               render={({ field: { onChange, value } }) => (
-                <View>
-                  <View className="relative">
-                    <TextInput
-                      placeholder="••••••••"
-                      value={value}
-                      onChangeText={onChange}
-                      secureTextEntry={!showPassword}
-                      style={{
-                        backgroundColor: "#F9FAFB",
-                        borderRadius: 12,
-                        paddingHorizontal: 16,
-                        paddingVertical: 14,
-                        paddingRight: 48,
-                        fontSize: 16,
-                        color: "#1F2937",
-                        borderWidth: 0,
-                      }}
-                      placeholderTextColor="#9CA3AF"
-                    />
-                    <TouchableOpacity
-                      className="absolute right-4"
-                      style={{ top: 14 }}
-                      onPress={() => setShowPassword(!showPassword)}
-                    >
-                      <Ionicons
-                        name={showPassword ? "eye-off" : "eye"}
-                        size={20}
-                        color="#9CA3AF"
-                      />
-                    </TouchableOpacity>
-                  </View>
-                  {errors.password && (
-                    <Text className="text-red-500 text-xs mt-1 ml-1">
-                      {errors.password.message}
-                    </Text>
-                  )}
-                </View>
+                <PasswordInput
+                  label="Password"
+                  placeholder="••••••••"
+                  value={value}
+                  onChangeText={onChange}
+                  error={errors.password?.message}
+                  showPassword={showPassword}
+                  onTogglePassword={() => setShowPassword(!showPassword)}
+                />
               )}
             />
           </View>
 
           {/* Login Button */}
-          <TouchableOpacity
-            className="w-full rounded-2xl py-4 mb-4"
-            style={{
-              backgroundColor: "#7C3AED",
-              shadowColor: "#7C3AED",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.3,
-              shadowRadius: 8,
-              elevation: 8,
-            }}
-            onPress={handleSubmit(onSubmit)}
-            disabled={isSubmitting}
-          >
-            <Text className="text-white text-lg font-semibold text-center">
-              {isSubmitting ? "Signing in..." : "Sign In"}
-            </Text>
-          </TouchableOpacity>
+          <View className="mb-4">
+            <ModernButton
+              title={isSubmitting ? "Signing in..." : "Sign In"}
+              onPress={handleSubmit(onSubmit)}
+              disabled={isSubmitting}
+              loading={isSubmitting}
+              variant="primary"
+            />
+          </View>
 
           {/* Register link */}
           <View className="flex-row justify-center">

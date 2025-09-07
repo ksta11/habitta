@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import Input from '../atoms/Input';
+import Input from '../atoms/InputForm';
 import Label from '../atoms/Label';
 
 interface InputFieldProps {

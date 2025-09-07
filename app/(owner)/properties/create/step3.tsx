@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Picker } from '@react-native-picker/picker';
-import Input from '../../../../components/atoms/Input';
+import Input from '../../../../components/atoms/InputForm';
 import { useForm } from 'react-hook-form';
 
 const plans = [
