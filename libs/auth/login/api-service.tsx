@@ -1,7 +1,9 @@
 import { LoginDTO, LoginResponse } from '../../../interfaces/LoginInterface';
 
-// Configuración de API usando variable de entorno
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
+// Configuración para Expo Go (dispositivo físico):
+const API_BASE_URL = 'http://192.168.1.22:3000'; // Tu IP local actual
+
+// Nota: Misma configuración que el registro para consistencia
 
 export const authenticationUser = async (credentials: LoginDTO): Promise<LoginResponse> => {
   try {

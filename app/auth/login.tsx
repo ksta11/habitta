@@ -1,25 +1,23 @@
 import React from 'react';
-import { View, ScrollView, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
-import FormLogin from '../../modules/auth/login/FormLogin';
+import { View, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import FormLogin from '../../modules/auth/login/ScreenLogin';
+import ScreenLogin from '../../modules/auth/login/ScreenLogin';
 
 export default function LoginPage() {
   return (
-    <SafeAreaView className="flex-1 bg-blue-50">
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1"
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      className="flex-1"
+    >
+      <ScrollView 
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        <ScrollView 
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          <View className="flex-1 justify-center px-4 py-8">            
-            {/* Formulario de login usando Atomic Design */}
-            <FormLogin />
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        <View className="flex-1 justify-center py-8">            
+          <ScreenLogin />
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
