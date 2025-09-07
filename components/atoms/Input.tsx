@@ -28,7 +28,7 @@ export default function Input({
         </Text>
       )}
       <TextInput
-        className={`border-2 rounded-lg px-4 py-3 text-base mt-3 ${
+        className={`border-2 rounded-3xl px-4 py-3 text-base mt-3 ${
           error ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white'
         }`}
         placeholder={placeholder}

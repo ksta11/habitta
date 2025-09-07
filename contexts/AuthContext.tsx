@@ -138,7 +138,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(result.user);
         
         // Redirigir según el rol
-        const redirectPath = result.user.role === 'admin' ? '/(admin)/home' : '/(user)/home';
+        let redirectPath: string;
+        switch (result.user.role) {
+          case 'admin':
+            redirectPath = '/(admin)/home';
+            break;
+          case 'owner':
+            redirectPath = '/(owner)/home';
+            break;
+          case 'user':
+          default:
+            redirectPath = '/(user)/home';
+            break;
+        }
         console.log('🚀 Redirigiendo a:', redirectPath);
         router.replace(redirectPath);
         

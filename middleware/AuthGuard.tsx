@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 interface AuthGuardProps {
   children: ReactNode;
-  requiredRole?: 'user' | 'admin';
+  requiredRole?: 'user' | 'admin' | 'owner';
 }
 
 /**
@@ -38,7 +38,14 @@ export function AuthGuard({ children, requiredRole }: AuthGuardProps) {
 
   // Verificar rol si es requerido
   if (requiredRole && user?.role !== requiredRole) {
-    const correctRoute = user?.role === 'admin' ? '/(admin)/home' : '/(user)/home';
+    let correctRoute = '/(user)/home'; // Default for user role
+    
+    if (user?.role === 'admin') {
+      correctRoute = '/(admin)/home';
+    } else if (user?.role === 'owner') {
+      correctRoute = '/(owner)/home';
+    }
+    
     router.replace(correctRoute);
     return null;
   }
