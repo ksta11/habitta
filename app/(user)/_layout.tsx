@@ -6,8 +6,8 @@ export default function UserTabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#2563eb", // blue-600
-        tabBarInactiveTintColor: "#6b7280", // gray-500
+        tabBarActiveTintColor: "#BD93EF", // blue-600
+        tabBarInactiveTintColor: "#DDCBF2", // gray-500
         tabBarStyle: {
           backgroundColor: "#ffffff",
           borderTopWidth: 1,
@@ -48,7 +48,7 @@ export default function UserTabsLayout() {
       <Tabs.Screen
         name="appointments"
         options={{
-          title: "Citas",
+          title: "Appointments",
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="calendar" size={size} color={color} />
           ),
@@ -59,7 +59,7 @@ export default function UserTabsLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: "Ajustes",
+          title: "Settings",
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="cog" size={size} color={color} />
           ),
