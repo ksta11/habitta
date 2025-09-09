@@ -12,7 +12,6 @@ import { loginSchema } from "../../../schemes/LoginSchema";
 import { LoginDTO } from "../../../interfaces/LoginInterface";
 import { useAuth } from "../../../contexts/AuthContext";
 
-// Atomic Design Components
 import LabeledInput from "../../../components/molecules/LabeledInput";
 import PasswordInput from "../../../components/molecules/PasswordInput";
 import ModernButton from "../../../components/atoms/ModernButton";
@@ -67,7 +66,7 @@ export default function FormLogin() {
     <View className="flex-1 w-full" style={{ backgroundColor: "#7C3AED" }}>
       <StatusBar style="light" backgroundColor="#7C3AED" translucent={false} />
 
-      {/* Header with gradient and decorative circles - Fixed position */}
+      {/* contenedor header with gradient and decorative circles - Fixed position */}
       <View
         className="absolute top-0 left-0 right-0 overflow-hidden w-full z-10"
         style={{
