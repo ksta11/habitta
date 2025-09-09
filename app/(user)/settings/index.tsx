@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, ScrollView } from 'react-native';
-import { AuthGuard } from '../../middleware/AuthGuard';
-import ScreenSettings from '../../modules/user/userSettings/ScreenSettings';
+import { AuthGuard } from '../../../middleware/AuthGuard';
+import ScreenSettings from '../../../modules/user/userSettings/ScreenSettings';
 
 export default function ProfileScreen() {
   return (

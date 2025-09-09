@@ -1,7 +1,7 @@
 import { LoginDTO, LoginResponse } from '../../../interfaces/LoginInterface';
 
 // Configuración para Expo Go (dispositivo físico):
-const API_BASE_URL = 'http://192.168.1.22:3000'; // Tu IP local actual
+const API_BASE_URL = 'http://192.168.1.12:3000'; // Tu IP local actual
 
 // Nota: Misma configuración que el registro para consistencia
 
@@ -10,7 +10,7 @@ export const authenticationUser = async (credentials: LoginDTO): Promise<LoginRe
     console.log('🔐 Enviando credenciales al backend:', { email: credentials.email });
     console.log('🔗 Intentando conectar a:', `${API_BASE_URL}/api/auth/login`);
 
-    // Código real para tu API:
+    
     const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: {

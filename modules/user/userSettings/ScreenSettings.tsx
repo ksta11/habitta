@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import { router } from 'expo-router';
+import { router, Link } from 'expo-router';
 import { useAuth } from '../../../contexts/AuthContext';
 import { AuthGuard } from '../../../middleware/AuthGuard';
 import Label from '../../../components/atoms/Label';
@@ -29,11 +29,6 @@ const ScreenSettings = () => {
     );
   };
 
-  const handleNavigation = (screen: string) => {
-    // Aquí puedes agregar la lógica de navegación específica
-    console.log(`Navegando a: ${screen}`);
-    // router.push(screen); // Descomenta cuando tengas las pantallas creadas
-  };
 
   return (
     <AuthGuard requiredRole="user">
@@ -51,30 +46,29 @@ const ScreenSettings = () => {
         />
         
         <View className="mt-4 space-y-3">
-          <TouchableOpacity 
-            className="py-3 border-b border-gray-100"
-            onPress={() => handleNavigation('profile-edit')}
-          >
-            <Label text="Editar Perfil" size="md" />
-          </TouchableOpacity>
+          <Link href="/(user)/settings/editProfile" asChild>
+            <TouchableOpacity className="py-3 border-b border-gray-100">
+              <Label text="Editar Perfil" size="md" />
+            </TouchableOpacity>
+          </Link>
           
           <TouchableOpacity 
             className="py-3 border-b border-gray-100"
-            onPress={() => handleNavigation('change-password')}
+            // onPress={() => console.log('Pantalla de cambio de contraseña no implementada aún')}
           >
             <Label text="Cambiar Contraseña" size="md" />
           </TouchableOpacity>
           
           <TouchableOpacity 
             className="py-3 border-b border-gray-100"
-            onPress={() => handleNavigation('privacy-settings')}
+            // onPress={() => console.log('Configuración de privacidad no implementada aún')}
           >
             <Label text="Configuración de Privacidad" size="md" />
           </TouchableOpacity>
           
           <TouchableOpacity 
             className="py-3"
-            onPress={() => handleNavigation('account-security')}
+            // onPress={() => console.log('Seguridad de cuenta no implementada aún')}
           >
             <Label text="Seguridad de Cuenta" size="md" />
           </TouchableOpacity>
@@ -92,21 +86,21 @@ const ScreenSettings = () => {
         <View className="mt-4 space-y-3">
           <TouchableOpacity 
             className="py-3 border-b border-gray-100"
-            onPress={() => handleNavigation('help-center')}
+            // onPress={() => console.log('Centro de ayuda no implementado aún')}
           >
             <Label text="Centro de Ayuda" size="md" />
           </TouchableOpacity>
           
           <TouchableOpacity 
             className="py-3 border-b border-gray-100"
-            onPress={() => handleNavigation('contact-support')}
+            // onPress={() => console.log('Contacto de soporte no implementado aún')}
           >
             <Label text="Contactar Soporte" size="md" />
           </TouchableOpacity>
           
           <TouchableOpacity 
             className="py-3"
-            onPress={() => handleNavigation('about-app')}
+            // onPress={() => console.log('Acerca de la app no implementado aún')}
           >
             <Label text="Acerca de la App" size="md" />
           </TouchableOpacity>
@@ -124,21 +118,21 @@ const ScreenSettings = () => {
         <View className="mt-4 space-y-3">
           <TouchableOpacity 
             className="py-3 border-b border-gray-100"
-            onPress={() => handleNavigation('clear-cache')}
+            // onPress={() => console.log('Limpiar caché no implementado aún')}
           >
             <Label text="Limpiar Caché" size="md" />
           </TouchableOpacity>
           
           <TouchableOpacity 
             className="py-3 border-b border-gray-100"
-            onPress={() => handleNavigation('data-usage')}
+            // onPress={() => console.log('Uso de datos no implementado aún')}
           >
             <Label text="Uso de Datos" size="md" />
           </TouchableOpacity>
           
           <TouchableOpacity 
             className="py-3"
-            onPress={() => handleNavigation('offline-mode')}
+            // onPress={() => console.log('Modo sin conexión no implementado aún')}
           >
             <Label text="Modo Sin Conexión" size="md" />
           </TouchableOpacity>
@@ -156,14 +150,14 @@ const ScreenSettings = () => {
         <View className="mt-4 space-y-3">
           <TouchableOpacity 
             className="py-3 border-b border-gray-100"
-            onPress={() => handleNavigation('export-data')}
+            // onPress={() => console.log('Exportar datos no implementado aún')}
           >
             <Label text="Exportar Datos" size="md" />
           </TouchableOpacity>
           
           <TouchableOpacity 
             className="py-3 border-b border-gray-100"
-            onPress={() => handleNavigation('delete-account')}
+            // onPress={() => console.log('Eliminar cuenta no implementado aún')}
           >
             <Label text="Eliminar Cuenta" size="md" variant="error" />
           </TouchableOpacity>
