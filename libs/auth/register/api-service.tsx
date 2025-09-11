@@ -1,7 +1,7 @@
 import { RegisterDTO } from '../../../interfaces/RegisterInterface';
 
-// Configuración para Expo Go (dispositivo físico):
-const API_BASE_URL = 'http://192.168.1.12:3000'; // Tu IP local actual
+
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://192.168.1.12:3000';
 
 // Nota: Cuando usas Expo Go escaneando QR, necesitas:
 // 1. Tu IP local (ya configurada arriba)

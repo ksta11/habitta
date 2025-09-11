@@ -277,8 +277,10 @@ export default function RegisterForm() {
                 <ToggleField
                   value={value}
                   onValueChange={onChange}
-                  text="I accept the"
                   linkText="Terms and Conditions"
+                  text="I accept the terms and conditions"
+                  
+              
                   error={errors.acceptTerms?.message}
                 />
               )}
