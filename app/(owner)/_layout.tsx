@@ -43,9 +43,9 @@ export default function PropertyLayout() {
           name="property"
           options={{
             title: 'Propiedades',
-              tabBarIcon: ({ color, size }) => (
-                <FontAwesome name="building" size={size} color={color} />
-              ),
+            tabBarIcon: ({ color, size }) => (
+              <FontAwesome name="building" size={size} color={color} />
+            ),
           }}
         />
 
