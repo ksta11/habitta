@@ -27,16 +27,6 @@ export default function PropertyLayout() {
           },
         }}
       >
-        {/* Tab Home */}
-        <Tabs.Screen
-          name="home"
-          options={{
-            title: "Inicio",
-            tabBarIcon: ({ color, size }) => (
-              <FontAwesome name="home" size={size} color={color} />
-            ),
-          }}
-        />
         
         {/* Tab Perfil */}
         <Tabs.Screen
