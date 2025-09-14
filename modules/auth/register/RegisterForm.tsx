@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {View,Text,TouchableOpacity,Alert,ScrollView,StatusBar as RNStatusBar, Platform} from "react-native";
+import {View,Text,Pressable,Alert,ScrollView,StatusBar as RNStatusBar, Platform} from "react-native";
 import { Link, router } from "expo-router";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -123,7 +123,7 @@ export default function RegisterForm() {
         />
 
         {/* Back button */}
-        <TouchableOpacity
+        <Pressable
           className="absolute w-10 h-10 rounded-full items-center justify-center"
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.2)",
@@ -139,7 +139,7 @@ export default function RegisterForm() {
           }}
         >
           <Ionicons name="chevron-back" size={20} color="white" />
-        </TouchableOpacity>
+        </Pressable>
 
         {/* Header text */}
         <View className="absolute left-6 right-6" style={{ bottom: 24 }}>
@@ -278,9 +278,8 @@ export default function RegisterForm() {
                   value={value}
                   onValueChange={onChange}
                   linkText="Terms and Conditions"
-                  text="I accept the terms and conditions"
-                  
-              
+                  text="I accept the"
+                  onLinkPress={() => router.push("/terms")}
                   error={errors.acceptTerms?.message}
                 />
               )}
@@ -302,9 +301,9 @@ export default function RegisterForm() {
           <View className="flex-row justify-center">
             <Text className="text-gray-600">Already have an account? </Text>
             <Link href="/auth/login" asChild>
-              <TouchableOpacity>
+              <Pressable>
                 <Text className="text-purple-600 font-medium">Sign in</Text>
-              </TouchableOpacity>
+              </Pressable>
             </Link>
           </View>
         </View>

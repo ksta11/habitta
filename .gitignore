@@ -37,6 +37,8 @@ yarn-error.*
 .env.test
 .env.production
 .env*.local
+.env.backup
+restore-env.bat
 
 # typescript
 *.tsbuildinfo
