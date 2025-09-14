@@ -30,6 +30,7 @@ export default function FormLogin() {
     }
   }, []);
 
+
   const {
     control,
     handleSubmit,
@@ -75,7 +76,7 @@ export default function FormLogin() {
           paddingBottom: 24,
           borderBottomLeftRadius: 32,
           borderBottomRightRadius: 32,
-          minHeight: Platform.OS === "ios" ? 280 + insets.top : 280,
+          minHeight: Platform.OS === "ios" ? 200 + insets.top : 220,
           marginTop: Platform.OS === "ios" ? -94 : -62, // Eliminar completamente el espacio con el header nativo
           width: "100%", // Asegurar ancho completo
         }}
@@ -150,7 +151,7 @@ export default function FormLogin() {
       <View
         className="flex-1 bg-gray-50 px-6"
         style={{
-          paddingTop: Platform.OS === "ios" ? 240 + insets.top : 240, // Espacio para el header fijo
+          paddingTop: Platform.OS === "ios" ? 200 + insets.top : 180, // Espacio para el header fijo
         }}
       >
         <View

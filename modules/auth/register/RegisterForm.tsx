@@ -85,7 +85,7 @@ export default function RegisterForm() {
           paddingBottom: 24,
           borderBottomLeftRadius: 32,
           borderBottomRightRadius: 32,
-          minHeight: Platform.OS === "ios" ? 280 + insets.top : 280,
+          minHeight: Platform.OS === "ios" ? 200 + insets.top : 220,
           marginTop: Platform.OS === "ios" ? -94 : -62, // Eliminar completamente el espacio con el header nativo
           width: "100%", // Asegurar ancho completo
         }}
@@ -157,8 +157,9 @@ export default function RegisterForm() {
         className="flex-1 bg-gray-50 px-6"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingBottom: 32,
-          paddingTop: Platform.OS === "ios" ? 240 + insets.top : 240, // Espacio para el header fijo
+          paddingBottom: 100, // Aumentamos padding para cubrir cuando aparece el teclado
+          paddingTop: Platform.OS === "ios" ? 160 + insets.top : 240,
+          minHeight: '100%', // Asegura que cubra toda la pantalla
         }}
       >
         <View
