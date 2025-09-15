@@ -9,6 +9,7 @@ import { StatusBar } from "expo-status-bar";
 
 import { editUserProfileSchema, EditUserProfileDTO } from "../../../../schemes/EditUserProfileSchema";
 import { getCurrentUserProfile, updateCurrentUserProfile } from "../../../../libs/userServices/api-service";
+import { useAuth } from "../../../../contexts/AuthContext";
 
 // Atomic Design Components
 import LabeledInput from "../../../../components/molecules/LabeledInput";
@@ -17,6 +18,7 @@ import ModernButton from "../../../../components/atoms/ModernButton";
 
 export default function FormEditUserProfile() {
   const router = useRouter();
+  const { updateUserData } = useAuth();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -47,8 +49,7 @@ export default function FormEditUserProfile() {
         // Cargar datos del usuario en el formulario
         setValue('name', response.user.name);
         setValue('email', response.user.email);
-        setValue('dateOfBirth', ''); // Por ahora vacío, se puede implementar después
-        setValue('country', ''); // Por ahora vacío, se puede implementar después
+        setValue('phone', response.user.phone || '');
       }
     } catch (error) {
       console.error('Error cargando perfil:', error);
@@ -69,8 +70,7 @@ export default function FormEditUserProfile() {
       name: "",
       email: "",
       password: "",
-      dateOfBirth: "",
-      country: "",
+      phone: ""
     },
   });
 
@@ -85,6 +85,7 @@ export default function FormEditUserProfile() {
       const updateData: any = {
         name: data.name,
         email: data.email,
+        phone: data.phone,
         ...(data.password && data.password.trim() !== '' && { password: data.password }),
       };
 
@@ -106,10 +107,34 @@ export default function FormEditUserProfile() {
         if (result.user && result.user._id) {
           console.log("✅ Perfil actualizado exitosamente");
           setSubmitSuccess("Perfil actualizado exitosamente");
+          
+          // Actualizar los datos del usuario en el contexto
+          try {
+            await updateUserData({
+              id: result.user._id,
+              name: result.user.name,
+              email: result.user.email,
+              phone: result.user.phone,
+              role: result.user.role,
+              creation_date: result.user.creation_date?.toString() || new Date().toISOString()
+            });
+            console.log("✅ Datos del usuario actualizados en el contexto");
+          } catch (error) {
+            console.error("❌ Error actualizando contexto:", error);
+          }
+          
           // Limpiar password después de actualizar
           setValue('password', '');
         } else if (result.message) {
           console.log("❌ Error del servidor:", result.message);
+          
+          // Verificar si es un error de autenticación
+          if (result.message.includes('sesión ha expirado') || result.message.includes('Token inválido')) {
+            setSubmitError("Tu sesión ha expirado. Serás redirigido al login...");
+            // El usuario será redirigido automáticamente por el servicio de API
+            return;
+          }
+          
           setSubmitError(result.message);
         } else {
           console.log("❌ Respuesta inesperada del servidor");
@@ -238,7 +263,7 @@ export default function FormEditUserProfile() {
           {/* Become Owner Button - Top */}
           <View className="mb-6">
             <ModernButton
-              title="Become a Owner"
+              title="Become an Owner"
               onPress={handleBecomeOwner}
               variant="secondary"
             />
@@ -317,40 +342,23 @@ export default function FormEditUserProfile() {
             />
           </View>
 
-          {/* Date of Birth Input */}
+          {/* Phone Input */}
           <View className="mb-3">
             <Controller
               control={control}
-              name="dateOfBirth"
+              name="phone"
               render={({ field: { onChange, value } }) => (
                 <LabeledInput
-                  label="Date of Birth"
-                  placeholder="YYYY-MM-DD"
+                  label="Phone"
+                  placeholder="Your phone number"
                   value={value || ''}
                   onChangeText={onChange}
-                  error={errors.dateOfBirth?.message}
+                  keyboardType="phone-pad"
+                  error={errors.phone?.message}
                 />
               )}
             />
           </View>
-
-          {/* Country/Region Input */}
-          <View className="mb-6">
-            <Controller
-              control={control}
-              name="country"
-              render={({ field: { onChange, value } }) => (
-                <LabeledInput
-                  label="Country/Region"
-                  placeholder="Your country or region"
-                  value={value || ''}
-                  onChangeText={onChange}
-                  error={errors.country?.message}
-                />
-              )}
-            />
-          </View>
-
           {/* Save Changes Button */}
           <View className="mb-4">
             <ModernButton

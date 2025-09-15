@@ -30,6 +30,7 @@ interface AuthContextType {
   
   // Utilidades
   refreshUser: () => Promise<void>;
+  updateUserData: (updatedUserData: User) => Promise<void>;
   clearError: () => void;
 }
 
@@ -234,6 +235,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Actualizar datos del usuario en el contexto
+  const updateUserData = async (updatedUserData: User): Promise<void> => {
+    try {
+      console.log('🔄 Actualizando datos del usuario en el contexto...');
+      console.log('📋 Datos recibidos:', updatedUserData);
+      console.log('📋 Usuario actual antes de actualizar:', user);
+      
+      // Actualizar el estado local
+      setUser(updatedUserData);
+      
+      // Actualizar el almacenamiento
+      await AsyncStorage.setItem(USER_KEY, JSON.stringify(updatedUserData));
+      
+      console.log('✅ Datos del usuario actualizados en el contexto');
+      console.log('📋 Usuario actual después de actualizar:', updatedUserData);
+    } catch (error) {
+      console.error('❌ Error al actualizar datos del usuario:', error);
+    }
+  };
+
   // Limpiar errores (por si quieres manejar errores en el contexto)
   const clearError = (): void => {
     // Implementar según necesites
@@ -253,6 +274,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     logout,
     refreshUser,
+    updateUserData,
     clearError,
   };
 

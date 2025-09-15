@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
@@ -8,6 +8,14 @@ import Button from '../../components/atoms/Button';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
+  
+  // Debug: Log de datos del usuario
+  console.log('👤 Datos del usuario en ProfileScreen:', user);
+  console.log('👤 Usuario name:', user?.name);
+  console.log('👤 Usuario email:', user?.email);
+  console.log('👤 Usuario phone:', user?.phone);
+  
+  // Forzar re-renderización cuando cambie el usuario
   
   const handleLogout = () => {
     Alert.alert(
@@ -30,9 +38,9 @@ export default function ProfileScreen() {
   };
 
   // Datos del usuario con fallbacks
-  const displayName = user?.name || 'Usuario';
-  const displayEmail = user?.email || 'email@ejemplo.com';
-  const displayPhone = user?.phone || 'No especificado';
+  const displayName = user?.name || '';
+  const displayEmail = user?.email || '';
+  const displayPhone = user?.phone || '';
   const displayRole = user?.role || 'user';
   const userInitial = displayName.charAt(0).toUpperCase();
 
@@ -100,7 +108,10 @@ export default function ProfileScreen() {
         />
         
         <View className="mt-4 space-y-3">
-          <TouchableOpacity className="py-3 border-b border-gray-100">
+          <TouchableOpacity 
+            className="py-3 border-b border-gray-100"
+            onPress={() => router.push('/(user)/settings/editProfile')}
+          >
             <Label text="Editar Perfil" size="md" />
           </TouchableOpacity>
           
