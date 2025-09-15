@@ -15,5 +15,5 @@
     "libs/**/*.tsx",
     "contexts/**/*.ts",
     "contexts/**/*.tsx"
-  ]
+, "interfaces/property/types.ts"  ]
 }

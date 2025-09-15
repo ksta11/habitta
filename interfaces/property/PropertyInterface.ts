@@ -46,7 +46,6 @@ export interface GetOwnerPropertiesResponse {
   data: Property[];
   message?: string;
 }
-
 // Interfaz extendida para gestión administrativa
 export interface AdminProperty extends Property {
   owner_name: string;
@@ -82,6 +81,11 @@ export interface PropertyFilters {
   };
   sortBy: 'title' | 'price' | 'created_at' | 'views';
   sortOrder: 'asc' | 'desc';
+}
+export interface GetPropertyByIdResponse {
+  success: boolean;
+  data: Property | null;
+  message?: string;
 }
 
 // Aquí puedes agregar más interfaces relacionadas a propiedades

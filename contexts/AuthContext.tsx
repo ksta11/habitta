@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { LoginDTO, LoginResponse } from '../interfaces/LoginInterface';
 import { RegisterDTO, RegisterFormDTO } from '../interfaces/RegisterInterface';
 import { authenticationUser } from '../libs/auth/login/api-service';
 import { registerUser } from '../libs/auth/register/api-service';
+import { isTokenExpired, getTokenTimeToExpiry } from '../utils/Tokens';
 
 // Tipos para el contexto
 interface User {
@@ -31,6 +32,7 @@ interface AuthContextType {
   // Utilidades
   refreshUser: () => Promise<void>;
   clearError: () => void;
+  updateAuthData: (newToken: string, newUser: User) => Promise<void>;
 }
 
 // Crear el contexto
@@ -58,6 +60,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Referencias para intervalos de verificación
+  const tokenCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const warningShownRef = useRef<boolean>(false);
 
   // Estado computado
   const isAuthenticated = !!user && !!token;
@@ -66,6 +72,97 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     loadStoredAuth();
   }, []);
+
+  // Configurar verificación periódica del token cuando el usuario esté autenticado
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      startTokenExpirationCheck();
+    } else {
+      stopTokenExpirationCheck();
+    }
+
+    // Cleanup al desmontar o cambiar token
+    return () => {
+      stopTokenExpirationCheck();
+    };
+  }, [isAuthenticated, token]);
+
+  // Función para iniciar la verificación periódica del token
+  const startTokenExpirationCheck = () => {
+    if (!token) return;
+
+    // Limpiar intervalo anterior si existe
+    stopTokenExpirationCheck();
+
+    // Verificar inmediatamente
+    checkTokenExpiration();
+
+    // Configurar verificación cada 30 segundos
+    tokenCheckIntervalRef.current = setInterval(() => {
+      checkTokenExpiration();
+    }, 30000); // 30 segundos
+
+    console.log('🕐 Verificación automática de expiración de token iniciada');
+  };
+
+  // Función para detener la verificación periódica
+  const stopTokenExpirationCheck = () => {
+    if (tokenCheckIntervalRef.current) {
+      clearInterval(tokenCheckIntervalRef.current);
+      tokenCheckIntervalRef.current = null;
+      console.log('⏹️ Verificación automática de expiración de token detenida');
+    }
+    warningShownRef.current = false;
+  };
+
+  // Función para verificar si el token ha expirado
+  const checkTokenExpiration = async () => {
+    if (!token) return;
+
+    try {
+      if (isTokenExpired(token)) {
+        console.log('🚨 Token expirado detectado - cerrando sesión automáticamente');
+        await handleTokenExpired();
+        return;
+      }
+
+      // Verificar si queda poco tiempo (ej: menos de 5 minutos)
+      const timeToExpiry = getTokenTimeToExpiry(token);
+      const fiveMinutes = 5 * 60 * 1000; // 5 minutos en milisegundos
+
+      if (timeToExpiry <= fiveMinutes && timeToExpiry > 0 && !warningShownRef.current) {
+        warningShownRef.current = true;
+        console.log('⚠️ Token expirará pronto:', Math.floor(timeToExpiry / 1000 / 60), 'minutos');
+        // Aquí podrías mostrar una notificación al usuario si quisieras
+      }
+    } catch (error) {
+      console.error('❌ Error al verificar expiración del token:', error);
+    }
+  };
+
+  // Función para manejar token expirado
+  const handleTokenExpired = async () => {
+    try {
+      console.log('🔐 Manejando token expirado...');
+      
+      // Limpiar estado
+      setUser(null);
+      setToken(null);
+      
+      // Limpiar almacenamiento
+      await clearStoredAuth();
+      
+      // Detener verificaciones
+      stopTokenExpirationCheck();
+      
+      // Redirigir al login
+      router.replace('/auth/login');
+      
+      console.log('✅ Sesión cerrada automáticamente por token expirado');
+    } catch (error) {
+      console.error('❌ Error al manejar token expirado:', error);
+    }
+  };
 
   // Cargar token y usuario almacenados
   const loadStoredAuth = async () => {
@@ -78,6 +175,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       ]);
 
       if (storedToken && storedUser) {
+        // Verificar si el token almacenado ya expiró
+        if (isTokenExpired(storedToken)) {
+          console.log('🚨 Token almacenado ya expiró - limpiando datos');
+          await clearStoredAuth();
+          setIsLoading(false);
+          return;
+        }
+
         const userData = JSON.parse(storedUser);
         setToken(storedToken);
         setUser(userData);
@@ -144,7 +249,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             redirectPath = '/(admin)/home';
             break;
           case 'owner':
-            redirectPath = '/(owner)/home';
+            redirectPath = '/(owner)/property';
             break;
           case 'user':
           default:
@@ -206,6 +311,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       console.log('🚪 Cerrando sesión...');
       
+      // Detener verificación de token
+      stopTokenExpirationCheck();
+      
       // Limpiar estado
       setUser(null);
       setToken(null);
@@ -234,6 +342,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Actualizar datos de autenticación (token y usuario)
+  const updateAuthData = async (newToken: string, newUser: User): Promise<void> => {
+    try {
+      console.log('🔄 Actualizando datos de autenticación...');
+      
+      // Actualizar estado
+      setToken(newToken);
+      setUser(newUser);
+      
+      // Almacenar nuevos datos
+      await storeAuth(newToken, newUser);
+      
+      console.log('✅ Datos de autenticación actualizados exitosamente');
+    } catch (error) {
+      console.error('❌ Error al actualizar datos de autenticación:', error);
+    }
+  };
+
   // Limpiar errores (por si quieres manejar errores en el contexto)
   const clearError = (): void => {
     // Implementar según necesites
@@ -254,6 +380,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     refreshUser,
     clearError,
+    updateAuthData,
   };
 
   return (
