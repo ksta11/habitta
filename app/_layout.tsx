@@ -21,11 +21,7 @@ export default function RootLayout() {
         {/* Pantalla principal */}
         <Stack.Screen name="index" />
         
-        {/* Rutas de autenticación directas */}
-        <Stack.Screen name="login" />
-        <Stack.Screen name="register" />
-        
-        {/* Grupo de autenticación (mantener para compatibilidad) */}
+        {/* Grupo de autenticación */}
         <Stack.Screen 
           name="auth" 
           options={{
@@ -36,7 +32,7 @@ export default function RootLayout() {
         {/* Rutas protegidas */}
         <Stack.Screen name="(user)" />
         <Stack.Screen name="(admin)" />
-        <Stack.Screen name="doctor" />
+        <Stack.Screen name="(owner)" />
       </Stack>
     </AuthProvider>
   );

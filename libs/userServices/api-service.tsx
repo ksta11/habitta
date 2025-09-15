@@ -1,4 +1,6 @@
-import { UserDTO, UserDAO, UserResponseDAO, ChangePasswordDTO, BooleanDAO, VerifyDAO } from '../../interfaces/UserInterface';
+
+import { UserDTO, UserDAO, UserResponseDAO, ChangePasswordDTO, BooleanDAO, BeAnOwnerDAO, VerifyDAO } from '../../interfaces/UserInterface';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Configuración para Expo Go (dispositivo físico):
@@ -17,6 +19,7 @@ const getAuthToken = async (): Promise<string | null> => {
     return null;
   }
 };
+
 
 // Función helper para validar token y manejar errores de autenticación
 const handleAuthError = async (response: Response, data: any) => {
@@ -86,6 +89,15 @@ const validateTokenBeforeRequest = async (): Promise<{ isValid: boolean; message
       isValid: false,
       message: 'Error validando autenticación. Por favor, inicia sesión.'
     };
+
+const getAuthUser = async (): Promise<string | null> => {
+  try {
+    const user = await AsyncStorage.getItem('@habitta_user');
+    return user;
+  } catch (error) {
+    console.error('❌ Error obteniendo usuario:', error);
+    return null;
+
   }
 };
 
@@ -491,6 +503,7 @@ export const deleteCurrentUserProfile = async(): Promise<VerifyDAO> => {
 
 
 
+
 /**
  * Cambiar contraseña del usuario actual
  */
@@ -548,3 +561,82 @@ export const deleteCurrentUserProfile = async(): Promise<VerifyDAO> => {
 //     };
 //   }
 // };
+
+/**
+ * Convertir usuario a propietario (owner)
+ */
+export const beAnOwner = async (): Promise<BeAnOwnerDAO> => {
+  try {
+    console.log('🏠 Convirtiendo usuario a propietario...');
+    console.log('🔗 Intentando conectar a:', `${API_BASE_URL}/api/users/be-an-owner`);
+    
+    const token = await getAuthToken();
+    if (!token) {
+      return {
+        message: 'Token de autenticación no encontrado',
+        success: false
+      };
+    }
+
+    // Obtener el usuario del AsyncStorage
+    const userString = await getAuthUser();
+    if (!userString) {
+      return {
+        message: 'Usuario no encontrado en el almacenamiento local',
+        success: false
+      };
+    }
+
+    const user = JSON.parse(userString);
+    const userId = user.id || user._id;
+
+    if (!userId) {
+      return {
+        message: 'ID de usuario no encontrado',
+        success: false
+      };
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/users/be-an-owner`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ id: userId }),
+    });
+
+    console.log('✅ Conexión exitosa! Status:', response.status);
+    const data = await response.json();
+    console.log('📦 Response data:', data);
+
+    if (!response.ok) {
+      return {
+        message: data.message || 'Error al convertir usuario a propietario',
+        success: false
+      };
+    }
+
+    return {
+      message: data.message || 'Usuario convertido a propietario exitosamente',
+      success: data.success !== undefined ? data.success : true,
+      data: data.data // Incluir los datos del usuario y token si están disponibles
+    };
+
+  } catch (error) {
+    console.error('❌ Error beAnOwner:', error);
+    
+    if (error instanceof TypeError && error.message === 'Network request failed') {
+      return {
+        message: `❌ No se pudo conectar con el servidor en ${API_BASE_URL}. \n\n🔧 Verifica que el backend esté corriendo y accesible desde tu dispositivo.`,
+        success: false
+      };
+    }
+    
+    return {
+      message: error instanceof Error ? error.message : 'Error de conexión',
+      success: false
+    };
+  }
+};
+

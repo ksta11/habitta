@@ -2,6 +2,7 @@ import React, { useEffect, ReactNode } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '../contexts/AuthContext';
+import { isTokenExpired } from '../utils/Tokens';
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -13,13 +14,37 @@ interface AuthGuardProps {
  * Solo verifica autenticación y rol básico
  */
 export function AuthGuard({ children, requiredRole }: AuthGuardProps) {
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const { isAuthenticated, isLoading, user, token, logout } = useAuth();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.replace('/auth/login');
     }
   }, [isLoading, isAuthenticated]);
+
+  useEffect(() => {
+    // Verificar si el token ha expirado al montar el componente
+    if (!isLoading && isAuthenticated && token && isTokenExpired(token)) {
+      console.log('🚨 Token expirado detectado en AuthGuard - cerrando sesión');
+      logout();
+      return;
+    }
+  }, [isLoading, isAuthenticated, token, logout]);
+
+  useEffect(() => {
+    // Verificar rol si es requerido - mover a useEffect para evitar setState during render
+    if (!isLoading && isAuthenticated && requiredRole && user?.role !== requiredRole) {
+      let correctRoute = '/(user)/home'; // Default for user role
+      
+      if (user?.role === 'admin') {
+        correctRoute = '/(admin)/home';
+      } else if (user?.role === 'owner') {
+        correctRoute = '/(owner)/property'; // Corregir ruta para owner
+      }
+      
+      router.replace(correctRoute);
+    }
+  }, [isLoading, isAuthenticated, requiredRole, user?.role]);
 
   // Mostrar loading
   if (isLoading) {
@@ -36,17 +61,8 @@ export function AuthGuard({ children, requiredRole }: AuthGuardProps) {
     return null;
   }
 
-  // Verificar rol si es requerido
+  // Si el rol no coincide, no mostrar nada (se redirige)
   if (requiredRole && user?.role !== requiredRole) {
-    let correctRoute = '/(user)/home'; // Default for user role
-    
-    if (user?.role === 'admin') {
-      correctRoute = '/(admin)/home';
-    } else if (user?.role === 'owner') {
-      correctRoute = '/(owner)/home';
-    }
-    
-    router.replace(correctRoute);
     return null;
   }
 

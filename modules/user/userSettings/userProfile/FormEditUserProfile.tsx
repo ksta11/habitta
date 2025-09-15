@@ -8,7 +8,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 
 import { editUserProfileSchema, EditUserProfileDTO } from "../../../../schemes/EditUserProfileSchema";
-import { getCurrentUserProfile, updateCurrentUserProfile } from "../../../../libs/userServices/api-service";
+
+import { getCurrentUserProfile, updateCurrentUserProfile, beAnOwner } from "../../../../libs/userServices/api-service";
+
 import { useAuth } from "../../../../contexts/AuthContext";
 
 // Atomic Design Components
@@ -18,11 +20,14 @@ import ModernButton from "../../../../components/atoms/ModernButton";
 
 export default function FormEditUserProfile() {
   const router = useRouter();
-  const { updateUserData } = useAuth();
+
+  const { updateAuthData } = useAuth();
+
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [becomeOwnerLoading, setBecomeOwnerLoading] = useState(false);
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -150,9 +155,54 @@ export default function FormEditUserProfile() {
     }
   };
 
-  const handleBecomeOwner = () => {
-    // Navegar a la pantalla de convertirse en owner
-    router.push('/(owner)/home');
+  const handleBecomeOwner = async () => {
+    try {
+      setBecomeOwnerLoading(true);
+      setSubmitError(null);
+      setSubmitSuccess(null);
+
+      console.log('🏠 Intentando convertir usuario a propietario...');
+      
+      const result = await beAnOwner();
+      
+      if (result.success) {
+        console.log('✅ Usuario convertido a propietario exitosamente');
+        setSubmitSuccess(result.message || 'Ahora eres un propietario');
+        
+        // Si la respuesta incluye un nuevo token y datos de usuario, actualizarlos
+        if (result.data && result.data.token && result.data.user) {
+          console.log('🔄 Actualizando token y datos de usuario...');
+          
+          // Convertir el formato de usuario del servidor al formato esperado por el contexto
+          const updatedUser = {
+            id: result.data.user.id,
+            email: result.data.user.email,
+            name: result.data.user.name,
+            role: result.data.user.role,
+            phone: result.data.user.phone,
+            creation_date: result.data.user.creation_date
+          };
+
+          // Actualizar token y usuario en el contexto y AsyncStorage
+          await updateAuthData(result.data.token, updatedUser);
+          
+          console.log('✅ Token y usuario actualizados correctamente');
+        }
+        
+        // Redirigir al home de owner después de un breve delay
+        setTimeout(() => {
+          router.replace('/(owner)/property');
+        }, 1500);
+      } else {
+        console.log('❌ Error al convertir usuario:', result.message);
+        setSubmitError(result.message || 'Error al convertir a propietario');
+      }
+    } catch (error) {
+      console.error('❌ Error en handleBecomeOwner:', error);
+      setSubmitError('Error inesperado. Intenta de nuevo.');
+    } finally {
+      setBecomeOwnerLoading(false);
+    }
   };
 
   if (isLoading) {
@@ -263,9 +313,13 @@ export default function FormEditUserProfile() {
           {/* Become Owner Button - Top */}
           <View className="mb-6">
             <ModernButton
-              title="Become an Owner"
+
+              title={becomeOwnerLoading ? "Converting..." : "Become a Owner"}
+
               onPress={handleBecomeOwner}
               variant="secondary"
+              disabled={becomeOwnerLoading}
+              loading={becomeOwnerLoading}
             />
           </View>
 

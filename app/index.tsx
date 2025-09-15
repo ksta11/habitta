@@ -12,7 +12,19 @@ export default function Index() {
     if (!isLoading) {
       if (isAuthenticated && user) {
         // Usuario autenticado, redirigir según el rol
-        const redirectPath = user.role === 'admin' ? '/(admin)/home' : '/(user)/home';
+        let redirectPath: string;
+        switch (user.role) {
+          case 'admin':
+            redirectPath = '/(admin)/home';
+            break;
+          case 'owner':
+            redirectPath = '/(owner)/home';
+            break;
+          case 'user':
+          default:
+            redirectPath = '/(user)/home';
+            break;
+        }
         console.log('🔄 Usuario autenticado, redirigiendo a:', redirectPath);
         router.replace(redirectPath);
       } else {
