@@ -47,4 +47,10 @@ export interface GetOwnerPropertiesResponse {
   message?: string;
 }
 
+export interface GetPropertyByIdResponse {
+  success: boolean;
+  data: Property | null;
+  message?: string;
+}
+
 // Aquí puedes agregar más interfaces relacionadas a propiedades

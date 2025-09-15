@@ -56,3 +56,20 @@ export interface VerifyDAO {
     message: string,
     verify: boolean,
 }
+
+export interface BeAnOwnerDAO {
+    message?: string,
+    success: boolean,
+    data?: {
+        user: {
+            id: string,
+            name: string,
+            email: string,
+            phone: string,
+            role: string,
+            status: string,
+            creation_date: string,
+        },
+        token: string,
+    }
+}
