@@ -2,7 +2,7 @@ import { UserDTO, UserDAO, UserResponseDAO, ChangePasswordDTO, BooleanDAO, Verif
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Configuración para Expo Go (dispositivo físico):
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://192.168.1.12:3000';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;  
 
 const TOKEN_KEY = '@habitta_token';
 const USER_KEY = '@habitta_user';
@@ -86,9 +86,20 @@ const validateTokenBeforeRequest = async (): Promise<{ isValid: boolean; message
       isValid: false,
       message: 'Error validando autenticación. Por favor, inicia sesión.'
     };
-  }
+<<<<<<< Updated upstream
+=======
 };
+const getAuthUser = async (): Promise<string | null> => {
+  try {
+    const user = await AsyncStorage.getItem('@habitta_user');
+    return user;
+  } catch (error) {
+    console.error('❌ Error obteniendo usuario:', error);
+    return null;
 
+>>>>>>> Stashed changes
+  }
+}; }
 /**
  * Actualizar usuario por ID
  */
@@ -547,4 +558,87 @@ export const deleteCurrentUserProfile = async(): Promise<VerifyDAO> => {
 //       success: false
 //     };
 //   }
+<<<<<<< Updated upstream
 // };
+=======
+// };
+
+/**
+ * Convertir usuario a propietario (owner)
+ */
+export const beAnOwner = async (): Promise<BeAnOwnerDAO> => {
+  try {
+    console.log('🏠 Convirtiendo usuario a propietario...');
+    console.log('🔗 Intentando conectar a:', `${API_BASE_URL}/api/users/be-an-owner`);
+    
+    const token = await getAuthToken();
+    if (!token) {
+      return {
+        message: 'Token de autenticación no encontrado',
+        success: false
+      };
+    }
+
+    // Obtener el usuario del AsyncStorage
+    const userString = await AsyncStorage.getItem(USER_KEY);
+    if (!userString) {
+      return {
+        message: 'Usuario no encontrado en el almacenamiento local',
+        success: false
+      };
+    }
+
+    const user = JSON.parse(userString);
+    const userId = user.id || user._id;
+
+    if (!userId) {
+      return {
+        message: 'ID de usuario no encontrado',
+        success: false
+      };
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/users/be-an-owner`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ id: userId }),
+    });
+
+    console.log('✅ Conexión exitosa! Status:', response.status);
+    const data = await response.json();
+    console.log('📦 Response data:', data);
+
+    if (!response.ok) {
+      return {
+        message: data.message || 'Error al convertir usuario a propietario',
+        success: false
+      };
+    }
+
+    return {
+      message: data.message || 'Usuario convertido a propietario exitosamente',
+      success: data.success !== undefined ? data.success : true,
+      data: data.data // Incluir los datos del usuario y token si están disponibles
+    };
+
+  } catch (error) {
+    console.error('❌ Error beAnOwner:', error);
+    
+    if (error instanceof TypeError && error.message === 'Network request failed') {
+      return {
+        message: `❌ No se pudo conectar con el servidor en ${API_BASE_URL}. \n\n🔧 Verifica que el backend esté corriendo y accesible desde tu dispositivo.`,
+        success: false
+      };
+    }
+    
+    return {
+      message: error instanceof Error ? error.message : 'Error de conexión',
+      success: false
+    };
+  }
+};
+
+>>>>>>> Stashed changes

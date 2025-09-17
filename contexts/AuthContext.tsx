@@ -68,6 +68,104 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loadStoredAuth();
   }, []);
 
+<<<<<<< Updated upstream
+=======
+  
+
+  // Configurar verificación periódica del token cuando el usuario esté autenticado
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      startTokenExpirationCheck();
+    } else {
+      stopTokenExpirationCheck();
+    }
+
+    // Cleanup al desmontar o cambiar token
+    return () => {
+      stopTokenExpirationCheck();
+    };
+  }, [isAuthenticated, token]);
+
+  
+
+  // Función para iniciar la verificación periódica del token
+  const startTokenExpirationCheck = () => {
+    if (!token) return;
+
+    // Limpiar intervalo anterior si existe
+    stopTokenExpirationCheck();
+
+    // Verificar inmediatamente
+    checkTokenExpiration();
+
+    // Configurar verificación cada 30 segundos
+    tokenCheckIntervalRef.current = setInterval(() => {
+      checkTokenExpiration();
+    }, 30000); // 30 segundos
+
+    console.log('🕐 Verificación automática de expiración de token iniciada');
+  };
+
+  // Función para detener la verificación periódica
+  const stopTokenExpirationCheck = () => {
+    if (tokenCheckIntervalRef.current) {
+      clearInterval(tokenCheckIntervalRef.current);
+      tokenCheckIntervalRef.current = null;
+      console.log('⏹️ Verificación automática de expiración de token detenida');
+    }
+    warningShownRef.current = false;
+  };
+
+  // Función para verificar si el token ha expirado
+  const checkTokenExpiration = async () => {
+    if (!token) return;
+
+    try {
+      if (isTokenExpired(token)) {
+        console.log('🚨 Token expirado detectado - cerrando sesión automáticamente');
+        await handleTokenExpired();
+        return;
+      }
+
+      // Verificar si queda poco tiempo (ej: menos de 5 minutos)
+      const timeToExpiry = getTokenTimeToExpiry(token);
+      const fiveMinutes = 5 * 60 * 1000; // 5 minutos en milisegundos
+
+      if (timeToExpiry <= fiveMinutes && timeToExpiry > 0 && !warningShownRef.current) {
+        warningShownRef.current = true;
+        console.log('⚠️ Token expirará pronto:', Math.floor(timeToExpiry / 1000 / 60), 'minutos');
+        // Aquí podrías mostrar una notificación al usuario si quisieras
+      }
+    } catch (error) {
+      console.error('❌ Error al verificar expiración del token:', error);
+    }
+  };
+
+  // Función para manejar token expirado
+  const handleTokenExpired = async () => {
+    try {
+      console.log('🔐 Manejando token expirado...');
+      
+      // Limpiar estado
+      setUser(null);
+      setToken(null);
+      
+      // Limpiar almacenamiento
+      await clearStoredAuth();
+      
+      // Detener verificaciones
+      stopTokenExpirationCheck();
+      
+      // Redirigir al login
+      router.replace('/auth/login');
+      
+      console.log('✅ Sesión cerrada automáticamente por token expirado');
+    } catch (error) {
+      console.error('❌ Error al manejar token expirado:', error);
+    }
+  };
+
+>>>>>>> Stashed changes
   // Cargar token y usuario almacenados
   const loadStoredAuth = async () => {
     try {
@@ -238,20 +336,45 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Actualizar datos del usuario en el contexto
   const updateUserData = async (updatedUserData: User): Promise<void> => {
     try {
-      console.log('🔄 Actualizando datos del usuario en el contexto...');
-      console.log('📋 Datos recibidos:', updatedUserData);
-      console.log('📋 Usuario actual antes de actualizar:', user);
+        console.log('🔄 Actualizando datos del usuario en el contexto...');
+        console.log('📋 Datos recibidos:', updatedUserData);
+        console.log('📋 Usuario actual antes de actualizar:', user);
       
       // Actualizar el estado local
-      setUser(updatedUserData);
+        setUser(updatedUserData);
       
       // Actualizar el almacenamiento
-      await AsyncStorage.setItem(USER_KEY, JSON.stringify(updatedUserData));
+        await AsyncStorage.setItem(USER_KEY, JSON.stringify(updatedUserData));
       
+<<<<<<< Updated upstream
       console.log('✅ Datos del usuario actualizados en el contexto');
       console.log('📋 Usuario actual después de actualizar:', updatedUserData);
     } catch (error) {
       console.error('❌ Error al actualizar datos del usuario:', error);
+=======
+        console.log('✅ Datos del usuario actualizados en el contexto');
+        console.log('📋 Usuario actual después de actualizar:', updatedUserData);
+      } catch (error) {
+        console.error('❌ Error al actualizar datos del usuario:', error);
+    };
+  };
+  // Actualizar datos de autenticación (token y usuario)
+  const updateAuthData = async (newToken: string, newUser: User): Promise<void> => {
+    try {
+      console.log('🔄 Actualizando datos de autenticación...');
+      
+      // Actualizar estado
+      setToken(newToken);
+      setUser(newUser);
+      
+      // Almacenar nuevos datos
+      await storeAuth(newToken, newUser);
+      
+      console.log('✅ Datos de autenticación actualizados exitosamente');
+    } catch (error) {
+      console.error('❌ Error al actualizar datos de autenticación:', error);
+
+>>>>>>> Stashed changes
     }
   };
 

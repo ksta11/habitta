@@ -110,7 +110,7 @@ export default function FormEditUserProfile() {
           
           // Actualizar los datos del usuario en el contexto
           try {
-            await updateUserData({
+            await updateData({
               id: result.user._id,
               name: result.user.name,
               email: result.user.email,
