@@ -1,4 +1,6 @@
-import { UserDTO, UserDAO, UserResponseDAO, ChangePasswordDTO, BooleanDAO, VerifyDAO } from '../../interfaces/UserInterface';
+
+import { UserDTO, UserDAO, UserResponseDAO, ChangePasswordDTO, BooleanDAO, BeAnOwnerDAO, VerifyDAO } from '../../interfaces/UserInterface';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Configuración para Expo Go (dispositivo físico):
@@ -17,6 +19,7 @@ const getAuthToken = async (): Promise<string | null> => {
     return null;
   }
 };
+
 
 // Función helper para validar token y manejar errores de autenticación
 const handleAuthError = async (response: Response, data: any) => {
@@ -86,20 +89,22 @@ const validateTokenBeforeRequest = async (): Promise<{ isValid: boolean; message
       isValid: false,
       message: 'Error validando autenticación. Por favor, inicia sesión.'
     };
-<<<<<<< Updated upstream
-=======
-};
-const getAuthUser = async (): Promise<string | null> => {
-  try {
-    const user = await AsyncStorage.getItem('@habitta_user');
-    return user;
-  } catch (error) {
-    console.error('❌ Error obteniendo usuario:', error);
-    return null;
 
->>>>>>> Stashed changes
-  }
-}; }
+  const getAuthUser = async (): Promise<string | null> => {
+    try {
+      const user = await AsyncStorage.getItem('@habitta_user');
+      return user;
+    } catch (error) {
+      console.error('❌ Error obteniendo usuario:', error);
+      return null;
+
+    }
+
+  };
+ };
+}
+
+
 /**
  * Actualizar usuario por ID
  */
@@ -502,6 +507,7 @@ export const deleteCurrentUserProfile = async(): Promise<VerifyDAO> => {
 
 
 
+
 /**
  * Cambiar contraseña del usuario actual
  */
@@ -558,10 +564,7 @@ export const deleteCurrentUserProfile = async(): Promise<VerifyDAO> => {
 //       success: false
 //     };
 //   }
-<<<<<<< Updated upstream
-// };
-=======
-// };
+
 
 /**
  * Convertir usuario a propietario (owner)
@@ -641,4 +644,3 @@ export const beAnOwner = async (): Promise<BeAnOwnerDAO> => {
   }
 };
 
->>>>>>> Stashed changes

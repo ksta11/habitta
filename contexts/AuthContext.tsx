@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { LoginDTO, LoginResponse } from '../interfaces/LoginInterface';
 import { RegisterDTO, RegisterFormDTO } from '../interfaces/RegisterInterface';
 import { authenticationUser } from '../libs/auth/login/api-service';
 import { registerUser } from '../libs/auth/register/api-service';
+import { isTokenExpired, getTokenTimeToExpiry } from '../utils/Tokens';
 
 // Tipos para el contexto
 interface User {
@@ -32,6 +33,7 @@ interface AuthContextType {
   refreshUser: () => Promise<void>;
   updateUserData: (updatedUserData: User) => Promise<void>;
   clearError: () => void;
+  updateAuthData: (newToken: string, newUser: User) => Promise<void>;
 }
 
 // Crear el contexto
@@ -59,6 +61,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Referencias para intervalos de verificación
+  const tokenCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const warningShownRef = useRef<boolean>(false);
 
   // Estado computado
   const isAuthenticated = !!user && !!token;
@@ -67,10 +73,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     loadStoredAuth();
   }, []);
-
-<<<<<<< Updated upstream
-=======
-  
 
   // Configurar verificación periódica del token cuando el usuario esté autenticado
   useEffect(() => {
@@ -165,7 +167,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
->>>>>>> Stashed changes
+
   // Cargar token y usuario almacenados
   const loadStoredAuth = async () => {
     try {
@@ -177,6 +179,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       ]);
 
       if (storedToken && storedUser) {
+        // Verificar si el token almacenado ya expiró
+        if (isTokenExpired(storedToken)) {
+          console.log('🚨 Token almacenado ya expiró - limpiando datos');
+          await clearStoredAuth();
+          setIsLoading(false);
+          return;
+        }
+
         const userData = JSON.parse(storedUser);
         setToken(storedToken);
         setUser(userData);
@@ -243,7 +253,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             redirectPath = '/(admin)/home';
             break;
           case 'owner':
-            redirectPath = '/(owner)/home';
+            redirectPath = '/(owner)/property';
             break;
           case 'user':
           default:
@@ -305,6 +315,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       console.log('🚪 Cerrando sesión...');
       
+      // Detener verificación de token
+      stopTokenExpirationCheck();
+      
       // Limpiar estado
       setUser(null);
       setToken(null);
@@ -333,6 +346,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+
   // Actualizar datos del usuario en el contexto
   const updateUserData = async (updatedUserData: User): Promise<void> => {
     try {
@@ -346,16 +360,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Actualizar el almacenamiento
         await AsyncStorage.setItem(USER_KEY, JSON.stringify(updatedUserData));
       
-<<<<<<< Updated upstream
       console.log('✅ Datos del usuario actualizados en el contexto');
       console.log('📋 Usuario actual después de actualizar:', updatedUserData);
     } catch (error) {
       console.error('❌ Error al actualizar datos del usuario:', error);
-=======
-        console.log('✅ Datos del usuario actualizados en el contexto');
-        console.log('📋 Usuario actual después de actualizar:', updatedUserData);
-      } catch (error) {
-        console.error('❌ Error al actualizar datos del usuario:', error);
+
     };
   };
   // Actualizar datos de autenticación (token y usuario)
@@ -373,8 +382,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log('✅ Datos de autenticación actualizados exitosamente');
     } catch (error) {
       console.error('❌ Error al actualizar datos de autenticación:', error);
-
->>>>>>> Stashed changes
     }
   };
 
@@ -399,6 +406,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     refreshUser,
     updateUserData,
     clearError,
+    updateAuthData,
   };
 
   return (
