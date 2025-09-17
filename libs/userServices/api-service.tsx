@@ -1,5 +1,5 @@
 
-import { UserDTO, UserDAO, UserResponseDAO, ChangePasswordDTO, BooleanDAO, BeAnOwnerDAO, VerifyDAO } from '../../interfaces/UserInterface';
+import { UserDTO, UserDAO, ChangePasswordDTO, BooleanDAO, BeAnOwnerDAO, VerifyDAO } from '../../interfaces/UserInterface';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -40,7 +40,7 @@ const handleAuthError = async (response: Response, data: any) => {
     return {
       message: 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.',
       user: {
-        _id: '',
+        id: '',
         name: '',
         email: '',
         phone: '',
@@ -53,7 +53,7 @@ const handleAuthError = async (response: Response, data: any) => {
   return {
     message: data.message || 'Error en la petición',
     user: {
-      _id: '',
+      id: '',
       name: '',
       email: '',
       phone: '',
@@ -118,10 +118,9 @@ export const updateUser = async (id: string, userData: UserDTO): Promise<UserDAO
       return {
         message: 'Token de autenticación no encontrado',
         user: {
-          _id: '',
+          id: '',
           name: '',
           email: '',
-          password: '',
           phone: '',
           role: '',
           creation_date: new Date()
@@ -146,10 +145,9 @@ export const updateUser = async (id: string, userData: UserDTO): Promise<UserDAO
       return {
         message: data.message || 'Error al actualizar usuario',
         user: {
-          _id: '',
+          id: '',
           name: '',
           email: '',
-          password: '',
           phone: '',
           role: '',
           creation_date: new Date()
@@ -160,7 +158,7 @@ export const updateUser = async (id: string, userData: UserDTO): Promise<UserDAO
     return {
       message: data.message || 'Usuario actualizado exitosamente',
       user: data.data?.user || data.user || {
-        _id: '',
+        id: '',
         name: '',
         email: '',
         password: '',
@@ -177,10 +175,9 @@ export const updateUser = async (id: string, userData: UserDTO): Promise<UserDAO
       return {
         message: `❌ No se pudo conectar con el servidor en ${API_BASE_URL}. \n\n🔧 Verifica que el backend esté corriendo y accesible desde tu dispositivo.`,
         user: {
-          _id: '',
+          id: '',
           name: '',
           email: '',
-          password: '',
           phone: '',
           role: '',
           creation_date: new Date()
@@ -191,10 +188,9 @@ export const updateUser = async (id: string, userData: UserDTO): Promise<UserDAO
     return {
       message: error instanceof Error ? error.message : 'Error de conexión',
       user: {
-        _id: '',
+        id: '',
         name: '',
         email: '',
-        password: '',
         phone: '',
         role: '',
         creation_date: new Date()
@@ -207,7 +203,7 @@ export const updateUser = async (id: string, userData: UserDTO): Promise<UserDAO
 /**
  * Obtener perfil del usuario actual
  */
-export const getCurrentUserProfile = async (): Promise<UserResponseDAO> => {
+export const getCurrentUserProfile = async (): Promise<UserDAO> => {
   try {
     console.log('👤 Obteniendo perfil del usuario actual...');
     
@@ -218,7 +214,7 @@ export const getCurrentUserProfile = async (): Promise<UserResponseDAO> => {
       return {
         message: 'Usuario no autenticado',
         user: {
-          _id: '',
+          id: '',
           name: '',
           email: '',
           phone: '',
@@ -238,7 +234,7 @@ export const getCurrentUserProfile = async (): Promise<UserResponseDAO> => {
       return {
         message: tokenValidation.message || 'Token de autenticación no válido',
         user: {
-          _id: '',
+          id: '',
           name: '',
           email: '',
           phone: '',
@@ -272,7 +268,7 @@ export const getCurrentUserProfile = async (): Promise<UserResponseDAO> => {
     return {
       message: data.message || 'Perfil obtenido exitosamente',
       user: data.data || {
-        _id: userId,
+        id: userId,
         name: storedUserData.name || '',
         email: storedUserData.email || '',
         phone: storedUserData.phone || '',
@@ -288,7 +284,7 @@ export const getCurrentUserProfile = async (): Promise<UserResponseDAO> => {
       return {
         message: `❌ No se pudo conectar con el servidor en ${API_BASE_URL}. \n\n🔧 Verifica que el backend esté corriendo y accesible desde tu dispositivo.`,
         user: {
-          _id: '',
+          id: '',
           name: '',
           email: '',
           phone: '',
@@ -301,7 +297,7 @@ export const getCurrentUserProfile = async (): Promise<UserResponseDAO> => {
     return {
       message: error instanceof Error ? error.message : 'Error de conexión',
       user: {
-        _id: '',
+        id: '',
         name: '',
         email: '',
         phone: '',
@@ -315,7 +311,7 @@ export const getCurrentUserProfile = async (): Promise<UserResponseDAO> => {
 /**
  * Actualizar perfil del usuario actual
  */
-export const updateCurrentUserProfile = async (userData: UserDTO): Promise<UserResponseDAO> => {
+export const updateCurrentUserProfile = async (userData: UserDTO): Promise<UserDAO> => {
   try {
     console.log('✏️ Actualizando perfil del usuario actual...');
     
@@ -326,7 +322,7 @@ export const updateCurrentUserProfile = async (userData: UserDTO): Promise<UserR
       return {
         message: 'Usuario no autenticado',
         user: {
-          _id: '',
+          id: '',
           name: '',
           email: '',
           phone: '',
@@ -346,7 +342,7 @@ export const updateCurrentUserProfile = async (userData: UserDTO): Promise<UserR
       return {
         message: tokenValidation.message || 'Token de autenticación no válido',
         user: {
-          _id: '',
+          id: '',
           name: '',
           email: '',
           phone: '',
@@ -381,7 +377,7 @@ export const updateCurrentUserProfile = async (userData: UserDTO): Promise<UserR
     return {
       message: data.message || 'Perfil actualizado exitosamente',
       user: data.data || {
-        _id: userId,
+        id: userId,
         name: userData.name || '',
         email: userData.email || '',
         phone: userData.phone || '',
@@ -397,7 +393,7 @@ export const updateCurrentUserProfile = async (userData: UserDTO): Promise<UserR
       return {
         message: `❌ No se pudo conectar con el servidor en ${API_BASE_URL}. \n\n🔧 Verifica que el backend esté corriendo y accesible desde tu dispositivo.`,
         user: {
-          _id: '',
+          id: '',
           name: '',
           email: '',
           phone: '',
@@ -410,7 +406,7 @@ export const updateCurrentUserProfile = async (userData: UserDTO): Promise<UserR
     return {
       message: error instanceof Error ? error.message : 'Error de conexión',
       user: {
-        _id: '',
+        id: '',
         name: '',
         email: '',
         phone: '',
