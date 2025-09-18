@@ -23,7 +23,7 @@ export default function LabeledInput({
 }: LabeledInputProps) {
   return (
     <View className="mb-3">
-      <Text className="text-gray-600 text-sm mb-2 ml-1">{label}</Text>
+      <Text className="text-gray-600 text-sm mb-2 ml-1 font-nunito-medium">{label}</Text>
       <Input
         placeholder={placeholder}
         value={value}

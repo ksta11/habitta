@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {View,Text,TouchableOpacity,Alert,ScrollView,StatusBar as RNStatusBar, Platform} from "react-native";
+import {View,Text,Pressable,Alert,ScrollView,StatusBar as RNStatusBar, Platform} from "react-native";
 import { Link, router } from "expo-router";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -55,12 +55,6 @@ export default function RegisterForm() {
         Alert.alert(
           "Registro exitoso",
           result.message || "Tu cuenta ha sido creada correctamente",
-          [
-            {
-              text: "Ir al login",
-              onPress: () => router.replace("/auth/login"),
-            },
-          ]
         );
       } else {
         console.log("❌ Registro fallido:", result.message);
@@ -85,7 +79,7 @@ export default function RegisterForm() {
           paddingBottom: 24,
           borderBottomLeftRadius: 32,
           borderBottomRightRadius: 32,
-          minHeight: Platform.OS === "ios" ? 280 + insets.top : 280,
+          minHeight: Platform.OS === "ios" ? 200 + insets.top : 220,
           marginTop: Platform.OS === "ios" ? -94 : -62, // Eliminar completamente el espacio con el header nativo
           width: "100%", // Asegurar ancho completo
         }}
@@ -123,7 +117,7 @@ export default function RegisterForm() {
         />
 
         {/* Back button */}
-        <TouchableOpacity
+        <Pressable
           className="absolute w-10 h-10 rounded-full items-center justify-center"
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.2)",
@@ -139,14 +133,14 @@ export default function RegisterForm() {
           }}
         >
           <Ionicons name="chevron-back" size={20} color="white" />
-        </TouchableOpacity>
+        </Pressable>
 
         {/* Header text */}
         <View className="absolute left-6 right-6" style={{ bottom: 24 }}>
-          <Text className="text-white text-xl font-bold mb-1 leading-tight">
+          <Text className="text-white text-xl font-nunito-bold mb-1 leading-tight">
             Create your new Account
           </Text>
-          <Text className="text-white opacity-80 text-sm leading-5">
+          <Text className="text-white opacity-80 text-sm font-nunito leading-5">
             Please fill in the details to create your account.
           </Text>
         </View>
@@ -157,8 +151,9 @@ export default function RegisterForm() {
         className="flex-1 bg-gray-50 px-6"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingBottom: 32,
-          paddingTop: Platform.OS === "ios" ? 240 + insets.top : 240, // Espacio para el header fijo
+          paddingBottom: 100, // Aumentamos padding para cubrir cuando aparece el teclado
+          paddingTop: Platform.OS === "ios" ? 160 + insets.top : 240,
+          minHeight: '100%', // Asegura que cubra toda la pantalla
         }}
       >
         <View
@@ -168,7 +163,7 @@ export default function RegisterForm() {
           {/* Error general */}
           {submitError && (
             <View className="mb-4 p-3 bg-red-100 rounded-2xl">
-              <Text className="text-red-600 text-sm text-center">
+              <Text className="text-red-600 text-sm font-nunito-medium text-center">
                 {submitError}
               </Text>
             </View>
@@ -278,9 +273,8 @@ export default function RegisterForm() {
                   value={value}
                   onValueChange={onChange}
                   linkText="Terms and Conditions"
-                  text="I accept the terms and conditions"
-                  
-              
+                  text="I accept the"
+                  onLinkPress={() => router.push("/terms")}
                   error={errors.acceptTerms?.message}
                 />
               )}
@@ -300,11 +294,11 @@ export default function RegisterForm() {
 
           {/* Login link */}
           <View className="flex-row justify-center">
-            <Text className="text-gray-600">Already have an account? </Text>
+            <Text className="text-gray-600 font-nunito">Already have an account? </Text>
             <Link href="/auth/login" asChild>
-              <TouchableOpacity>
-                <Text className="text-purple-600 font-medium">Sign in</Text>
-              </TouchableOpacity>
+              <Pressable>
+                <Text className="text-purple-600 font-nunito-semibold">Sign in</Text>
+              </Pressable>
             </Link>
           </View>
         </View>

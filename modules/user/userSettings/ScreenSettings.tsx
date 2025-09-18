@@ -1,12 +1,70 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { router, Link } from 'expo-router';
 import { useAuth } from '../../../contexts/AuthContext';
-import { AuthGuard } from '../../../middleware/AuthGuard';
+import { deleteCurrentUserProfile } from '../../../libs/userServices/api-service';
 import Label from '../../../components/atoms/Label';
 
 const ScreenSettings = () => {
   const { logout } = useAuth();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Eliminar Cuenta',
+      '¿Estás seguro que deseas eliminar tu cuenta? Esta acción no se puede deshacer y se perderán todos tus datos permanentemente.',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Eliminar Cuenta',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setIsDeleting(true);
+              console.log('🗑️ Iniciando eliminación de cuenta...');
+              
+              const result = await deleteCurrentUserProfile();
+              
+              if (result.verify) {
+                console.log('✅ Cuenta eliminada exitosamente');
+                Alert.alert(
+                  'Cuenta Eliminada',
+                  'Tu cuenta ha sido eliminada exitosamente. Serás redirigido al login.',
+                  [
+                    {
+                      text: 'OK',
+                      onPress: () => {
+                        router.replace('/auth/login');
+                      },
+                    },
+                  ]
+                );
+              } else {
+                console.log('❌ Error eliminando cuenta:', result.message);
+                Alert.alert(
+                  'Error',
+                  result.message || 'No se pudo eliminar la cuenta. Intenta de nuevo.',
+                  [{ text: 'OK' }]
+                );
+              }
+            } catch (error) {
+              console.error('❌ Error inesperado:', error);
+              Alert.alert(
+                'Error',
+                'Ocurrió un error inesperado. Intenta de nuevo.',
+                [{ text: 'OK' }]
+              );
+            } finally {
+              setIsDeleting(false);
+            }
+          },
+        },
+      ]
+    );
+  };
 
   const handleLogout = () => {
     Alert.alert(
@@ -20,8 +78,9 @@ const ScreenSettings = () => {
         {
           text: 'Cerrar Sesión',
           style: 'destructive',
-          onPress: () => {
+          onPress: async () => {
             console.log('🚪 Cerrando sesión...');
+            await logout(); // ✅ Usa la función del contexto que limpia todo
             router.replace('/auth/login');
           },
         },
@@ -31,7 +90,6 @@ const ScreenSettings = () => {
 
 
   return (
-    <AuthGuard requiredRole="user">
       <ScrollView 
         className="flex-1 bg-gray-50"
         contentContainerStyle={{ padding: 24 }}
@@ -157,9 +215,14 @@ const ScreenSettings = () => {
           
           <TouchableOpacity 
             className="py-3 border-b border-gray-100"
-            // onPress={() => console.log('Eliminar cuenta no implementado aún')}
+            onPress={handleDeleteAccount}
+            disabled={isDeleting}
           >
-            <Label text="Eliminar Cuenta" size="md" variant="error" />
+            <Label 
+              text={isDeleting ? "Eliminando..." : "Eliminar Cuenta"} 
+              size="md" 
+              variant="error" 
+            />
           </TouchableOpacity>
           
           <TouchableOpacity 
@@ -171,7 +234,6 @@ const ScreenSettings = () => {
         </View>
       </View>
     </ScrollView>
-    </AuthGuard>
   );
 };
 

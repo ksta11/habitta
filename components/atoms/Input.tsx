@@ -9,6 +9,13 @@ interface InputProps {
   secureTextEntry?: boolean;
   error?: string;
   keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
+  // Color props
+  borderColor?: string;
+  backgroundColor?: string;
+  labelColor?: string;
+  textColor?: string;
+  errorColor?: string;
+  placeholderColor?: string;
 }
 
 export default function Input({
@@ -18,28 +25,62 @@ export default function Input({
   onChangeText,
   secureTextEntry = false,
   error,
-  keyboardType = 'default'
+  keyboardType = 'default',
+  // Color defaults
+  borderColor = '#D1D5DB', // gray-300
+  backgroundColor = '#FFFFFF', // white
+  labelColor = '#6B7280', // gray-500
+  textColor = '#1F2937', // gray-800
+  errorColor = '#EF4444', // red-500
+  placeholderColor = '#9CA3AF' // gray-400
 }: InputProps) {
+  const getBorderStyle = () => {
+    if (error) {
+      return {
+        borderColor: errorColor,
+        borderWidth: 2,
+        backgroundColor: `${errorColor}10` // 10% opacity
+      };
+    }
+    return {
+      borderColor: borderColor,
+      borderWidth: 2,
+      backgroundColor: backgroundColor
+    };
+  };
+
   return (
     <View className="mb-4">
       {label && (
-        <Text className="absolute left-4 top-4 bg-white px-1 text-xs text-gray-500 z-10" style={{transform: [{translateY: -10}]}}>
+        <Text 
+          className="absolute left-4 top-4 bg-white px-1 text-xs z-10" 
+          style={{
+            transform: [{translateY: -10}],
+            color: labelColor,
+            backgroundColor: backgroundColor
+          }}
+        >
           {label}
         </Text>
       )}
       <TextInput
-        className={`border-2 rounded-3xl px-4 py-3 text-base mt-3 ${
-          error ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white'
-        }`}
+        className="rounded-3xl px-4 py-3 text-base mt-3"
+        style={{
+          ...getBorderStyle(),
+          color: textColor
+        }}
         placeholder={placeholder}
         value={value}
         onChangeText={onChangeText}
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
-        placeholderTextColor="#9CA3AF"
+        placeholderTextColor={placeholderColor}
       />
       {error && (
-        <Text className="text-red-500 text-sm mt-1 ml-1">
+        <Text 
+          className="text-sm mt-1 ml-1"
+          style={{ color: errorColor }}
+        >
           {error}
         </Text>
       )}

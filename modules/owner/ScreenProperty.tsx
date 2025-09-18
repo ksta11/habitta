@@ -2,8 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import PropertyCard from '../../components/atoms/PropertyCard';
+import ButtonAtom from '../../components/atoms/ButtonAtom';
 import { getOwnerProperties } from '../../libs/owner/property/api-service';
-import { Property } from '../../interfaces/PropertyInterface';
+import { Property } from '../../interfaces/property/PropertyInterface';
 
 export default function PropertyScreen() {
   const router = useRouter();
@@ -117,18 +118,39 @@ export default function PropertyScreen() {
                     // router.push(`/property/${property.id}`);
                   }}
                 />
+                
+                {/* Botón de editar */}
+                <View className="mt-2">
+                  <ButtonAtom
+                    title="Editar Propiedad"
+                    onPress={() => {
+                      console.log(`Editando propiedad ${property.id}:`, property.title);
+                      router.push(`./edit/${property.id}`);
+                    }}
+                    variant="warning"
+                    size="medium"
+                    icon="create-outline"
+                    iconPosition="left"
+                    fullWidth={true}
+                  />
+                </View>
               </View>
             );
           })}
         </ScrollView>
       )}
       
-      <TouchableOpacity
-        className="mt-4 bg-blue-500 rounded-lg p-4"
-        onPress={() => router.push('../(owner)/(properties)/create/Form')}
-      >
-        <Text className="text-white text-center font-bold">Crear nueva propiedad</Text>
-      </TouchableOpacity>
+      <View className="mt-4">
+        <ButtonAtom
+          title="Crear nueva propiedad"
+          onPress={() => router.push('./create/Form')}
+          variant="primary"
+          size="large"
+          icon="add-circle-outline"
+          iconPosition="left"
+          fullWidth={true}
+        />
+      </View>
     </View>
   );
 }

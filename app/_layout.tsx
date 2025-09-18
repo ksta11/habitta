@@ -4,8 +4,23 @@ import { AuthProvider } from "../contexts/AuthContext";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { StatusBar as RNStatusBar, Platform } from "react-native";
+import { useFonts } from "expo-font";
+import {
+  Nunito_400Regular,
+  Nunito_500Medium,
+  Nunito_600SemiBold,
+  Nunito_700Bold,
+} from "@expo-google-fonts/nunito";
+import * as SplashScreen from "expo-splash-screen";
 
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    Nunito_400Regular,
+    Nunito_500Medium,
+    Nunito_600SemiBold,
+    Nunito_700Bold,
+  });
+
   useEffect(() => {
     if (Platform.OS === 'ios') {
       RNStatusBar.setBackgroundColor('#7C3AED', true);
@@ -14,6 +29,23 @@ export default function RootLayout() {
     }
   }, []);
 
+  useEffect(() => {
+    async function prepare() {
+      await SplashScreen.preventAutoHideAsync();
+    }
+    prepare();
+  }, []);
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
     <AuthProvider>
       <StatusBar style="light" backgroundColor="#7C3AED" />
@@ -21,11 +53,7 @@ export default function RootLayout() {
         {/* Pantalla principal */}
         <Stack.Screen name="index" />
         
-        {/* Rutas de autenticación directas */}
-        <Stack.Screen name="login" />
-        <Stack.Screen name="register" />
-        
-        {/* Grupo de autenticación (mantener para compatibilidad) */}
+        {/* Grupo de autenticación */}
         <Stack.Screen 
           name="auth" 
           options={{
@@ -36,7 +64,7 @@ export default function RootLayout() {
         {/* Rutas protegidas */}
         <Stack.Screen name="(user)" />
         <Stack.Screen name="(admin)" />
-        <Stack.Screen name="doctor" />
+        <Stack.Screen name="(owner)" />
       </Stack>
     </AuthProvider>
   );

@@ -7,7 +7,19 @@ export default function PropertiesLayout() {
         headerShown: false,
       }}>
       <Stack.Screen 
+        name="index" 
+        options={{ 
+          headerShown: false 
+        }} 
+      />
+      <Stack.Screen 
         name="create" 
+        options={{ 
+          headerShown: false 
+        }} 
+      />
+      <Stack.Screen 
+        name="edit" 
         options={{ 
           headerShown: false 
         }} 

@@ -24,7 +24,7 @@ export default function PasswordInput({
 }: PasswordInputProps) {
   return (
     <View className="mb-3">
-      <Text className="text-gray-600 text-sm mb-2 ml-1">{label}</Text>
+      <Text className="text-gray-600 text-sm mb-2 ml-1 font-nunito-medium">{label}</Text>
       <View className="relative">
         <Input
           placeholder={placeholder}

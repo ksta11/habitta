@@ -12,7 +12,19 @@ export default function Index() {
     if (!isLoading) {
       if (isAuthenticated && user) {
         // Usuario autenticado, redirigir según el rol
-        const redirectPath = user.role === 'admin' ? '/(admin)/home' : '/(user)/home';
+        let redirectPath: string;
+        switch (user.role) {
+          case 'admin':
+            redirectPath = '/(admin)/home';
+            break;
+          case 'owner':
+            redirectPath = '/(owner)/(properties)';
+            break;
+          case 'user':
+          default:
+            redirectPath = '/(user)/home';
+            break;
+        }
         console.log('🔄 Usuario autenticado, redirigiendo a:', redirectPath);
         router.replace(redirectPath);
       } else {
@@ -23,6 +35,26 @@ export default function Index() {
     }
   }, [isLoading, isAuthenticated, user]);
 
+  // Mostrar estado de carga mientras se determina la autenticación
+  if (isLoading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-blue-50">
+        <Label 
+          text="Habitta" 
+          size="xl" 
+          weight="bold"
+        />
+        <View className="mt-2">
+          <Label 
+            text="Cargando..." 
+            size="md"
+          />
+        </View>
+      </View>
+    );
+  }
+
+  // Si no está loading pero aún no se ha redirigido, mostrar loading también
   return (
     <View className="flex-1 justify-center items-center bg-blue-50">
       <Label 
@@ -32,7 +64,7 @@ export default function Index() {
       />
       <View className="mt-2">
         <Label 
-          text="Cargando..." 
+          text="Redirigiendo..." 
           size="md"
         />
       </View>

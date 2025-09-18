@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {View,Text,TouchableOpacity,StatusBar as RNStatusBar,Platform} from "react-native";
+import {View,Text,Pressable,StatusBar as RNStatusBar,Platform} from "react-native";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { useRouter } from "expo-router";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,6 +29,7 @@ export default function FormLogin() {
       RNStatusBar.setBarStyle("light-content", true);
     }
   }, []);
+
 
   const {
     control,
@@ -75,7 +76,7 @@ export default function FormLogin() {
           paddingBottom: 24,
           borderBottomLeftRadius: 32,
           borderBottomRightRadius: 32,
-          minHeight: Platform.OS === "ios" ? 280 + insets.top : 280,
+          minHeight: Platform.OS === "ios" ? 200 + insets.top : 220,
           marginTop: Platform.OS === "ios" ? -94 : -62, // Eliminar completamente el espacio con el header nativo
           width: "100%", // Asegurar ancho completo
         }}
@@ -113,13 +114,17 @@ export default function FormLogin() {
         />
 
         {/* Back button */}
-        <TouchableOpacity
+        <Pressable
           className="absolute w-10 h-10 rounded-full items-center justify-center"
-          style={{
-            backgroundColor: "rgba(255, 255, 255, 0.2)",
-            top: Platform.OS === "ios" ? insets.top + 20 : 20,
-            left: 16,
-          }}
+          style={({ pressed }) => [
+            {
+              backgroundColor: pressed 
+                ? "rgba(255, 255, 255, 0.3)" 
+                : "rgba(255, 255, 255, 0.2)",
+              top: Platform.OS === "ios" ? insets.top + 20 : 20,
+              left: 16,
+            }
+          ]}
           onPress={() => {
             if (router.canGoBack()) {
               router.back();
@@ -129,7 +134,7 @@ export default function FormLogin() {
           }}
         >
           <Ionicons name="chevron-back" size={20} color="white" />
-        </TouchableOpacity>
+        </Pressable>
 
         {/* Header text */}
         <View className="absolute left-6 right-6" style={{ bottom: 24 }}>
@@ -146,7 +151,7 @@ export default function FormLogin() {
       <View
         className="flex-1 bg-gray-50 px-6"
         style={{
-          paddingTop: Platform.OS === "ios" ? 240 + insets.top : 240, // Espacio para el header fijo
+          paddingTop: Platform.OS === "ios" ? 200 + insets.top : 180, // Espacio para el header fijo
         }}
       >
         <View
@@ -215,9 +220,9 @@ export default function FormLogin() {
           <View className="flex-row justify-center">
             <Text className="text-gray-600">Don't have an account? </Text>
             <Link href="/auth/register" asChild>
-              <TouchableOpacity>
+              <Pressable>
                 <Text className="text-purple-600 font-medium">Sign up</Text>
-              </TouchableOpacity>
+              </Pressable>
             </Link>
           </View>
         </View>
