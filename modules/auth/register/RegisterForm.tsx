@@ -55,12 +55,6 @@ export default function RegisterForm() {
         Alert.alert(
           "Registro exitoso",
           result.message || "Tu cuenta ha sido creada correctamente",
-          [
-            {
-              text: "Ir al login",
-              onPress: () => router.replace("/auth/login"),
-            },
-          ]
         );
       } else {
         console.log("❌ Registro fallido:", result.message);
@@ -143,10 +137,10 @@ export default function RegisterForm() {
 
         {/* Header text */}
         <View className="absolute left-6 right-6" style={{ bottom: 24 }}>
-          <Text className="text-white text-xl font-bold mb-1 leading-tight">
+          <Text className="text-white text-xl font-nunito-bold mb-1 leading-tight">
             Create your new Account
           </Text>
-          <Text className="text-white opacity-80 text-sm leading-5">
+          <Text className="text-white opacity-80 text-sm font-nunito leading-5">
             Please fill in the details to create your account.
           </Text>
         </View>
@@ -169,7 +163,7 @@ export default function RegisterForm() {
           {/* Error general */}
           {submitError && (
             <View className="mb-4 p-3 bg-red-100 rounded-2xl">
-              <Text className="text-red-600 text-sm text-center">
+              <Text className="text-red-600 text-sm font-nunito-medium text-center">
                 {submitError}
               </Text>
             </View>
@@ -300,10 +294,10 @@ export default function RegisterForm() {
 
           {/* Login link */}
           <View className="flex-row justify-center">
-            <Text className="text-gray-600">Already have an account? </Text>
+            <Text className="text-gray-600 font-nunito">Already have an account? </Text>
             <Link href="/auth/login" asChild>
               <Pressable>
-                <Text className="text-purple-600 font-medium">Sign in</Text>
+                <Text className="text-purple-600 font-nunito-semibold">Sign in</Text>
               </Pressable>
             </Link>
           </View>

@@ -28,12 +28,12 @@ export default function ToggleField({
         />
         <View className="ml-3 flex-1">
           <View className="flex-row flex-wrap items-center">
-            <Text className="text-gray-600 text-sm">
+            <Text className="text-gray-600 text-sm font-nunito">
               {text}{linkText && ' '}
             </Text>
             {linkText && onLinkPress && (
               <Pressable onPress={onLinkPress}>
-                <Text className="text-purple-600 font-medium text-sm underline">
+                <Text className="text-purple-600 font-nunito-semibold text-sm underline">
                   {linkText}
                 </Text>
               </Pressable>
@@ -42,7 +42,7 @@ export default function ToggleField({
         </View>
       </View>
       {error && (
-        <Text className="text-red-500 text-xs mt-1 ml-1">
+        <Text className="text-red-500 text-xs mt-1 ml-1 font-nunito">
           {error}
         </Text>
       )}

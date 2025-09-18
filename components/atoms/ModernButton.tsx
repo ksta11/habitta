@@ -1,5 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text } from 'react-native';
+import { FONTS } from '../../utils/fonts';
 
 interface ModernButtonProps {
   title: string;
@@ -51,14 +52,14 @@ export default function ModernButton({
       return {
         color: '#FFFFFF',
         fontSize: 18,
-        fontWeight: '600' as const,
+        fontFamily: FONTS.semibold,
       };
     }
 
     return {
       color: disabled ? '#9CA3AF' : '#7C3AED',
       fontSize: 18,
-      fontWeight: '600' as const,
+      fontFamily: FONTS.semibold,
     };
   };
 

@@ -1,3 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Nunito_400Regular';
+  }
+}
+
+@layer utilities {
+  .font-nunito {
+    font-family: 'Nunito_400Regular';
+  }
+  
+  .font-nunito-medium {
+    font-family: 'Nunito_500Medium';
+  }
+  
+  .font-nunito-semibold {
+    font-family: 'Nunito_600SemiBold';
+  }
+  
+  .font-nunito-bold {
+    font-family: 'Nunito_700Bold';
+  }
+}
