@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
 import Input from '../../../../components/atoms/Input';
 import PickerAtom from '../../../../components/atoms/Picker';
 import ProgressBar from '../../../../components/atoms/ProgressBar';
+import ButtonAtom from '../../../../components/atoms/ButtonAtom';
 import { FormStepProps } from '../../../../interfaces/property/types';
 
 export default function ScreenStep2({
@@ -98,18 +99,28 @@ export default function ScreenStep2({
         {...register('services')}
       />
       <View className="flex-row justify-between">
-        <TouchableOpacity
-          className="bg-erie-black rounded-lg p-3 flex-1 mr-2"
-          onPress={prevStep}
-        >
-          <Text className="text-center text-white-traffic font-bold">Atrás</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          className="bg-lavender-indigo rounded-lg p-3 flex-1 ml-2"
-          onPress={nextStep}
-        >
-          <Text className="text-center text-white-traffic font-bold">Siguiente</Text>
-        </TouchableOpacity>
+        <View className="flex-1 mr-2">
+          <ButtonAtom
+            title="Atrás"
+            onPress={prevStep}
+            variant="secondary"
+            size="large"
+            icon="arrow-back-outline"
+            iconPosition="left"
+            fullWidth={true}
+          />
+        </View>
+        <View className="flex-1 ml-2">
+          <ButtonAtom
+            title="Siguiente"
+            onPress={nextStep}
+            variant="primary"
+            size="large"
+            icon="arrow-forward-outline"
+            iconPosition="right"
+            fullWidth={true}
+          />
+        </View>
       </View>
     </View>
   );

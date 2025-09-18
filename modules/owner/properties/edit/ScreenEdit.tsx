@@ -160,7 +160,7 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
   return (
     <ScrollView className="flex-1 bg-white">
       {/* Header */}
-      <View className="bg-violet-800 px-4 py-6 pt-12">
+      <View className="bg-violet px-4 py-6 pt-12">
         <TouchableOpacity 
           onPress={() => router.back()}
           className="mb-4"
@@ -459,7 +459,7 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
                   ]
                 );
               }}
-              variant="outline"
+              variant="secondary"
               size="large"
               icon="close-outline"
               iconPosition="left"
