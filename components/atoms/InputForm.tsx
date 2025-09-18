@@ -1,5 +1,6 @@
 import React from 'react';
 import { TextInput, View, Text } from 'react-native';
+import { FONTS } from '../../utils/fonts';
 
 interface InputProps {
   placeholder?: string;
@@ -32,6 +33,7 @@ export default function Input({
         fontSize: 16,
         color: '#1F2937',
         borderWidth: 0,
+        fontFamily: FONTS.regular,
       };
     }
     
@@ -43,6 +45,7 @@ export default function Input({
       fontSize: 16,
       borderColor: error ? '#EF4444' : '#D1D5DB',
       backgroundColor: error ? '#FEF2F2' : '#FFFFFF',
+      fontFamily: FONTS.regular,
     };
   };
 
@@ -59,7 +62,7 @@ export default function Input({
         placeholderTextColor="#9CA3AF"
       />
       {error && (
-        <Text className="text-red-500 text-xs mt-1 ml-1">
+        <Text className="text-red-500 text-xs mt-1 ml-1 font-nunito">
           {error}
         </Text>
       )}
