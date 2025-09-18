@@ -13,10 +13,19 @@ export const PropertySchema = z.object({
   bathrooms: z.number().min(0, 'Los baños son requeridos'),
   area: z.number().min(1, 'El área es requerida'),
   services: z.string().min(2, 'Los servicios son requeridos'),
-  publication_status: z.enum(['published', 'rented', 'disabled'], {
-    message: 'Selecciona un estado válido'
-  }),
   images: z.array(z.string().url('URL de imagen inválida')).min(1, 'Agrega al menos una imagen'),
 });
 
-export type PropertyFormType = z.infer<typeof PropertySchema>;
+// Schema para CREAR propiedades (sin publication_status)
+export const CreatePropertySchema = PropertySchema;
+
+// Schema para EDITAR propiedades (con publication_status)
+export const EditPropertySchema = PropertySchema.extend({
+  publication_status: z.enum(['published', 'rented', 'disabled'], {
+    message: 'Selecciona un estado válido'
+  }),
+});
+
+// Tipos
+export type CreatePropertyFormType = z.infer<typeof CreatePropertySchema>;
+export type EditPropertyFormType = z.infer<typeof EditPropertySchema>;

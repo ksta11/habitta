@@ -18,7 +18,7 @@ export default function ScreenStep2({
 }: FormStepProps) {
   const { errors } = formState;
   return (
-    <View className="flex-1 bg-white p-4">
+    <View className="flex-1 bg-white-traffic p-4">
       <ProgressBar
         steps={[
           { icon: 'home-outline', title: 'General', description: 'Información básica' },
@@ -31,7 +31,7 @@ export default function ScreenStep2({
       <PickerAtom
         label="Tipo de propiedad"
         value={watch('type')}
-        onValueChange={value => setValue('type', value)}
+        onValueChange={value => setValue('type', value as 'house' | 'apartament' | 'store' | 'office' | 'werehouse')}
         options={[
           { label: 'Selecciona un tipo', value: '' },
           { label: 'Casa', value: 'house' },
@@ -41,6 +41,10 @@ export default function ScreenStep2({
           { label: 'Bodega', value: 'werehouse' },
         ]}
         error={errors.type?.message}
+        borderColor="#A346E6"
+        backgroundColor="#F6F6F6"
+        labelColor="#A346E6"
+        textColor="#1F1F1F"
       />
       <Input
         label="Área"
@@ -49,6 +53,10 @@ export default function ScreenStep2({
         onChangeText={text => setValue('area', Number(text))}
         error={errors.area?.message}
         keyboardType="numeric"
+        borderColor="#A346E6"
+        backgroundColor="#F6F6F6"
+        labelColor="#A346E6"
+        textColor="#1F1F1F"
         {...register('area')}
       />
       <Input
@@ -58,6 +66,10 @@ export default function ScreenStep2({
         onChangeText={text => setValue('rooms', Number(text))}
         error={errors.rooms?.message}
         keyboardType="numeric"
+        borderColor="#A346E6"
+        backgroundColor="#F6F6F6"
+        labelColor="#A346E6"
+        textColor="#1F1F1F"
         {...register('rooms')}
       />
       <Input
@@ -67,6 +79,10 @@ export default function ScreenStep2({
         onChangeText={text => setValue('bathrooms', Number(text))}
         error={errors.bathrooms?.message}
         keyboardType="numeric"
+        borderColor="#A346E6"
+        backgroundColor="#F6F6F6"
+        labelColor="#A346E6"
+        textColor="#1F1F1F"
         {...register('bathrooms')}
       />
       <Input
@@ -75,21 +91,24 @@ export default function ScreenStep2({
         value={watch('services')}
         onChangeText={text => setValue('services', text)}
         error={errors.services?.message}
+        borderColor="#A346E6"
+        backgroundColor="#F6F6F6"
+        labelColor="#A346E6"
+        textColor="#1F1F1F"
         {...register('services')}
       />
       <View className="flex-row justify-between">
         <TouchableOpacity
-          className="bg-gray-300 rounded-lg p-3 flex-1 mr-2"
+          className="bg-erie-black rounded-lg p-3 flex-1 mr-2"
           onPress={prevStep}
-          disabled={isFirstStep}
         >
-          <Text className="text-center text-gray-700 font-bold">Atrás</Text>
+          <Text className="text-center text-white-traffic font-bold">Atrás</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          className="bg-blue-500 rounded-lg p-3 flex-1 ml-2"
+          className="bg-lavender-indigo rounded-lg p-3 flex-1 ml-2"
           onPress={nextStep}
         >
-          <Text className="text-center text-white font-bold">Siguiente</Text>
+          <Text className="text-center text-white-traffic font-bold">Siguiente</Text>
         </TouchableOpacity>
       </View>
     </View>

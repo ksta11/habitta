@@ -253,7 +253,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             redirectPath = '/(admin)/home';
             break;
           case 'owner':
-            redirectPath = '/(owner)/property';
+            redirectPath = '/(owner)/(properties)/index';
             break;
           case 'user':
           default:

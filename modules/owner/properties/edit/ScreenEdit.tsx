@@ -3,12 +3,13 @@ import { View, Text, ScrollView, ActivityIndicator, Alert, TouchableOpacity } fr
 import { useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { getPropertyById } from '../../../../libs/owner/property/api-service';
-import { Property } from '../../../../interfaces/property/PropertyInterface';
-import { PropertySchema, PropertyFormType } from '../../../../schemes/PropertySchema';
+import { getPropertyById, updateProperty } from '../../../../libs/owner/property/api-service';
+import { Property, UpdatePropertyDTO } from '../../../../interfaces/property/PropertyInterface';
+import { EditPropertySchema, EditPropertyFormType } from '../../../../schemes/PropertySchema';
 import ImageCarousel from '../../../../components/atoms/ImageCarousel';
 import Input from '../../../../components/atoms/Input';
 import PickerAtom from '../../../../components/atoms/Picker';
+import ButtonAtom from '../../../../components/atoms/ButtonAtom';
 
 interface ScreenEditProps {
   propertyId: string;
@@ -25,8 +26,8 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
     handleSubmit,
     setValue,
     formState: { errors, isSubmitting }
-  } = useForm<PropertyFormType>({
-    resolver: zodResolver(PropertySchema),
+  } = useForm<EditPropertyFormType>({
+    resolver: zodResolver(EditPropertySchema),
     defaultValues: {
       title: '',
       description: '',
@@ -90,21 +91,41 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
     loadProperty();
   }, [propertyId]);
 
-  const onSubmit = async (data: PropertyFormType) => {
+  const onSubmit = async (data: EditPropertyFormType) => {
     try {
       console.log('📝 Datos del formulario:', data);
-      // TODO: Implement API call to update property
-      Alert.alert(
-        'Éxito', 
-        'Los datos están listos para enviar. El endpoint se implementará próximamente.',
-        [
-          {
-            text: 'Ver datos en consola',
-            onPress: () => console.table(data)
-          },
-          { text: 'OK' }
-        ]
-      );
+      
+      if (!property?.id) {
+        Alert.alert('Error', 'ID de propiedad no válido');
+        return;
+      }
+      
+      // Preparar datos para la API (agregar id_owner)
+      const updateData: UpdatePropertyDTO = {
+        ...data,
+        id_owner: property.id_owner,
+        images: data.images || []
+      };
+      
+      console.log('🔄 Enviando actualización de propiedad...');
+      const response = await updateProperty(property.id, updateData);
+      
+      if (response.success) {
+        console.log('✅ Propiedad actualizada exitosamente');
+        Alert.alert(
+          'Éxito', 
+          response.message || 'Los cambios se han guardado correctamente',
+          [
+            {
+              text: 'OK',
+              onPress: () => router.back()
+            }
+          ]
+        );
+      } else {
+        console.log('❌ Error al actualizar:', response.message);
+        Alert.alert('Error', response.message || 'No se pudieron guardar los cambios');
+      }
     } catch (error) {
       console.error('💥 Error al guardar:', error);
       Alert.alert('Error', 'Hubo un problema al guardar los cambios');
@@ -139,7 +160,7 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
   return (
     <ScrollView className="flex-1 bg-white">
       {/* Header */}
-      <View className="bg-blue-500 px-4 py-6 pt-12">
+      <View className="bg-violet-800 px-4 py-6 pt-12">
         <TouchableOpacity 
           onPress={() => router.back()}
           className="mb-4"
@@ -147,8 +168,10 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
           <Text className="text-white text-lg">← Volver</Text>
         </TouchableOpacity>
         <Text className="text-white text-xl font-bold mb-3">Editar Propiedad</Text>
-        
-        {/* Title Input */}
+      </View>
+
+      {/* Property Title Section */}
+      <View className="px-4 py-4 bg-gray-50">
         <Controller
           control={control}
           name="title"
@@ -159,6 +182,10 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
               value={value}
               onChangeText={onChange}
               error={errors.title?.message}
+              borderColor="#8B5CF6"
+              backgroundColor="#FFFFFF"
+              labelColor="#8B5CF6"
+              textColor="#1F2937"
             />
           )}
         />
@@ -188,6 +215,10 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
                 value={value}
                 onChangeText={onChange}
                 error={errors.address?.message}
+                borderColor="#8B5CF6"
+                backgroundColor="#FFFFFF"
+                labelColor="#8B5CF6"
+                textColor="#1F2937"
               />
             )}
           />
@@ -202,6 +233,10 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
                 value={value}
                 onChangeText={onChange}
                 error={errors.city?.message}
+                borderColor="#8B5CF6"
+                backgroundColor="#FFFFFF"
+                labelColor="#8B5CF6"
+                textColor="#1F2937"
               />
             )}
           />
@@ -221,6 +256,10 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
                 value={value}
                 onChangeText={onChange}
                 error={errors.description?.message}
+                borderColor="#8B5CF6"
+                backgroundColor="#FFFFFF"
+                labelColor="#8B5CF6"
+                textColor="#1F2937"
               />
             )}
           />
@@ -246,6 +285,10 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
                   { label: 'Bodega', value: 'werehouse' }
                 ]}
                 error={errors.type?.message}
+                borderColor="#8B5CF6"
+                backgroundColor="#FFFFFF"
+                labelColor="#8B5CF6"
+                textColor="#1F2937"
               />
             )}
           />
@@ -261,6 +304,10 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
                 onChangeText={(text) => onChange(parseFloat(text) || 0)}
                 keyboardType="numeric"
                 error={errors.price?.message}
+                borderColor="#8B5CF6"
+                backgroundColor="#FFFFFF"
+                labelColor="#8B5CF6"
+                textColor="#1F2937"
               />
             )}
           />
@@ -278,6 +325,10 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
                     onChangeText={(text) => onChange(parseInt(text) || 0)}
                     keyboardType="numeric"
                     error={errors.rooms?.message}
+                    borderColor="#8B5CF6"
+                    backgroundColor="#FFFFFF"
+                    labelColor="#8B5CF6"
+                    textColor="#1F2937"
                   />
                 )}
               />
@@ -295,6 +346,10 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
                     onChangeText={(text) => onChange(parseInt(text) || 0)}
                     keyboardType="numeric"
                     error={errors.bathrooms?.message}
+                    borderColor="#8B5CF6"
+                    backgroundColor="#FFFFFF"
+                    labelColor="#8B5CF6"
+                    textColor="#1F2937"
                   />
                 )}
               />
@@ -312,6 +367,10 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
                 onChangeText={(text) => onChange(parseFloat(text) || 0)}
                 keyboardType="numeric"
                 error={errors.area?.message}
+                borderColor="#8B5CF6"
+                backgroundColor="#FFFFFF"
+                labelColor="#8B5CF6"
+                textColor="#1F2937"
               />
             )}
           />
@@ -331,6 +390,10 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
                 value={value}
                 onChangeText={onChange}
                 error={errors.services?.message}
+                borderColor="#8B5CF6"
+                backgroundColor="#FFFFFF"
+                labelColor="#8B5CF6"
+                textColor="#1F2937"
               />
             )}
           />
@@ -354,6 +417,10 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
                   { label: 'Deshabilitada', value: 'disabled' }
                 ]}
                 error={errors.publication_status?.message}
+                borderColor="#8B5CF6"
+                backgroundColor="#FFFFFF"
+                labelColor="#8B5CF6"
+                textColor="#1F2937"
               />
             )}
           />
@@ -361,38 +428,45 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
 
         {/* Action Buttons */}
         <View className="flex-row gap-3 mt-6">
-          <TouchableOpacity
-            className={`flex-1 rounded-lg py-4 ${
-              isSubmitting ? 'bg-gray-400' : 'bg-green-500'
-            }`}
-            onPress={handleSubmit(onSubmit)}
-            disabled={isSubmitting}
-          >
-            <Text className="text-white text-center font-bold">
-              {isSubmitting ? '💾 Guardando...' : '💾 Guardar Cambios'}
-            </Text>
-          </TouchableOpacity>
+          <View className="flex-1">
+            <ButtonAtom
+              title={isSubmitting ? 'Guardando...' : 'Guardar'}
+              onPress={handleSubmit(onSubmit)}
+              variant="success"
+              size="large"
+              icon="save-outline"
+              iconPosition="left"
+              disabled={isSubmitting}
+              loading={isSubmitting}
+              fullWidth={true}
+            />
+          </View>
           
-          <TouchableOpacity
-            className="flex-1 bg-gray-500 rounded-lg py-4"
-            onPress={() => {
-              Alert.alert(
-                'Cancelar',
-                '¿Estás seguro de que quieres cancelar? Los cambios no guardados se perderán.',
-                [
-                  { text: 'No', style: 'cancel' },
-                  { 
-                    text: 'Sí, cancelar', 
-                    style: 'destructive',
-                    onPress: () => router.back()
-                  }
-                ]
-              );
-            }}
-            disabled={isSubmitting}
-          >
-            <Text className="text-white text-center font-bold">❌ Cancelar</Text>
-          </TouchableOpacity>
+          <View className="flex-1">
+            <ButtonAtom
+              title="Cancelar"
+              onPress={() => {
+                Alert.alert(
+                  'Cancelar',
+                  '¿Estás seguro de que quieres cancelar? Los cambios no guardados se perderán.',
+                  [
+                    { text: 'No', style: 'cancel' },
+                    { 
+                      text: 'Sí, cancelar', 
+                      style: 'destructive',
+                      onPress: () => router.back()
+                    }
+                  ]
+                );
+              }}
+              variant="outline"
+              size="large"
+              icon="close-outline"
+              iconPosition="left"
+              disabled={isSubmitting}
+              fullWidth={true}
+            />
+          </View>
         </View>
       </View>
     </ScrollView>

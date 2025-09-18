@@ -11,7 +11,17 @@ module.exports = {
   ],
   presets: [require("nativewind/preset")],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        // Colores personalizados de Habitta
+        violet: '#531A99',
+        'deep-violet': '#320964',
+        'lavender-indigo': '#A346E6',
+        'lavender-bright': '#BD93EF',
+        'erie-black': '#1F1F1F',
+        'white-traffic': '#F6F6F6',
+      }
+    },
   },
   plugins: [],
 }

@@ -18,7 +18,7 @@ export default function Index() {
             redirectPath = '/(admin)/home';
             break;
           case 'owner':
-            redirectPath = '/(owner)/home';
+            redirectPath = '/(owner)/(properties)';
             break;
           case 'user':
           default:
@@ -35,6 +35,26 @@ export default function Index() {
     }
   }, [isLoading, isAuthenticated, user]);
 
+  // Mostrar estado de carga mientras se determina la autenticación
+  if (isLoading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-blue-50">
+        <Label 
+          text="Habitta" 
+          size="xl" 
+          weight="bold"
+        />
+        <View className="mt-2">
+          <Label 
+            text="Cargando..." 
+            size="md"
+          />
+        </View>
+      </View>
+    );
+  }
+
+  // Si no está loading pero aún no se ha redirigido, mostrar loading también
   return (
     <View className="flex-1 justify-center items-center bg-blue-50">
       <Label 
@@ -44,7 +64,7 @@ export default function Index() {
       />
       <View className="mt-2">
         <Label 
-          text="Cargando..." 
+          text="Redirigiendo..." 
           size="md"
         />
       </View>

@@ -1,4 +1,4 @@
-import { CreatePropertyDTO, PropertyImage, GetOwnerPropertiesResponse, GetPropertyByIdResponse } from '../../../interfaces/property/PropertyInterface';
+import { CreatePropertyDTO, PropertyImage, GetOwnerPropertiesResponse, GetPropertyByIdResponse, UpdatePropertyDTO, UpdatePropertyResponse } from '../../../interfaces/property/PropertyInterface';
 import { uploadImageToCloudinary } from '../../cloudinary/api-service';
 import { useAuth } from '../../../contexts/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -65,6 +65,101 @@ export const createProperty = async (propertyData: CreatePropertyDTO) => {
 			message: data.message || 'Propiedad creada exitosamente',
 		};
 	} catch (error) {
+		return {
+			success: false,
+			statusCode: 500,
+			message: error instanceof Error ? error.message : 'Error de conexión',
+		};
+	}
+};
+
+// Actualizar propiedad
+export const updateProperty = async (propertyId: string, propertyData: UpdatePropertyDTO): Promise<UpdatePropertyResponse> => {
+	try {
+		console.log('🏠 Iniciando actualización de propiedad:', propertyId);
+		console.log('📋 Datos a actualizar:', propertyData);
+		
+		// Subir imágenes a Cloudinary si vienen como uri
+		let uploadedImages: PropertyImage[] = [];
+		if (propertyData.images && propertyData.images.length > 0) {
+			console.log(`📸 Procesando ${propertyData.images.length} imágenes...`);
+			
+			for (const img of propertyData.images) {
+				// img ahora es un string (uri local o url remota)
+				if (typeof img === 'string' && img.startsWith('file://')) {
+					console.log('⏳ Subiendo imagen local nueva:', img);
+					const url = await uploadImageToCloudinary(img);
+					if (url) {
+						uploadedImages.push({ url_image: url });
+						console.log('✅ Nueva imagen subida exitosamente:', url);
+					} else {
+						console.log('❌ Error al subir imagen:', img);
+					}
+				} else if (typeof img === 'string') {
+					// Si ya es una URL (imagen existente), solo agregarla
+					uploadedImages.push({ url_image: img });
+					console.log('🔗 Imagen existente mantenida:', img);
+				}
+			}
+			
+			console.log(`🎉 Proceso de imágenes completado. Total: ${uploadedImages.length}`);
+		}
+		
+		// Preparar datos para enviar al backend
+		const propertyToUpdate = { 
+			...propertyData, 
+			images: uploadedImages
+		};
+
+		// Obtener token para la autorización
+		const token = await AsyncStorage.getItem(TOKEN_KEY);
+		if (!token) {
+			console.log('❌ No se encontró token de autenticación');
+			return {
+				success: false,
+				message: 'Token de autenticación no encontrado',
+				statusCode: 401
+			};
+		}
+
+		const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
+		const url = `${API_BASE_URL}/api/properties/${propertyId}`;
+		console.log('🌐 URL de actualización:', url);
+
+		const response = await fetch(url, {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${token}`,
+			},
+			body: JSON.stringify(propertyToUpdate),
+		});
+
+		console.log('📡 Status de respuesta:', response.status);
+		
+		const data = await response.json();
+		console.log('📋 Respuesta del servidor:', data);
+
+		if (!response.ok) {
+			console.log('❌ Error en la actualización:', data.message);
+			return {
+				success: false,
+				statusCode: response.status,
+				message: data.message || 'Error al actualizar la propiedad',
+			};
+		}
+
+		console.log('✅ Propiedad actualizada exitosamente:', data.data?.title || 'Sin título');
+
+		return {
+			success: true,
+			statusCode: response.status,
+			data: data.data,
+			message: data.message || 'Propiedad actualizada exitosamente',
+		};
+
+	} catch (error) {
+		console.error('💥 Error crítico al actualizar propiedad:', error);
 		return {
 			success: false,
 			statusCode: 500,

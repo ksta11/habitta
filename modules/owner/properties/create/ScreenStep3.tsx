@@ -43,7 +43,7 @@ export default function ScreenStep3({
   };
 
   return (
-    <View className="flex-1 bg-white p-4">
+    <View className="flex-1 bg-white-traffic p-4">
       <ProgressBar
         steps={[
           { icon: 'home-outline', title: 'General', description: 'Información básica' },
@@ -60,6 +60,10 @@ export default function ScreenStep3({
         onChangeText={text => setValue('price', Number(text))}
         error={errors.price?.message}
         keyboardType="numeric"
+        borderColor="#A346E6"
+        backgroundColor="#F6F6F6"
+        labelColor="#A346E6"
+        textColor="#1F1F1F"
         {...register('price')}
       />
       <Text className="mb-2 font-semibold">Tipo de plan</Text>
@@ -71,6 +75,10 @@ export default function ScreenStep3({
           // Nota: El plan no se guarda en el formulario principal por ahora
         }}
         options={plans.map(plan => ({ label: `${plan.name} (${plan.price})`, value: plan.name }))}
+        borderColor="#A346E6"
+        backgroundColor="#F6F6F6"
+        labelColor="#A346E6"
+        textColor="#1F1F1F"
       />
       <Text className="mb-2 font-semibold">Imágenes de la propiedad</Text>
       <Text className="text-sm text-gray-600 mb-3">
@@ -104,15 +112,15 @@ export default function ScreenStep3({
                   resizeMode="cover"
                 />
                 {/* Número de imagen */}
-                <View className="absolute -top-1 -left-1 bg-blue-500 w-5 h-5 rounded-full items-center justify-center">
-                  <Text className="text-white text-xs font-bold">{idx + 1}</Text>
+                <View className="absolute -top-1 -left-1 bg-lavender-indigo w-5 h-5 rounded-full items-center justify-center">
+                  <Text className="text-white-traffic text-xs font-bold">{idx + 1}</Text>
                 </View>
                 {/* Botón eliminar */}
                 <TouchableOpacity 
-                  className="absolute -top-1 -right-1 bg-red-500 w-5 h-5 rounded-full items-center justify-center"
+                  className="absolute -top-1 -right-1 bg-erie-black w-5 h-5 rounded-full items-center justify-center"
                   onPress={() => removeImage(idx)}
                 >
-                  <Text className="text-white text-xs font-bold">×</Text>
+                  <Text className="text-white-traffic text-xs font-bold">×</Text>
                 </TouchableOpacity>
               </View>
             ))}
@@ -122,17 +130,16 @@ export default function ScreenStep3({
 
       <View className="flex-row justify-between mt-6">
         <TouchableOpacity
-          className="bg-gray-300 rounded-lg p-3 flex-1 mr-2"
+          className="bg-erie-black rounded-lg p-3 flex-1 mr-2"
           onPress={prevStep}
-          disabled={isFirstStep}
         >
-          <Text className="text-center text-gray-700 font-bold">Atrás</Text>
+          <Text className="text-center text-white-traffic font-bold">Atrás</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          className="bg-green-500 rounded-lg p-3 flex-1 ml-2"
+          className="bg-violet rounded-lg p-3 flex-1 ml-2"
           onPress={isLastStep ? onSubmit : nextStep}
         >
-          <Text className="text-center text-white font-bold">{isLastStep ? 'Guardar' : 'Siguiente'}</Text>
+          <Text className="text-center text-white-traffic font-bold">{isLastStep ? 'Guardar' : 'Siguiente'}</Text>
         </TouchableOpacity>
       </View>
     </View>
