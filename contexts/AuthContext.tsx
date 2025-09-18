@@ -253,7 +253,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             redirectPath = '/(admin)/home';
             break;
           case 'owner':
-            redirectPath = '/(owner)/(properties)/index';
+            redirectPath = '/(owner)/(properties)';
             break;
           case 'user':
           default:
@@ -293,7 +293,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (result.success) {
         console.log('✅ Registro exitoso');
         
-        // Después del registro exitoso, redirigir al login
         router.replace('/auth/login');
         
         return { success: true, message: result.message };
