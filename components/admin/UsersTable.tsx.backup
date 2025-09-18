@@ -3,7 +3,7 @@ import {
   View,
   Text,
   ScrollView,
-  Pressable,
+  TouchableOpacity,
   TextInput,
   FlatList,
   Alert,
@@ -292,7 +292,7 @@ export const UsersTable: React.FC = () => {
       {/* Acciones */}
       <View className="flex-row justify-end space-x-2">
         {user.solicitudPropietario && (
-          <Pressable
+          <TouchableOpacity
             onPress={() => Alert.alert(
               'Solicitud de Propietario',
               `${user.name} tiene una solicitud ${user.solicitudPropietario?.estado}. Ve a la sección de Solicitudes para más detalles.`,
@@ -302,22 +302,22 @@ export const UsersTable: React.FC = () => {
           >
             <FontAwesome name="file-text" size={12} color="#8b5cf6" />
             <Text className="text-purple-600 text-xs font-medium ml-1">Ver Solicitud</Text>
-          </Pressable>
+          </TouchableOpacity>
         )}
-        <Pressable
+        <TouchableOpacity
           onPress={() => handleUserAction('Contactar', user)}
           className="bg-blue-100 px-3 py-2 rounded-lg flex-row items-center"
         >
           <FontAwesome name="envelope" size={12} color="#3b82f6" />
           <Text className="text-blue-600 text-xs font-medium ml-1">Email</Text>
-        </Pressable>
-        <Pressable
+        </TouchableOpacity>
+        <TouchableOpacity
           onPress={() => handleUserAction('Llamar', user)}
           className="bg-green-100 px-3 py-2 rounded-lg flex-row items-center"
         >
           <FontAwesome name="phone" size={12} color="#10b981" />
           <Text className="text-green-600 text-xs font-medium ml-1">Llamar</Text>
-        </Pressable>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -358,7 +358,7 @@ export const UsersTable: React.FC = () => {
 
           {/* Filtros por tipo y estado */}
           <View className="flex-row justify-between space-x-2">
-            <Pressable 
+            <TouchableOpacity 
               onPress={() => setFilterType(filterType === 'all' ? 'Propietario' : filterType === 'Propietario' ? 'Inquilino' : 'all')}
               className={`flex-1 px-4 py-2 rounded-lg border ${
                 filterType === 'Propietario' ? 'bg-blue-100 border-blue-300' : 
@@ -372,9 +372,9 @@ export const UsersTable: React.FC = () => {
                 {filterType === 'all' ? 'Tipo: Todos' : 
                  filterType === 'Propietario' ? 'Propietarios' : 'Inquilinos'}
               </Text>
-            </Pressable>
+            </TouchableOpacity>
             
-            <Pressable 
+            <TouchableOpacity 
               onPress={() => setFilterStatus(filterStatus === 'all' ? 'Activo' : filterStatus === 'Activo' ? 'Pendiente' : filterStatus === 'Pendiente' ? 'Inactivo' : 'all')}
               className={`flex-1 px-4 py-2 rounded-lg border ${
                 filterStatus === 'Activo' ? 'bg-green-100 border-green-300' : 
@@ -389,12 +389,12 @@ export const UsersTable: React.FC = () => {
               }`}>
                 {filterStatus === 'all' ? 'Estado: Todos' : filterStatus}
               </Text>
-            </Pressable>
+            </TouchableOpacity>
           </View>
 
           {/* Botón para limpiar filtros */}
           {(filterType !== 'all' || filterStatus !== 'all' || searchTerm !== '') && (
-            <Pressable 
+            <TouchableOpacity 
               onPress={() => {
                 setFilterType('all');
                 setFilterStatus('all');
@@ -405,7 +405,7 @@ export const UsersTable: React.FC = () => {
               <Text className="text-red-800 text-sm font-medium">
                 Limpiar Filtros
               </Text>
-            </Pressable>
+            </TouchableOpacity>
           )}
         </View>
 

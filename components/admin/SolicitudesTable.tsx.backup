@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, ScrollView, Pressable, TextInput, Modal, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, Alert } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { AdminStatsGrid } from './AdminStatsGrid';
 import { 
@@ -451,25 +451,25 @@ export const SolicitudesTable: React.FC = () => {
 
           {/* Filtros por estado */}
           <View className="flex-row flex-wrap gap-2">
-            <Pressable 
+            <TouchableOpacity 
               className="bg-yellow-100 px-3 py-1 rounded-full"
               onPress={() => setFilters(prev => ({ ...prev, estado: 'pendiente' }))}
             >
               <Text className="text-yellow-800 text-sm font-medium">Solo Pendientes</Text>
-            </Pressable>
-            <Pressable 
+            </TouchableOpacity>
+            <TouchableOpacity 
               className="bg-blue-100 px-3 py-1 rounded-full"
               onPress={() => setFilters(prev => ({ ...prev, estado: 'en_revision' }))}
             >
               <Text className="text-blue-800 text-sm font-medium">En Revisión</Text>
-            </Pressable>
-            <Pressable 
+            </TouchableOpacity>
+            <TouchableOpacity 
               className="bg-green-100 px-3 py-1 rounded-full"
               onPress={() => setFilters(prev => ({ ...prev, estado: 'aprobada' }))}
             >
               <Text className="text-green-800 text-sm font-medium">Aprobadas</Text>
-            </Pressable>
-            <Pressable 
+            </TouchableOpacity>
+            <TouchableOpacity 
               className="bg-gray-100 px-3 py-1 rounded-full"
               onPress={() => setFilters({
                 search: '',
@@ -482,7 +482,7 @@ export const SolicitudesTable: React.FC = () => {
               })}
             >
               <Text className="text-gray-800 text-sm font-medium">Limpiar Filtros</Text>
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -496,7 +496,7 @@ export const SolicitudesTable: React.FC = () => {
 
           <View className="p-6">
             {filteredSolicitudes.map((solicitud) => (
-              <Pressable
+              <TouchableOpacity
                 key={solicitud.id}
                 className="border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50"
                 onPress={() => {
@@ -534,11 +534,11 @@ export const SolicitudesTable: React.FC = () => {
                 </View>
 
                 <View className="flex-row justify-end mt-3">
-                  <Pressable className="bg-blue-100 px-3 py-1 rounded">
+                  <TouchableOpacity className="bg-blue-100 px-3 py-1 rounded">
                     <Text className="text-blue-800 text-sm font-medium">Ver Detalles</Text>
-                  </Pressable>
+                  </TouchableOpacity>
                 </View>
-              </Pressable>
+              </TouchableOpacity>
             ))}
 
             {filteredSolicitudes.length === 0 && (
@@ -570,9 +570,9 @@ export const SolicitudesTable: React.FC = () => {
                     <Text className="text-xl font-bold text-gray-800">
                       Detalles de Solicitud
                     </Text>
-                    <Pressable onPress={() => setModalVisible(false)}>
+                    <TouchableOpacity onPress={() => setModalVisible(false)}>
                       <FontAwesome name="times" size={20} color="#6b7280" />
-                    </Pressable>
+                    </TouchableOpacity>
                   </View>
 
                   <ScrollView className="max-h-96">
@@ -615,18 +615,18 @@ export const SolicitudesTable: React.FC = () => {
 
                   {(selectedSolicitud.estado === 'pendiente' || selectedSolicitud.estado === 'en_revision') && (
                     <View className="flex-row mt-6 space-x-3">
-                      <Pressable 
+                      <TouchableOpacity 
                         className="flex-1 bg-green-600 py-3 rounded-lg mr-2"
                         onPress={() => handleAprobar(selectedSolicitud.id)}
                       >
                         <Text className="text-white text-center font-medium">Aprobar</Text>
-                      </Pressable>
-                      <Pressable 
+                      </TouchableOpacity>
+                      <TouchableOpacity 
                         className="flex-1 bg-red-600 py-3 rounded-lg ml-2"
                         onPress={() => handleRechazar(selectedSolicitud.id)}
                       >
                         <Text className="text-white text-center font-medium">Rechazar</Text>
-                      </Pressable>
+                      </TouchableOpacity>
                     </View>
                   )}
                 </>

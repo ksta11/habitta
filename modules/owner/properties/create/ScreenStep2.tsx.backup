@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import Input from '../../../../components/atoms/Input';
 import PickerAtom from '../../../../components/atoms/Picker';
 import ProgressBar from '../../../../components/atoms/ProgressBar';
@@ -98,20 +98,19 @@ export default function ScreenStep2({
         {...register('services')}
       />
       <View className="flex-row justify-between">
-        <Pressable
+        <TouchableOpacity
           className="bg-erie-black rounded-lg p-3 flex-1 mr-2"
           onPress={prevStep}
         >
           <Text className="text-center text-white-traffic font-bold">Atrás</Text>
-        </Pressable>
-        <Pressable
+        </TouchableOpacity>
+        <TouchableOpacity
           className="bg-lavender-indigo rounded-lg p-3 flex-1 ml-2"
           onPress={nextStep}
         >
           <Text className="text-center text-white-traffic font-bold">Siguiente</Text>
-        </Pressable>
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
-

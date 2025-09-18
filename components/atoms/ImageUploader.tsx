@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, Pressable, Alert } from 'react-native';
 import { Svg, Path } from 'react-native-svg';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -163,7 +163,7 @@ export default function ImageUploader({
   };
 
   return (
-    <TouchableOpacity 
+    <Pressable 
       onPress={showSourceOptions}
       disabled={disabled}
       className={`rounded border border-gray-300 p-4 shadow-sm ${
@@ -178,6 +178,6 @@ export default function ImageUploader({
 
         {getIcon()}
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }

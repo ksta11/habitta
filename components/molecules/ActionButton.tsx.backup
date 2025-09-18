@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Pressable } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import Button from '../atoms/Button';
 import Label from '../atoms/Label';
 
@@ -40,14 +40,14 @@ export default function ActionButton({
           {subtitleAction && onSubtitlePress && (
             <>
               <Label text=" " size="sm" />
-              <Pressable onPress={onSubtitlePress}>
+              <TouchableOpacity onPress={onSubtitlePress}>
                 <Label 
                   text={subtitleAction} 
                   size="sm" 
                   weight="semibold"
                   variant="default"
                 />
-              </Pressable>
+              </TouchableOpacity>
             </>
           )}
         </View>
@@ -55,4 +55,3 @@ export default function ActionButton({
     </View>
   );
 }
-

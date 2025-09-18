@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StatusBar as RNStatusBar, Platform, ScrollView, KeyboardAvoidingView } from "react-native";
+import { View, Text, Pressable, StatusBar as RNStatusBar, Platform, ScrollView, KeyboardAvoidingView } from "react-native";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { useRouter } from "expo-router";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -191,7 +191,7 @@ export default function FormEditUserProfile() {
         
         // Redirigir al home de owner después de un breve delay
         setTimeout(() => {
-          router.replace('/(owner)/property');
+          router.replace('/(owner)/(properties)');
         }, 1500);
       } else {
         console.log('❌ Error al convertir usuario:', result.message);
@@ -264,7 +264,7 @@ export default function FormEditUserProfile() {
         />
 
         {/* Back button */}
-        <TouchableOpacity
+        <Pressable
           className="absolute w-10 h-10 rounded-full items-center justify-center"
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.2)",
@@ -280,7 +280,7 @@ export default function FormEditUserProfile() {
           }}
         >
           <Ionicons name="chevron-back" size={20} color="white" />
-        </TouchableOpacity>
+        </Pressable>
 
         {/* Header text */}
         <View className="absolute left-6 right-6" style={{ bottom: 24 }}>
@@ -441,3 +441,4 @@ export default function FormEditUserProfile() {
     </View>
   );
 }
+

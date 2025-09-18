@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Image, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface PropertyCardProps {
@@ -22,7 +22,7 @@ export default function PropertyCard({
   onPress
 }: PropertyCardProps) {
   return (
-    <TouchableOpacity 
+    <Pressable 
       onPress={onPress}
       className="block rounded-lg p-4 shadow-sm bg-white"
       activeOpacity={0.7}
@@ -83,6 +83,6 @@ export default function PropertyCard({
           </View>
         </View>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }

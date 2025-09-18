@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, Alert, ScrollView, RefreshControl, ActivityIndicator } from 'react-native';
+import { View, Text, Pressable, Alert, ScrollView, RefreshControl, ActivityIndicator } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { AuthGuard } from '../../middleware/AuthGuard';
@@ -208,20 +208,20 @@ export default function ProfileScreen() {
         />
         
         <View className="mt-4 space-y-3">
-          <TouchableOpacity 
+          <Pressable 
             className="py-3 border-b border-gray-100"
             onPress={() => router.push('/(user)/settings/editProfile')}
           >
             <Label text="Editar Perfil" size="md" />
-          </TouchableOpacity>
+          </Pressable>
           
-          <TouchableOpacity className="py-3 border-b border-gray-100">
+          <Pressable className="py-3 border-b border-gray-100">
             <Label text="Cambiar Contraseña" size="md" />
-          </TouchableOpacity>
+          </Pressable>
           
-          <TouchableOpacity className="py-3" onPress={handleLogout}>
+          <Pressable className="py-3" onPress={handleLogout}>
             <Label text="Cerrar Sesión" size="md" variant="error" />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
         </View>
@@ -229,3 +229,4 @@ export default function ProfileScreen() {
     </AuthGuard>
   );
 }
+

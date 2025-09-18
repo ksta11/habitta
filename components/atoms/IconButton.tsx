@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
+import { Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface IconButtonProps {
@@ -22,12 +22,13 @@ export default function IconButton({
   }
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={onPress}
       disabled={disabled}
       style={{ opacity: disabled ? 0.5 : 1 }}
     >
       <Ionicons name={iconName} size={size} color={color} />
-    </TouchableOpacity>
+    </Pressable>
   );
 }
+

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { View, Pressable, Alert, ScrollView } from 'react-native';
 import { router, Link } from 'expo-router';
 import { useAuth } from '../../../contexts/AuthContext';
 import { deleteCurrentUserProfile } from '../../../libs/userServices/api-service';
@@ -105,31 +105,31 @@ const ScreenSettings = () => {
         
         <View className="mt-4 space-y-3">
           <Link href="/(user)/settings/editProfile" asChild>
-            <TouchableOpacity className="py-3 border-b border-gray-100">
+            <Pressable className="py-3 border-b border-gray-100">
               <Label text="Editar Perfil" size="md" />
-            </TouchableOpacity>
+            </Pressable>
           </Link>
           
-          <TouchableOpacity 
+          <Pressable 
             className="py-3 border-b border-gray-100"
             // onPress={() => console.log('Pantalla de cambio de contraseña no implementada aún')}
           >
             <Label text="Cambiar Contraseña" size="md" />
-          </TouchableOpacity>
+          </Pressable>
           
-          <TouchableOpacity 
+          <Pressable 
             className="py-3 border-b border-gray-100"
             // onPress={() => console.log('Configuración de privacidad no implementada aún')}
           >
             <Label text="Configuración de Privacidad" size="md" />
-          </TouchableOpacity>
+          </Pressable>
           
-          <TouchableOpacity 
+          <Pressable 
             className="py-3"
             // onPress={() => console.log('Seguridad de cuenta no implementada aún')}
           >
             <Label text="Seguridad de Cuenta" size="md" />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
 
@@ -142,26 +142,26 @@ const ScreenSettings = () => {
         />
         
         <View className="mt-4 space-y-3">
-          <TouchableOpacity 
+          <Pressable 
             className="py-3 border-b border-gray-100"
             // onPress={() => console.log('Centro de ayuda no implementado aún')}
           >
             <Label text="Centro de Ayuda" size="md" />
-          </TouchableOpacity>
+          </Pressable>
           
-          <TouchableOpacity 
+          <Pressable 
             className="py-3 border-b border-gray-100"
             // onPress={() => console.log('Contacto de soporte no implementado aún')}
           >
             <Label text="Contactar Soporte" size="md" />
-          </TouchableOpacity>
+          </Pressable>
           
-          <TouchableOpacity 
+          <Pressable 
             className="py-3"
             // onPress={() => console.log('Acerca de la app no implementado aún')}
           >
             <Label text="Acerca de la App" size="md" />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
 
@@ -174,26 +174,26 @@ const ScreenSettings = () => {
         />
         
         <View className="mt-4 space-y-3">
-          <TouchableOpacity 
+          <Pressable 
             className="py-3 border-b border-gray-100"
             // onPress={() => console.log('Limpiar caché no implementado aún')}
           >
             <Label text="Limpiar Caché" size="md" />
-          </TouchableOpacity>
+          </Pressable>
           
-          <TouchableOpacity 
+          <Pressable 
             className="py-3 border-b border-gray-100"
             // onPress={() => console.log('Uso de datos no implementado aún')}
           >
             <Label text="Uso de Datos" size="md" />
-          </TouchableOpacity>
+          </Pressable>
           
-          <TouchableOpacity 
+          <Pressable 
             className="py-3"
             // onPress={() => console.log('Modo sin conexión no implementado aún')}
           >
             <Label text="Modo Sin Conexión" size="md" />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
 
@@ -206,14 +206,14 @@ const ScreenSettings = () => {
         />
         
         <View className="mt-4 space-y-3">
-          <TouchableOpacity 
+          <Pressable 
             className="py-3 border-b border-gray-100"
             // onPress={() => console.log('Exportar datos no implementado aún')}
           >
             <Label text="Exportar Datos" size="md" />
-          </TouchableOpacity>
+          </Pressable>
           
-          <TouchableOpacity 
+          <Pressable 
             className="py-3 border-b border-gray-100"
             onPress={handleDeleteAccount}
             disabled={isDeleting}
@@ -223,14 +223,14 @@ const ScreenSettings = () => {
               size="md" 
               variant="error" 
             />
-          </TouchableOpacity>
+          </Pressable>
           
-          <TouchableOpacity 
+          <Pressable 
             className="py-3" 
             onPress={handleLogout}
           >
             <Label text="Cerrar Sesión" size="md" variant="error" />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     </ScrollView>
@@ -238,3 +238,4 @@ const ScreenSettings = () => {
 };
 
 export default ScreenSettings;
+

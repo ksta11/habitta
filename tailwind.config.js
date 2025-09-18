@@ -26,7 +26,7 @@ module.exports = {
         'nunito-medium': ['Nunito_500Medium'],
         'nunito-semibold': ['Nunito_600SemiBold'],
         'nunito-bold': ['Nunito_700Bold'],
-        // Aliases para facilitar el uso
+       //Alias para usar con tailwind
         'sans': ['Nunito_400Regular'],
         'medium': ['Nunito_500Medium'],
         'semibold': ['Nunito_600SemiBold'],

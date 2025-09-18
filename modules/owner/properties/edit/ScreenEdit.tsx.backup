@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, Alert, Pressable } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -147,12 +147,12 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
         <Text className="text-gray-500 text-center">
           No se pudo cargar la propiedad
         </Text>
-        <Pressable
+        <TouchableOpacity
           className="mt-4 bg-blue-500 rounded-lg px-6 py-3"
           onPress={() => router.back()}
         >
           <Text className="text-white font-bold">Volver</Text>
-        </Pressable>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -161,12 +161,12 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
     <ScrollView className="flex-1 bg-white">
       {/* Header */}
       <View className="bg-violet-800 px-4 py-6 pt-12">
-        <Pressable 
+        <TouchableOpacity 
           onPress={() => router.back()}
           className="mb-4"
         >
           <Text className="text-white text-lg">← Volver</Text>
-        </Pressable>
+        </TouchableOpacity>
         <Text className="text-white text-xl font-bold mb-3">Editar Propiedad</Text>
       </View>
 
@@ -472,4 +472,3 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
     </ScrollView>
   );
 }
-

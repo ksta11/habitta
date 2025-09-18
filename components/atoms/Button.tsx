@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text } from 'react-native';
+import { Pressable, Text } from 'react-native';
 
 interface ButtonProps {
   title: string;
@@ -78,7 +78,7 @@ export default function Button({
   };
 
   return (
-    <TouchableOpacity
+    <Pressable
       className={getButtonStyles()}
       onPress={onPress}
       disabled={disabled}
@@ -87,6 +87,7 @@ export default function Button({
       <Text className={getTextStyles()}>
         {title}
       </Text>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
+

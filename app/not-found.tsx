@@ -1,13 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 
 const NotFound: React.FC = () => (
     <View style={styles.container}>
         <Text style={styles.title}>404</Text>
         <Text style={styles.subtitle}>Página no encontrada</Text>
-        <TouchableOpacity style={styles.button} onPress={() => {/* Navega al inicio */}}>
+        <Pressable style={styles.button} onPress={() => {/* Navega al inicio */}}>
             <Text style={styles.buttonText}>Volver al inicio</Text>
-        </TouchableOpacity>
+        </Pressable>
     </View>
 );
 

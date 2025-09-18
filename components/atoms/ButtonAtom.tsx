@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text, ActivityIndicator, View, ViewStyle } from 'react-native';
+import { Pressable, Text, ActivityIndicator, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface ButtonAtomProps {
@@ -185,13 +185,12 @@ export default function ButtonAtom({
   };
 
   return (
-    <TouchableOpacity
+    <Pressable
       style={buttonStyles}
       onPress={onPress}
       disabled={isDisabled}
-      activeOpacity={0.8}
     >
       {renderContent()}
-    </TouchableOpacity>
+    </Pressable>
   );
 }
