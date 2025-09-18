@@ -459,7 +459,7 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
                   ]
                 );
               }}
-              variant="outline"
+              variant="secondary"
               size="large"
               icon="close-outline"
               iconPosition="left"

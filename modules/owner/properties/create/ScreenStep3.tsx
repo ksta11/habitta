@@ -6,6 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 import ProgressBar from '../../../../components/atoms/ProgressBar';
 import PickerAtom from '../../../../components/atoms/Picker';
 import ImageUploader from '../../../../components/atoms/ImageUploader';
+import ButtonAtom from '../../../../components/atoms/ButtonAtom';
 import { FormStepProps } from '../../../../interfaces/property/types';
 
 const plans = [
@@ -129,18 +130,28 @@ export default function ScreenStep3({
       )}
 
       <View className="flex-row justify-between mt-6">
-        <Pressable
-          className="bg-erie-black rounded-lg p-3 flex-1 mr-2"
-          onPress={prevStep}
-        >
-          <Text className="text-center text-white-traffic font-bold">Atrás</Text>
-        </Pressable>
-        <Pressable
-          className="bg-violet rounded-lg p-3 flex-1 ml-2"
-          onPress={isLastStep ? onSubmit : nextStep}
-        >
-          <Text className="text-center text-white-traffic font-bold">{isLastStep ? 'Guardar' : 'Siguiente'}</Text>
-        </Pressable>
+        <View className="flex-1 mr-2">
+          <ButtonAtom
+            title="Atrás"
+            onPress={prevStep}
+            variant="secondary"
+            size="large"
+            icon="arrow-back-outline"
+            iconPosition="left"
+            fullWidth={true}
+          />
+        </View>
+        <View className="flex-1 ml-2">
+          <ButtonAtom
+            title={isLastStep ? 'Guardar' : 'Siguiente'}
+            onPress={isLastStep ? onSubmit : nextStep}
+            variant={isLastStep ? 'success' : 'primary'}
+            size="large"
+            icon={isLastStep ? 'save-outline' : 'arrow-forward-outline'}
+            iconPosition={isLastStep ? 'left' : 'right'}
+            fullWidth={true}
+          />
+        </View>
       </View>
     </View>
   );

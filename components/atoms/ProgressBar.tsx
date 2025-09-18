@@ -39,7 +39,7 @@ export default function ProgressBar({ steps, currentStep }: ProgressBarProps) {
               key={index}
               className={`
                 flex-1 flex-col items-center justify-center gap-1 p-2
-                ${isActive ? 'bg-blue-50' : isCompleted ? 'bg-green-50' : 'bg-white'}
+                ${isActive ? 'bg-lavender-indigo/10' : isCompleted ? 'bg-violet/10' : 'bg-white'}
                 ${index < steps.length - 1 ? 'border-r border-gray-100' : ''}
               `}
             >
@@ -48,10 +48,10 @@ export default function ProgressBar({ steps, currentStep }: ProgressBarProps) {
                 size={18}
                 color={
                   isCompleted 
-                    ? '#059669' // green-600
+                    ? '#531A99' // violet (más vibrante que deep-violet)
                     : isActive 
-                    ? '#2563eb' // blue-600
-                    : '#6b7280' // gray-500
+                    ? '#A346E6' // lavender-indigo (vibrante)
+                    : '#9CA3AF' // gray-400 (más claro que antes)
                 }
               />
               
@@ -59,10 +59,10 @@ export default function ProgressBar({ steps, currentStep }: ProgressBarProps) {
                 <Text className={`
                   text-xs font-medium text-center
                   ${isCompleted 
-                    ? 'text-green-600' 
+                    ? 'text-violet' 
                     : isActive 
-                    ? 'text-blue-600' 
-                    : 'text-gray-900'
+                    ? 'text-lavender-indigo' 
+                    : 'text-gray-600'
                   }
                 `}>
                   {step.title}

@@ -12,7 +12,7 @@ interface ButtonAtomProps {
   icon?: keyof typeof Ionicons.glyphMap;
   iconPosition?: 'left' | 'right';
   fullWidth?: boolean;
-  style?: object;
+  className?: string;
 }
 
 export default function ButtonAtom({
@@ -25,155 +25,127 @@ export default function ButtonAtom({
   icon,
   iconPosition = 'left',
   fullWidth = false,
-  style = {}
+  className = ''
 }: ButtonAtomProps) {
   
-  // Configuración de colores por variante
-  const getVariantStyles = () => {
+  // Configuración de estilos por variante usando Tailwind
+  const getVariantClasses = () => {
     const variants = {
-      primary: {
-        backgroundColor: '#8B5CF6', // morado
-        borderColor: '#8B5CF6',
-        textColor: '#FFFFFF',
-        borderWidth: 2,
-      },
-      secondary: {
-        backgroundColor: '#6B7280', // gris
-        borderColor: '#6B7280',
-        textColor: '#FFFFFF',
-        borderWidth: 2,
-      },
-      danger: {
-        backgroundColor: '#EF4444', // rojo
-        borderColor: '#EF4444',
-        textColor: '#FFFFFF',
-        borderWidth: 2,
-      },
-      success: {
-        backgroundColor: '#10B981', // verde
-        borderColor: '#10B981',
-        textColor: '#FFFFFF',
-        borderWidth: 2,
-      },
-      warning: {
-        backgroundColor: '#F59E0B', // amarillo
-        borderColor: '#F59E0B',
-        textColor: '#FFFFFF',
-        borderWidth: 2,
-      },
-      outline: {
-        backgroundColor: 'transparent',
-        borderColor: '#8B5CF6',
-        textColor: '#8B5CF6',
-        borderWidth: 2,
-      },
-      ghost: {
-        backgroundColor: 'transparent',
-        borderColor: 'transparent',
-        textColor: '#8B5CF6',
-        borderWidth: 0,
-      }
+      primary: 'bg-blue-500 border-blue-500 border-2',
+      secondary: 'bg-gray-600 border-gray-600 border-2',
+      danger: 'bg-red-500 border-red-500 border-2',
+      success: 'bg-green-500 border-green-500 border-2',
+      warning: 'bg-yellow-500 border-yellow-500 border-2',
+      outline: 'bg-transparent border-blue-500 border-2',
+      ghost: 'bg-transparent border-transparent'
     };
     
     return variants[variant];
   };
 
-  // Configuración de tamaños
-  const getSizeStyles = () => {
+  // Configuración de colores de texto por variante
+  const getTextColorClasses = () => {
+    const textColors = {
+      primary: 'text-white',
+      secondary: 'text-white',
+      danger: 'text-white',
+      success: 'text-white',
+      warning: 'text-white',
+      outline: 'text-blue-500',
+      ghost: 'text-blue-500'
+    };
+    
+    return textColors[variant];
+  };
+
+  // Configuración de tamaños usando Tailwind
+  const getSizeClasses = () => {
     const sizes = {
-      small: {
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        fontSize: 14,
-        iconSize: 16,
-        borderRadius: 8,
-        minHeight: 36,
-      },
-      medium: {
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        fontSize: 16,
-        iconSize: 20,
-        borderRadius: 12,
-        minHeight: 48,
-      },
-      large: {
-        paddingVertical: 16,
-        paddingHorizontal: 32,
-        fontSize: 18,
-        iconSize: 24,
-        borderRadius: 16,
-        minHeight: 56,
-      }
+      small: 'py-2 px-4 min-h-[36px] rounded-2xl',
+      medium: 'py-3 px-6 min-h-[48px] rounded-[20px]',
+      large: 'py-4 px-8 min-h-[56px] rounded-3xl'
     };
     
     return sizes[size];
   };
 
-  const variantStyles = getVariantStyles();
-  const sizeStyles = getSizeStyles();
+  // Configuración de tamaños de texto e íconos
+  const getContentSizes = () => {
+    const sizes = {
+      small: { fontSize: 14, iconSize: 16 },
+      medium: { fontSize: 16, iconSize: 20 },
+      large: { fontSize: 18, iconSize: 24 }
+    };
+    
+    return sizes[size];
+  };
+
+  const variantClasses = getVariantClasses();
+  const textColorClasses = getTextColorClasses();
+  const sizeClasses = getSizeClasses();
+  const contentSizes = getContentSizes();
   
   // Estados de disabled y loading
   const isDisabled = disabled || loading;
-  const opacity = isDisabled ? 0.6 : 1;
+  const opacityClass = isDisabled ? 'opacity-60' : 'opacity-100';
+  const widthClass = fullWidth ? 'w-full' : '';
 
-  // Estilos del botón
-  const buttonStyles: ViewStyle = {
-    backgroundColor: variantStyles.backgroundColor,
-    borderColor: variantStyles.borderColor,
-    borderWidth: variantStyles.borderWidth,
-    borderRadius: sizeStyles.borderRadius,
-    paddingVertical: sizeStyles.paddingVertical,
-    paddingHorizontal: sizeStyles.paddingHorizontal,
-    minHeight: sizeStyles.minHeight,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    opacity,
-    ...(fullWidth && { width: '100%' }),
-    ...style
-  };
+  // Clases base del botón con sombra
+  const buttonClasses = `
+    ${variantClasses}
+    ${sizeClasses}
+    ${opacityClass}
+    ${widthClass}
+    flex-row items-center justify-center
+    shadow-lg
+    ${className}
+  `.trim().replace(/\s+/g, ' ');
 
-  // Estilos del texto
-  const textStyles = {
-    color: variantStyles.textColor,
-    fontSize: sizeStyles.fontSize,
-    fontWeight: '600' as const,
-    textAlign: 'center' as const,
-  };
+  // Clases del texto
+  const textClasses = `${textColorClasses} font-semibold text-center`;
 
   // Renderizar contenido del botón
   const renderContent = () => {
     if (loading) {
       return (
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View className="flex-row items-center">
           <ActivityIndicator 
             size="small" 
-            color={variantStyles.textColor} 
+            color={variant === 'outline' || variant === 'ghost' ? '#3B82F6' : '#FFFFFF'}
             style={{ marginRight: 8 }}
           />
-          <Text style={textStyles}>Cargando...</Text>
+          <Text 
+            className={textClasses}
+            style={{ fontSize: contentSizes.fontSize }}
+          >
+            Cargando...
+          </Text>
         </View>
       );
     }
 
     if (icon) {
       return (
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View className="flex-row items-center">
           {iconPosition === 'left' && (
             <Ionicons 
               name={icon} 
-              size={sizeStyles.iconSize} 
-              color={variantStyles.textColor}
+              size={contentSizes.iconSize} 
+              color={variant === 'outline' || variant === 'ghost' ? '#3B82F6' : '#FFFFFF'}
               style={{ marginRight: 8 }}
             />
           )}
-          <Text style={textStyles}>{title}</Text>
+          <Text 
+            className={textClasses}
+            style={{ fontSize: contentSizes.fontSize }}
+          >
+            {title}
+          </Text>
           {iconPosition === 'right' && (
             <Ionicons 
               name={icon} 
-              size={sizeStyles.iconSize} 
-              color={variantStyles.textColor}
+              size={contentSizes.iconSize} 
+              color={variant === 'outline' || variant === 'ghost' ? '#3B82F6' : '#FFFFFF'}
               style={{ marginLeft: 8 }}
             />
           )}
@@ -181,12 +153,29 @@ export default function ButtonAtom({
       );
     }
 
-    return <Text style={textStyles}>{title}</Text>;
+    return (
+      <Text 
+        className={textClasses}
+        style={{ fontSize: contentSizes.fontSize }}
+      >
+        {title}
+      </Text>
+    );
   };
 
   return (
     <Pressable
-      style={buttonStyles}
+      className={buttonClasses}
+      style={{
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 4,
+        },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        elevation: 6, // Para Android
+      }}
       onPress={onPress}
       disabled={isDisabled}
     >
