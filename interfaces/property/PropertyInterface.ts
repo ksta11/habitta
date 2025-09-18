@@ -8,12 +8,32 @@ export interface CreatePropertyDTO {
   address: string;
   city: string;
   price: number;
-  type: string;
+  type: 'house' | 'apartament' | 'store' | 'office' | 'werehouse';
   rooms: number;
   bathrooms: number;
   area: number;
   services: string;
   images: string[];
+}
+
+export interface EditPropertyDTO {
+  title: string;
+  description: string;
+  address: string;
+  city: string;
+  price: number;
+  type: 'house' | 'apartament' | 'store' | 'office' | 'werehouse';
+  rooms: number;
+  bathrooms: number;
+  area: number;
+  services: string;
+  publication_status: 'published' | 'rented' | 'disabled';
+  images: string[];
+}
+
+// DTO para actualizar propiedad (incluye id_owner para el backend)
+export interface UpdatePropertyDTO extends EditPropertyDTO {
+  id_owner: string;
 }
 
 // Interfaces para obtener propiedades del owner
@@ -86,6 +106,13 @@ export interface GetPropertyByIdResponse {
   success: boolean;
   data: Property | null;
   message?: string;
+}
+
+export interface UpdatePropertyResponse {
+  success: boolean;
+  data?: Property;
+  message?: string;
+  statusCode?: number;
 }
 
 // Aquí puedes agregar más interfaces relacionadas a propiedades

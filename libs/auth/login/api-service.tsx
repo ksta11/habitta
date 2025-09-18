@@ -1,5 +1,5 @@
 import { LoginDTO, LoginResponse } from '../../../interfaces/LoginInterface';
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://192.168.1.12:3000';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;  
 
 export const authenticationUser = async (credentials: LoginDTO): Promise<LoginResponse> => {
   try {

@@ -88,6 +88,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
   }, [isAuthenticated, token]);
 
+  
+
   // Función para iniciar la verificación periódica del token
   const startTokenExpirationCheck = () => {
     if (!token) return;
@@ -164,6 +166,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('❌ Error al manejar token expirado:', error);
     }
   };
+
 
   // Cargar token y usuario almacenados
   const loadStoredAuth = async () => {
@@ -250,7 +253,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             redirectPath = '/(admin)/home';
             break;
           case 'owner':
-            redirectPath = '/(owner)/property';
+            redirectPath = '/(owner)/(properties)/index';
             break;
           case 'user':
           default:
@@ -347,21 +350,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Actualizar datos del usuario en el contexto
   const updateUserData = async (updatedUserData: User): Promise<void> => {
     try {
-      console.log('🔄 Actualizando datos del usuario en el contexto...');
-      console.log('📋 Datos recibidos:', updatedUserData);
-      console.log('📋 Usuario actual antes de actualizar:', user);
+        console.log('🔄 Actualizando datos del usuario en el contexto...');
+        console.log('📋 Datos recibidos:', updatedUserData);
+        console.log('📋 Usuario actual antes de actualizar:', user);
       
       // Actualizar el estado local
-      setUser(updatedUserData);
+        setUser(updatedUserData);
       
       // Actualizar el almacenamiento
-      await AsyncStorage.setItem(USER_KEY, JSON.stringify(updatedUserData));
+        await AsyncStorage.setItem(USER_KEY, JSON.stringify(updatedUserData));
       
       console.log('✅ Datos del usuario actualizados en el contexto');
       console.log('📋 Usuario actual después de actualizar:', updatedUserData);
     } catch (error) {
       console.error('❌ Error al actualizar datos del usuario:', error);
 
+    };
+  };
   // Actualizar datos de autenticación (token y usuario)
   const updateAuthData = async (newToken: string, newUser: User): Promise<void> => {
     try {
@@ -377,7 +382,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log('✅ Datos de autenticación actualizados exitosamente');
     } catch (error) {
       console.error('❌ Error al actualizar datos de autenticación:', error);
-
     }
   };
 

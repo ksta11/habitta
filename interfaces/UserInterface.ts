@@ -17,27 +17,17 @@ export interface ChangePasswordDTO{
     newPassword: string,
 }
 
+// Interfaz unificada que coincide con la respuesta del backend
 export interface UserDAO {
     message?: string,
     user: {
-        _id: string,
-        name: string,
-        email: string,
-        password: string,
-        phone: string,
-        role: string,
-        creation_date: Date,
-    }
-}
-
-export interface UserResponseDAO {
-    message?: string,
-    user: {
-        _id: string,
+        id: string,
         name: string,
         email: string,
         phone: string,
         role: string,
+        status?: string,
+        verificationCode?: string | null,
         creation_date: Date,
     }
 }

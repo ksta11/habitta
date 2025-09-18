@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PropertySchema } from '../../../../schemes/PropertySchema';
-import { CreatePropertyDTO } from '../../../../interfaces/property/PropertyInterface';
+import { CreatePropertySchema, CreatePropertyFormType } from '../../../../schemes/PropertySchema';
 import ScreenStep1 from './ScreenStep1';
 import ScreenStep2 from './ScreenStep2';
 import ScreenStep3 from './ScreenStep3';
@@ -36,8 +35,8 @@ const stepFields: FieldName[][] = [
 export default function ScreenForm() {
   const [currentStep, setCurrentStep] = useState(0);
   const { user } = useAuth();
-  const form = useForm<CreatePropertyDTO>({
-    resolver: zodResolver(PropertySchema),
+  const form = useForm<CreatePropertyFormType>({
+    resolver: zodResolver(CreatePropertySchema),
     mode: 'onTouched',
     defaultValues: {
       title: '',
@@ -48,7 +47,7 @@ export default function ScreenForm() {
       area: 0,
       rooms: 0,
       bathrooms: 0,
-      type: '',
+      type: "house",
       services: '',
       images: [],
     },
@@ -63,7 +62,17 @@ export default function ScreenForm() {
       setCurrentStep((s) => Math.min(s + 1, steps.length - 1));
     }
   };
-  const prevStep = () => setCurrentStep((s) => Math.max(s - 1, 0));
+  
+  const prevStep = () => {
+    if (currentStep === 0) {
+      // Si estamos en el primer step, resetear formulario y volver a la pantalla anterior
+      form.reset();
+      router.back();
+    } else {
+      // Si no, ir al step anterior
+      setCurrentStep((s) => Math.max(s - 1, 0));
+    }
+  };
 
   // Lógica para enviar el formulario
   const router = useRouter();

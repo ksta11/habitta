@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { router, Link } from 'expo-router';
 import { useAuth } from '../../../contexts/AuthContext';
-import { AuthGuard } from '../../../middleware/AuthGuard';
 import { deleteCurrentUserProfile } from '../../../libs/userServices/api-service';
 import Label from '../../../components/atoms/Label';
 
@@ -79,8 +78,9 @@ const ScreenSettings = () => {
         {
           text: 'Cerrar Sesión',
           style: 'destructive',
-          onPress: () => {
+          onPress: async () => {
             console.log('🚪 Cerrando sesión...');
+            await logout(); // ✅ Usa la función del contexto que limpia todo
             router.replace('/auth/login');
           },
         },
@@ -90,7 +90,6 @@ const ScreenSettings = () => {
 
 
   return (
-    <AuthGuard requiredRole="user">
       <ScrollView 
         className="flex-1 bg-gray-50"
         contentContainerStyle={{ padding: 24 }}
@@ -235,7 +234,6 @@ const ScreenSettings = () => {
         </View>
       </View>
     </ScrollView>
-    </AuthGuard>
   );
 };
 

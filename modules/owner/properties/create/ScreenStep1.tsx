@@ -17,7 +17,7 @@ export default function ScreenStep1({
 }: FormStepProps) {
   const { errors } = formState;
   return (
-    <View className="flex-1 bg-white p-4">
+    <View className="flex-1 bg-white-traffic p-4">
       <ProgressBar
         steps={[
           { icon: 'home-outline', title: 'General', description: 'Información básica' },
@@ -33,6 +33,10 @@ export default function ScreenStep1({
         value={watch('title')}
         onChangeText={text => setValue('title', text)}
         error={errors.title?.message}
+        borderColor="#A346E6"
+        backgroundColor="#F6F6F6"
+        labelColor="#A346E6"
+        textColor="#1F1F1F"
         {...register('title')}
       />
       <Input
@@ -41,6 +45,10 @@ export default function ScreenStep1({
         value={watch('description')}
         onChangeText={text => setValue('description', text)}
         error={errors.description?.message}
+        borderColor="#A346E6"
+        backgroundColor="#F6F6F6"
+        labelColor="#A346E6"
+        textColor="#1F1F1F"
         {...register('description')}
       />
       <Input
@@ -49,6 +57,10 @@ export default function ScreenStep1({
         value={watch('city')}
         onChangeText={text => setValue('city', text)}
         error={errors.city?.message}
+        borderColor="#A346E6"
+        backgroundColor="#F6F6F6"
+        labelColor="#A346E6"
+        textColor="#1F1F1F"
         {...register('city')}
       />
       <Input
@@ -57,22 +69,27 @@ export default function ScreenStep1({
         value={watch('address')}
         onChangeText={text => setValue('address', text)}
         error={errors.address?.message}
+        borderColor="#A346E6"
+        backgroundColor="#F6F6F6"
+        labelColor="#A346E6"
+        textColor="#1F1F1F"
         {...register('address')}
       />
 
       <View className="flex-row justify-between">
         <TouchableOpacity
-          className="bg-gray-300 rounded-lg p-3 flex-1 mr-2"
+          className="bg-erie-black rounded-lg p-3 flex-1 mr-2"
           onPress={prevStep}
-          disabled={isFirstStep}
         >
-          <Text className="text-center text-gray-700 font-bold">Atrás</Text>
+          <Text className="text-center text-white-traffic font-bold">
+            {isFirstStep ? 'Cancelar' : 'Atrás'}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          className="bg-blue-500 rounded-lg p-3 flex-1 ml-2"
+          className="bg-lavender-indigo rounded-lg p-3 flex-1 ml-2"
           onPress={nextStep}
         >
-          <Text className="text-center text-white font-bold">Siguiente</Text>
+          <Text className="text-center text-white-traffic font-bold">Siguiente</Text>
         </TouchableOpacity>
       </View>
     </View>

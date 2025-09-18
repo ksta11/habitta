@@ -50,7 +50,7 @@ export default function FormEditUserProfile() {
     try {
       setIsLoading(true);
       const response = await getCurrentUserProfile();
-      if (response.user._id) {
+      if (response.user.id) {
         // Cargar datos del usuario en el formulario
         setValue('name', response.user.name);
         setValue('email', response.user.email);
@@ -109,14 +109,14 @@ export default function FormEditUserProfile() {
 
       // Verificar si la respuesta es válida
       if (result && typeof result === 'object') {
-        if (result.user && result.user._id) {
+        if (result.user && result.user.id) {
           console.log("✅ Perfil actualizado exitosamente");
           setSubmitSuccess("Perfil actualizado exitosamente");
           
           // Actualizar los datos del usuario en el contexto
           try {
-            await updateUserData({
-              id: result.user._id,
+            await updateData({
+              id: result.user.id,
               name: result.user.name,
               email: result.user.email,
               phone: result.user.phone,
