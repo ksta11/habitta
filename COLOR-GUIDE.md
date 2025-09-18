@@ -190,7 +190,6 @@ export const DARK_COLORS = {
 
 ## ✅ Checklist de Accesibilidad
 
-- [x] **Contraste**: Todos los colores cumplen WCAG 2.1 AA
 - [x] **Legibilidad**: Textos legibles en todos los backgrounds
 - [x] **Consistencia**: Uso consistente de colores por función
 - [x] **Estados**: Colores distintivos para estados interactivos
@@ -206,4 +205,4 @@ export const DARK_COLORS = {
 
 ---
 
-*Esta guía asegura una experiencia visual cohesiva y profesional en toda la aplicación Habitta* 🎨✨
+*Esta guía asegura una experiencia visual cohesiva y profesional en toda la aplicación Habitta* 
