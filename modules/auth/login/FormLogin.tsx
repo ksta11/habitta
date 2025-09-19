@@ -64,7 +64,7 @@ export default function FormLogin() {
   };
 
   return (
-    <View className="flex-1 w-full" style={{ backgroundColor: "#7C3AED" }}>
+    <View className="flex-1 w-full bg-violet" >
       <StatusBar style="light" backgroundColor="#7C3AED" translucent={false} />
 
       {/* contenedor header with gradient and decorative circles - Fixed position */}

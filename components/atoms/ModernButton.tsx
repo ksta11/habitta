@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text } from 'react-native';
+import { Pressable, Text } from 'react-native';
 import { FONTS } from '../../utils/fonts';
 
 interface ModernButtonProps {
@@ -64,7 +64,7 @@ export default function ModernButton({
   };
 
   return (
-    <TouchableOpacity
+    <Pressable
       style={getButtonStyle()}
       onPress={onPress}
       disabled={disabled || loading}
@@ -72,6 +72,7 @@ export default function ModernButton({
       <Text style={getTextStyle()}>
         {loading ? 'Loading...' : title}
       </Text>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
+

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, TouchableOpacity } from 'react-native';
+import { View, ScrollView, Pressable } from 'react-native';
 import Label from '../../components/atoms/Label';
 import Button from '../../components/atoms/Button';
 
@@ -104,10 +104,9 @@ export default function Home() {
           
           <View className="mt-3 flex-row flex-wrap justify-between">
             {quickActions.map((action) => (
-              <TouchableOpacity
+              <Pressable
                 key={action.id}
-                className={`${action.color} rounded-lg p-4 mb-3 items-center`}
-                style={{ width: '48%' }}
+                className={`${action.color} rounded-lg p-4 mb-3 items-center w-[48%]`}
                 onPress={() => console.log(`Acción: ${action.title}`)}
               >
                 <View className="text-2xl mb-2">
@@ -118,7 +117,7 @@ export default function Home() {
                   size="sm" 
                   weight="medium"
                 />
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </View>
         </View>
@@ -140,14 +139,14 @@ export default function Home() {
             
             <View className="flex-row justify-between mt-3">
               {['😊', '😐', '😷', '🤒'].map((emoji, index) => (
-                <TouchableOpacity
+                <Pressable
                   key={index}
                   className="bg-gray-100 rounded-full p-3 items-center justify-center"
                   style={{ width: 60, height: 60 }}
                   onPress={() => console.log(`Estado: ${emoji}`)}
                 >
                   <Label text={emoji} size="xl" />
-                </TouchableOpacity>
+                </Pressable>
               ))}
             </View>
           </View>
@@ -163,7 +162,7 @@ export default function Home() {
           
           <View className="mt-3">
             {recentActivity.map((activity) => (
-              <TouchableOpacity
+              <Pressable
                 key={activity.id}
                 className="bg-white rounded-lg p-4 mb-3 shadow-sm"
               >
@@ -182,7 +181,7 @@ export default function Home() {
                   </View>
                   <Label text=">" size="lg" variant="default" />
                 </View>
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </View>
         </View>
@@ -190,6 +189,7 @@ export default function Home() {
     </ScrollView>
   );
 }
+
 
 
 

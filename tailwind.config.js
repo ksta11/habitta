@@ -14,7 +14,7 @@ module.exports = {
     extend: {
       colors: {
         // Colores personalizados de Habitta
-        violet: '#531A99',
+        violet: '#7C3AED',
         'deep-violet': '#320964',
         'lavender-indigo': '#A346E6',
         'lavender-bright': '#BD93EF',
@@ -26,7 +26,7 @@ module.exports = {
         'nunito-medium': ['Nunito_500Medium'],
         'nunito-semibold': ['Nunito_600SemiBold'],
         'nunito-bold': ['Nunito_700Bold'],
-        // Aliases para facilitar el uso
+       //Alias para usar con tailwind
         'sans': ['Nunito_400Regular'],
         'medium': ['Nunito_500Medium'],
         'semibold': ['Nunito_600SemiBold'],

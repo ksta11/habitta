@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text, ActivityIndicator, View } from 'react-native';
+import { Pressable, Text, ActivityIndicator, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface ButtonAtomProps {
@@ -164,7 +164,7 @@ export default function ButtonAtom({
   };
 
   return (
-    <TouchableOpacity
+    <Pressable
       className={buttonClasses}
       style={{
         shadowColor: '#000',
@@ -178,9 +178,8 @@ export default function ButtonAtom({
       }}
       onPress={onPress}
       disabled={isDisabled}
-      activeOpacity={0.8}
     >
       {renderContent()}
-    </TouchableOpacity>
+    </Pressable>
   );
 }

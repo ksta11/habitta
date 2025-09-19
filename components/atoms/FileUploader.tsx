@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, Pressable, Alert } from 'react-native';
 import { Svg, Path } from 'react-native-svg';
 import * as DocumentPicker from 'expo-document-picker';
 
@@ -62,7 +62,7 @@ export default function FileUploader({
   const displayTitle = title === "Upload your file(s)" ? getDefaultTitle() : title;
 
   return (
-    <TouchableOpacity 
+    <Pressable 
       onPress={handleFilePick}
       disabled={disabled}
       className={`rounded border border-gray-300 p-4 shadow-sm ${
@@ -90,6 +90,7 @@ export default function FileUploader({
           />
         </Svg>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
+

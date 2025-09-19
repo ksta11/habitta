@@ -6,7 +6,6 @@ import ScreenLogin from '../../modules/auth/login/ScreenLogin';
 export default function LoginPage() {
   return (
     <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1"
     >
       <ScrollView 

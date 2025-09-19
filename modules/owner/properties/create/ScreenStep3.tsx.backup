@@ -1,12 +1,11 @@
 
 import React from 'react';
-import { View, Text, Pressable, Image } from 'react-native';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
 import Input from '../../../../components/atoms/Input';
 import * as ImagePicker from 'expo-image-picker';
 import ProgressBar from '../../../../components/atoms/ProgressBar';
 import PickerAtom from '../../../../components/atoms/Picker';
 import ImageUploader from '../../../../components/atoms/ImageUploader';
-import ButtonAtom from '../../../../components/atoms/ButtonAtom';
 import { FormStepProps } from '../../../../interfaces/property/types';
 
 const plans = [
@@ -117,12 +116,12 @@ export default function ScreenStep3({
                   <Text className="text-white-traffic text-xs font-bold">{idx + 1}</Text>
                 </View>
                 {/* Botón eliminar */}
-                <Pressable 
+                <TouchableOpacity 
                   className="absolute -top-1 -right-1 bg-erie-black w-5 h-5 rounded-full items-center justify-center"
                   onPress={() => removeImage(idx)}
                 >
                   <Text className="text-white-traffic text-xs font-bold">×</Text>
-                </Pressable>
+                </TouchableOpacity>
               </View>
             ))}
           </View>
@@ -130,28 +129,18 @@ export default function ScreenStep3({
       )}
 
       <View className="flex-row justify-between mt-6">
-        <View className="flex-1 mr-2">
-          <ButtonAtom
-            title="Atrás"
-            onPress={prevStep}
-            variant="secondary"
-            size="large"
-            icon="arrow-back-outline"
-            iconPosition="left"
-            fullWidth={true}
-          />
-        </View>
-        <View className="flex-1 ml-2">
-          <ButtonAtom
-            title={isLastStep ? 'Guardar' : 'Siguiente'}
-            onPress={isLastStep ? onSubmit : nextStep}
-            variant={isLastStep ? 'success' : 'primary'}
-            size="large"
-            icon={isLastStep ? 'save-outline' : 'arrow-forward-outline'}
-            iconPosition={isLastStep ? 'left' : 'right'}
-            fullWidth={true}
-          />
-        </View>
+        <TouchableOpacity
+          className="bg-erie-black rounded-lg p-3 flex-1 mr-2"
+          onPress={prevStep}
+        >
+          <Text className="text-center text-white-traffic font-bold">Atrás</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          className="bg-violet rounded-lg p-3 flex-1 ml-2"
+          onPress={isLastStep ? onSubmit : nextStep}
+        >
+          <Text className="text-center text-white-traffic font-bold">{isLastStep ? 'Guardar' : 'Siguiente'}</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
