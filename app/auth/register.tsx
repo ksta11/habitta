@@ -5,7 +5,6 @@ import ScreenRegister from '../../modules/auth/register/ScreenRegister';
 export default function RegisterPage() {
   return (
     <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1"
     >
       <ScrollView 

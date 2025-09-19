@@ -106,8 +106,7 @@ export default function Home() {
             {quickActions.map((action) => (
               <Pressable
                 key={action.id}
-                className={`${action.color} rounded-lg p-4 mb-3 items-center`}
-                style={{ width: '48%' }}
+                className={`${action.color} rounded-lg p-4 mb-3 items-center w-[48%]`}
                 onPress={() => console.log(`Acción: ${action.title}`)}
               >
                 <View className="text-2xl mb-2">

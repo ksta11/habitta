@@ -67,7 +67,7 @@ export default function RegisterForm() {
   };
 
   return (
-    <View className="flex-1 w-full" style={{ backgroundColor: "#7C3AED" }}>
+    <View className="flex-1 w-full bg-violet">
       <StatusBar style="light" backgroundColor="#7C3AED" translucent={false} />
 
       {/* Header with gradient and decorative circles - Fixed position */}

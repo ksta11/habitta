@@ -15,7 +15,6 @@ export default function ScreenRegister() {
       }}
     >
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1 w-full"
         style={{ backgroundColor: "#7C3AED" }}
       >
