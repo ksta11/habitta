@@ -13,7 +13,7 @@ export interface CreatePropertyDTO {
   bathrooms: number;
   area: number;
   services: string;
-  images: string[];
+  images: PropertyImage[];
 }
 
 export interface EditPropertyDTO {
@@ -28,7 +28,7 @@ export interface EditPropertyDTO {
   area: number;
   services: string;
   publication_status: 'published' | 'rented' | 'disabled';
-  images: string[];
+  images: PropertyImage[];
 }
 
 // DTO para actualizar propiedad (incluye id_owner para el backend)
@@ -111,6 +111,12 @@ export interface GetPropertyByIdResponse {
 export interface UpdatePropertyResponse {
   success: boolean;
   data?: Property;
+  message?: string;
+  statusCode?: number;
+}
+
+export interface DeletePropertyResponse {
+  success: boolean;
   message?: string;
   statusCode?: number;
 }
