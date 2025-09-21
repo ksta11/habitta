@@ -614,7 +614,7 @@ export const SolicitudesTable: React.FC = () => {
                   </ScrollView>
 
                   {(selectedSolicitud.estado === 'pendiente' || selectedSolicitud.estado === 'en_revision') && (
-                    <View className="flex-row mt-6 space-x-3">
+                    <View className="flex-row mt-6">
                       <Pressable 
                         className="flex-1 bg-green-600 py-3 rounded-lg mr-2"
                         onPress={() => handleAprobar(selectedSolicitud.id)}

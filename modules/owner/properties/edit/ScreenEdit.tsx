@@ -221,7 +221,7 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
         <Label text="Ubicación" size="lg" weight="semibold" />
         <View className="mb-4" />
 
-        <View className="flex-row space-x-3">
+        <View className="flex-row">
           <View className="flex-1 mr-1">
             <Controller
               control={control}
@@ -307,7 +307,7 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
           )}
         />
 
-        <View className="flex-row space-x-3">
+        <View className="flex-row">
           <View className="flex-1 mr-1">
             <Controller
               control={control}
@@ -411,7 +411,7 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
           )}
         />
 
-        <View className="flex-row space-x-3 mt-6">
+        <View className="flex-row mt-6">
           <ButtonAtom
             title={isSubmitting ? 'Guardando...' : 'Guardar'}
             onPress={handleSubmit(onSubmit)}

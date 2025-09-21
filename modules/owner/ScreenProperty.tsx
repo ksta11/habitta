@@ -166,7 +166,7 @@ export default function PropertyScreen() {
                 />
                 
                 {/* Botones de editar y eliminar */}
-                <View className="mt-2 flex-row space-x-3">
+                <View className="mt-2 flex-row">
                   <View className="flex-1 mr-2">
                     <ButtonAtom
                       title="Editar"

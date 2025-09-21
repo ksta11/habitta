@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 
-export default function PropertiesLayout() {
+export default function ApplicationsLayout() {
   return (
     <Stack
       screenOptions={{
@@ -16,20 +16,8 @@ export default function PropertiesLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: 'Propiedades',
+          title: 'Solicitudes de Arriendo',
         }}
-      />
-      <Stack.Screen 
-        name="create" 
-        options={{ 
-          headerShown: false 
-        }} 
-      />
-      <Stack.Screen 
-        name="edit" 
-        options={{ 
-          headerShown: false 
-        }} 
       />
     </Stack>
   );

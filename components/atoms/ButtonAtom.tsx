@@ -40,7 +40,7 @@ export default function ButtonAtom({
       ghost: 'bg-transparent border-transparent',
       'habitta-primary': 'bg-violet border-violet border-2',
       'habitta-secondary': 'bg-lavender-indigo border-lavender-indigo border-2',
-      'habitta-outline': 'bg-transparent border-violet border-2'
+      'habitta-outline': 'bg-white border-violet border-2'
     };
     
     return variants[variant];

@@ -290,7 +290,7 @@ export const UsersTable: React.FC = () => {
       </View>
 
       {/* Acciones */}
-      <View className="flex-row justify-end space-x-2">
+      <View className="flex-row justify-end">
         {user.solicitudPropietario && (
           <Pressable
             onPress={() => Alert.alert(
@@ -357,7 +357,7 @@ export const UsersTable: React.FC = () => {
           </View>
 
           {/* Filtros por tipo y estado */}
-          <View className="flex-row justify-between space-x-2">
+          <View className="flex-row justify-between">
             <Pressable 
               onPress={() => setFilterType(filterType === 'all' ? 'Propietario' : filterType === 'Propietario' ? 'Inquilino' : 'all')}
               className={`flex-1 px-4 py-2 rounded-lg border ${

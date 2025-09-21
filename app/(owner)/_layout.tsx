@@ -36,6 +36,17 @@ export default function OwnerTabsLayout() {
           }}
         />
 
+        {/* Tab Solicitudes */}
+        <Tabs.Screen
+          name="(applications)"
+          options={{
+            title: 'Solicitudes',
+            tabBarIcon: ({ color, size }) => (
+              <FontAwesome name="envelope" size={size} color={color} />
+            ),
+          }}
+        />
+
         {/* Tab Configuración */}
         <Tabs.Screen
           name="settings"
@@ -44,14 +55,6 @@ export default function OwnerTabsLayout() {
             tabBarIcon: ({ color, size }) => (
               <FontAwesome name="cog" size={size} color={color} />
             ),
-          }}
-        />
-
-        {/* Ocultar el archivo property.tsx ya que usaremos (properties) */}
-        <Tabs.Screen
-          name="property"
-          options={{
-            href: null, // Esto oculta el archivo property.tsx
           }}
         />
       </Tabs>
