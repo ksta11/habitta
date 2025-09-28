@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, ScrollView, Pressable, Alert, Image, Text } from "react-native";
+import { View, ScrollView, Pressable, Alert, Image, Text, RefreshControl } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import Label from "../../components/atoms/Label";
 import Input from "../../components/atoms/Input";
 import {
-  getOwnerProperties,
-  deleteProperty,
+  getAllProperties,
 } from "../../libs/owner/property/api-service";
 import { Property } from "../../interfaces/property/PropertyInterface";
 
@@ -25,84 +24,17 @@ const categories = [
   { id: 5, name: "Apartamentos duplex", icon: "🏠", active: false },
 ];
 
-const properties = [
-  {
-    id: 1,
-    title: "Apartamento moderno en Polanco",
-    location: "Polanco, CDMX",
-    price: "$25,000",
-    rating: 4.9,
-    reviews: 127,
-    image:
-      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=300&h=200&fit=crop",
-    isFavorite: false,
-  },
-  {
-    id: 2,
-    title: "Casa con jardín en Roma Norte",
-    location: "Roma Norte, CDMX",
-    price: "$35,000",
-    rating: 4.8,
-    reviews: 89,
-    image:
-      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=300&h=200&fit=crop",
-    isFavorite: true,
-  },
-  {
-    id: 3,
-    title: "Oficina ejecutiva en Santa Fe",
-    location: "Santa Fe, CDMX",
-    price: "$45,000",
-    rating: 4.7,
-    reviews: 156,
-    image:
-      "https://images.unsplash.com/photo-1497366216548-37526070297c?w=300&h=200&fit=crop",
-    isFavorite: false,
-  },
-  {
-    id: 4,
-    title: "Co-living en Condesa",
-    location: "Condesa, CDMX",
-    price: "$18,000",
-    rating: 4.6,
-    reviews: 203,
-    image:
-      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=300&h=200&fit=crop",
-    isFavorite: false,
-  },
-  {
-    id: 5,
-    title: "Loft industrial en Doctores",
-    location: "Doctores, CDMX",
-    price: "$22,000",
-    rating: 4.5,
-    reviews: 74,
-    image:
-      "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=300&h=200&fit=crop",
-    isFavorite: true,
-  },
-  {
-    id: 6,
-    title: "Penthouse en Zona Rosa",
-    location: "Zona Rosa, CDMX",
-    price: "$65,000",
-    rating: 4.9,
-    reviews: 45,
-    image:
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=300&h=200&fit=crop",
-    isFavorite: false,
-  },
-];
+
 
 export default function Home() {
-  const [favorites, setFavorites] = useState<number[]>([2, 5]);
+  const [favorites, setFavorites] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState("home");
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
 
-  const toggleFavorite = (propertyId: number) => {
+  const toggleFavorite = (propertyId: string) => {
     setFavorites((prev) =>
       prev.includes(propertyId)
         ? prev.filter((id) => id !== propertyId)
@@ -110,15 +42,27 @@ export default function Home() {
     );
   };
 
-  const navigateToProperty = (propertyId: number) => {
+  const navigateToProperty = (propertyId: string) => {
     console.log("Navegando a:", `/(user)/(home)/${propertyId}`);
     router.push(`/(user)/(home)/${propertyId}`);
+  };
+
+  // Función helper para formatear el precio
+  const formatPrice = (price: number): string => {
+    return `$${price.toLocaleString('es-MX')}`;
+  };
+
+  // Función helper para obtener la primera imagen
+  const getPropertyImage = (property: Property): string => {
+    return property.images && property.images.length > 0 
+      ? property.images[0].url_image 
+      : 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=300&h=200&fit=crop'; // imagen por defecto
   };
 
   const loadProperties = async () => {
     try {
       console.log("🏠 Cargando propiedades...");
-      const response = await getOwnerProperties();
+      const response = await getAllProperties();
 
       if (response.success) {
         setProperties(response.data);
@@ -158,19 +102,6 @@ export default function Home() {
   );
   return (
     <View className="flex-1 bg-white">
-      {/* Status Bar */}
-      <View className="flex-row justify-between items-center px-6 py-2">
-        <Label text="9:41" size="sm" weight="medium" />
-        <View className="flex-row items-center gap-1">
-          <View className="w-4 h-2 bg-black rounded-sm" />
-          <View className="w-4 h-2 bg-black rounded-sm" />
-          <View className="w-4 h-2 bg-black rounded-sm" />
-          <View className="w-6 h-3 border border-black rounded-sm">
-            <View className="w-4 h-2 bg-black rounded-sm m-0.5" />
-          </View>
-        </View>
-      </View>
-
       {/* Header */}
       <View className="flex-row items-center justify-between px-6 py-4">
         <View className="flex-row items-center gap-3">
@@ -191,7 +122,18 @@ export default function Home() {
         </Pressable>
       </View>
 
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        className="flex-1" 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={['#3B82F6']} // Android
+            tintColor="#3B82F6" // iOS
+          />
+        }
+      >
         {/* Search Bar */}
         <View className="px-6 mb-6">
           <View className="flex-row gap-3">
@@ -238,7 +180,18 @@ export default function Home() {
           </View>
 
           <View className="space-y-4">
-            {properties.map((property) => (
+            {loading ? (
+              <View className="flex-1 justify-center items-center py-20">
+                <Text className="text-gray-600">Cargando propiedades...</Text>
+              </View>
+            ) : properties.length === 0 ? (
+              <View className="flex-1 justify-center items-center py-20">
+                <Text className="text-gray-600 text-center">
+                  No hay propiedades disponibles
+                </Text>
+              </View>
+            ) : (
+              properties.map((property) => (
               <Pressable
                 key={property.id}
                 onPress={() => navigateToProperty(property.id)}
@@ -246,7 +199,7 @@ export default function Home() {
               >
                 <View className="relative">
                   <Image
-                    source={{ uri: property.image }}
+                    source={{ uri: getPropertyImage(property) }}
                     className="w-full h-48"
                     resizeMode="cover"
                   />
@@ -273,33 +226,30 @@ export default function Home() {
                   <View className="flex-row items-center gap-1 mb-2">
                     <LocationIcon />
                     <Label
-                      text={property.location}
+                      text={`${property.address}, ${property.city}`}
                       size="sm"
                       variant="default"
                     />
                   </View>
                   <View className="flex-row items-center justify-between">
                     <View className="flex-row items-center gap-1">
-                      <StarIcon />
-                      <Label
-                        text={property.rating.toString()}
-                        size="sm"
-                        weight="medium"
-                      />
-                      <Label
-                        text={`(${property.reviews})`}
-                        size="sm"
-                        variant="default"
-                      />
+                      <Text className="text-sm text-gray-600 capitalize">
+                        {property.type}
+                      </Text>
+                      <Text className="text-sm text-gray-400">•</Text>
+                      <Text className="text-sm text-gray-600">
+                        {property.rooms} hab • {property.bathrooms} baños
+                      </Text>
                     </View>
                     <View className="items-end">
-                      <Label text={property.price} size="lg" weight="bold" />
+                      <Label text={formatPrice(property.price)} size="lg" weight="bold" />
                       <Label text="/mes" size="sm" variant="default" />
                     </View>
                   </View>
                 </View>
               </Pressable>
-            ))}
+              ))
+            )}
           </View>
         </View>
       </ScrollView>
