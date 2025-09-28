@@ -15,11 +15,24 @@ export const editUserProfileSchema = z.object({
   .trim().optional(),
   password: z
     .string()
-    .min(1, 'La contraseña es requerida')
-    .min(8, 'La contraseña debe tener al menos 8 caracteres')
-    .max(100, 'La contraseña no puede exceder 100 caracteres')
-    .regex(/[A-Z]/, 'La contraseña debe tener al menos una mayúscula')
-    .regex(/[0-9]/, 'La contraseña debe tener al menos un número').optional(),
+    .optional()
+    .refine(
+      (password) => {
+        // Si la contraseña está vacía o es undefined, es válida (no se cambiará)
+        if (!password || password.trim() === '') return true;
+        
+        // Si tiene contenido, debe cumplir con las validaciones
+        return (
+          password.length >= 8 &&
+          password.length <= 100 &&
+          /[A-Z]/.test(password) &&
+          /[0-9]/.test(password)
+        );
+      },
+      {
+        message: 'La contraseña debe tener al menos 8 caracteres, una mayúscula y un número'
+      }
+    ),
   phone: z
     .string()
     .min(1, 'El teléfono es requerido')

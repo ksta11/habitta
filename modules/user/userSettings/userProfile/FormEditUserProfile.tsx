@@ -21,7 +21,7 @@ import ModernButton from "../../../../components/atoms/ModernButton";
 export default function FormEditUserProfile() {
   const router = useRouter();
 
-  const { updateAuthData } = useAuth();
+  const { updateAuthData, updateUserData } = useAuth();
 
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
@@ -84,27 +84,11 @@ export default function FormEditUserProfile() {
       setSubmitError(null);
       setSubmitSuccess(null);
 
-      // console.log("📨 Actualizando perfil de usuario...", data);
-      
-      // Preparar datos para enviar (sin password si está vacío)
-      const updateData: any = {
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        ...(data.password && data.password.trim() !== '' && { password: data.password }),
-      };
+      console.log("📤 Datos a enviar:", data);
 
-      // Solo agregar password si no está vacío
-      if (data.password && data.password.trim() !== '') {
-        updateData.password = data.password;
-      }
-
-      console.log("📤 Datos a enviar:", updateData);
-
-      const result = await updateCurrentUserProfile(updateData);
+      const result = await updateCurrentUserProfile(data);
 
       console.log("📥 Respuesta del servidor:", result);
-      console.log("📥 Tipo de respuesta:", typeof result);
       console.log("📥 Estructura de respuesta:", JSON.stringify(result, null, 2));
 
       // Verificar si la respuesta es válida
@@ -115,14 +99,16 @@ export default function FormEditUserProfile() {
           
           // Actualizar los datos del usuario en el contexto
           try {
-            await updateData({
+            const updatedUser = {
               id: result.user.id,
               name: result.user.name,
               email: result.user.email,
               phone: result.user.phone,
               role: result.user.role,
               creation_date: result.user.creation_date?.toString() || new Date().toISOString()
-            });
+            };
+            
+            await updateUserData(updatedUser);
             console.log("✅ Datos del usuario actualizados en el contexto");
           } catch (error) {
             console.error("❌ Error actualizando contexto:", error);
