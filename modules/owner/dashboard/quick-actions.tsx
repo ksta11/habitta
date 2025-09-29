@@ -30,11 +30,11 @@ export function QuickActions() {
       <CardHeader className="pb-4">
         <CardTitle className="text-lg font-semibold">Accesos Rápidos</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent>
         {actions.map((action, index) => (
           <Pressable 
             key={index} 
-            className={`w-full justify-start h-auto p-4 ${action.color} rounded-xl border-0`}
+            className={`w-full justify-start h-auto p-4 mb-1 ${action.color} rounded-xl border-0`}
             onPress={() => console.log(`${action.title} pressed`)}
           >
             <View className="flex-row items-center">

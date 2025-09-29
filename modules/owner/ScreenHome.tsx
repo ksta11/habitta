@@ -24,9 +24,6 @@ export default function Dashboard() {
                         <RecentApplications />
                     </View>
                     <View className="mt-6">
-                        <CurrentPlan />
-                    </View>
-                    <View className="mt-6">
                         <QuickActions />
                     </View>
                 </View>
