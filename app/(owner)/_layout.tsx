@@ -25,6 +25,17 @@ export default function OwnerTabsLayout() {
           },
         }}
       >
+        {/* Tab Configuración */}
+        <Tabs.Screen
+          name="home"
+          options={{
+            title: "Inicio",
+            tabBarIcon: ({ color, size }) => (
+              <FontAwesome name="home" size={size} color={color} />
+            ),
+          }}
+        />
+
         {/* Tab Propiedades */}
         <Tabs.Screen
           name="(properties)"
