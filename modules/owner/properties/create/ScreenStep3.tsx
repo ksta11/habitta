@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { View, Text, Pressable, Image } from 'react-native';
 import Input from '../../../../components/atoms/Input';
@@ -33,9 +32,9 @@ export default function ScreenStep3({
   const images = watch('images') || [];
 
   const handleImageSelect = (selectedImages: ImagePicker.ImagePickerAsset[]) => {
-    // Convertir ImagePickerAsset[] a string[] (URIs) y agregar a las imágenes existentes
-    const newImageUris = selectedImages.map(image => image.uri);
-    const allImages = [...images, ...newImageUris];
+    // Convertir ImagePickerAsset[] a PropertyImage[] y agregar a las imágenes existentes
+    const newImages = selectedImages.map(image => ({ url_image: image.uri }));
+    const allImages = [...images, ...newImages];
     setValue('images', allImages);
   };
 
@@ -105,10 +104,10 @@ export default function ScreenStep3({
             Fotos seleccionadas ({images.length}/10):
           </Text>
           <View className="flex-row flex-wrap gap-2">
-            {images.map((uri: string, idx: number) => (
+            {images.map((image, idx: number) => (
               <View key={idx} className="relative">
                 <Image 
-                  source={{ uri }} 
+                  source={{ uri: image.url_image }} 
                   className="w-20 h-20 rounded-lg border-2 border-gray-200" 
                   resizeMode="cover"
                 />

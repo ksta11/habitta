@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { AdminStatsGrid } from '../../components/admin';
-import { PropTechCharts } from '../../components/admin/PropTechCharts';
+import { AdminStatsGrid, PropTechCharts } from '../../components/admin';
 
 export default function AdminDashboard() {
+
   return (
     <ScrollView className="flex-1 bg-gray-50">
       <View className="p-6">
@@ -23,41 +23,24 @@ export default function AdminDashboard() {
           <Text className="text-lg font-semibold text-gray-800 mb-4">
             Métricas Generales
           </Text>
-          <AdminStatsGrid variant="full" />
+          <AdminStatsGrid 
+            variant="full"
+          />
         </View>
 
-        {/* Secciones adicionales del dashboard */}
+        {/* Actividad Reciente */}
         <View className="bg-white rounded-lg p-6 shadow-sm mb-6">
           <Text className="text-lg font-semibold text-gray-800 mb-4">
             Actividad Reciente
           </Text>
-          <View className="space-y-3">
-            <View className="flex-row items-center p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-              <FontAwesome name="user-plus" size={16} color="#3b82f6" />
-              <View className="ml-3 flex-1">
-                <Text className="text-gray-800 font-medium">Nuevo usuario registrado</Text>
-                <Text className="text-gray-500 text-sm">Ana García se registró como inquilina</Text>
-              </View>
-              <Text className="text-gray-400 text-xs">Hace 2h</Text>
-            </View>
-            
-            <View className="flex-row items-center p-3 bg-green-50 rounded-lg border-l-4 border-green-400">
-              <FontAwesome name="building" size={16} color="#10b981" />
-              <View className="ml-3 flex-1">
-                <Text className="text-gray-800 font-medium">Nueva propiedad añadida</Text>
-                <Text className="text-gray-500 text-sm">Apartamento en Madrid Centro</Text>
-              </View>
-              <Text className="text-gray-400 text-xs">Hace 4h</Text>
-            </View>
-            
-            <View className="flex-row items-center p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
-              <FontAwesome name="exclamation-triangle" size={16} color="#f59e0b" />
-              <View className="ml-3 flex-1">
-                <Text className="text-gray-800 font-medium">Usuario pendiente de aprobación</Text>
-                <Text className="text-gray-500 text-sm">Carlos Rodríguez requiere verificación</Text>
-              </View>
-              <Text className="text-gray-400 text-xs">Hace 6h</Text>
-            </View>
+          <View className="bg-gray-50 rounded-lg p-8 items-center">
+            <FontAwesome name="clock-o" size={48} color="#d1d5db" />
+            <Text className="text-gray-500 mt-4 text-center">
+              Actividad reciente disponible próximamente
+            </Text>
+            <Text className="text-gray-400 text-sm text-center mt-2">
+              Funcionalidad en desarrollo
+            </Text>
           </View>
         </View>
 
