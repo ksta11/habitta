@@ -2,24 +2,28 @@ import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/atoms/Card';
+import { router } from 'expo-router';
 
 const actions = [
   {
     title: "Publicar Inmueble",
     description: "Agregar nueva propiedad",
     icon: "add" as const,
+    link: "/(owner)/(properties)/create/Form",
     color: "bg-violet", // violet principal
   },
   {
     title: "Ver Estadísticas",
     description: "Reportes completos",
     icon: "bar-chart" as const,
+    link: "/(owner)/home",
     color: "bg-lavender-indigo", // lavender-indigo
   },
   {
     title: "Ajustar Plan",
     description: "Cambiar suscripción",
     icon: "settings" as const,
+    link: "/(owner)/home",
     color: "bg-deep-violet", // deep-violet
   },
 ];
@@ -35,7 +39,7 @@ export function QuickActions() {
           <Pressable 
             key={index} 
             className={`w-full justify-start h-auto p-4 mb-1 ${action.color} rounded-xl border-0`}
-            onPress={() => console.log(`${action.title} pressed`)}
+            onPress={() => router.push(action.link)}
           >
             <View className="flex-row items-center">
               <Ionicons name={action.icon} size={20} color="white" style={{ marginRight: 12 }} />

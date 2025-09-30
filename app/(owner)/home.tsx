@@ -9,7 +9,7 @@ export default function Dashboard() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
     >
-    <View className="flex-1 justify-center px-4 py-8">            
+    <View className="flex-1 justify-center">            
         <ScreenHome />
     </View>
     </ScrollView>

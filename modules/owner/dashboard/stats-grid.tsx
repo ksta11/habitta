@@ -3,38 +3,61 @@ import { View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card, CardContent } from '../../../components/atoms/Card';
 
-const stats = [
-  {
-    title: "Propiedades Publicadas",
-    value: "12",
-    icon: "home" as const,
-    color: "#A346E6", // lavender-indigo
-    bgColor: "#A346E6",
-  },
-  {
-    title: "Solicitudes Pendientes",
-    value: "8",
-    icon: "mail" as const,
-    color: "#531a99", // violet original
-    bgColor: "#531a99",
-  },
-  {
-    title: "Pagos Este Mes",
-    value: "$24,500",
-    icon: "card" as const,
-    color: "#BD93EF", // lavender-bright
-    bgColor: "#BD93EF",
-  },
-  {
-    title: "Mantenimientos",
-    value: "3",
-    icon: "construct" as const,
-    color: "#320964", // deep-violet
-    bgColor: "#320964",
-  },
-];
+interface StatsGridProps {
+  totalProperties: number;
+  pendingApplications: number;
+  scheduledMaintenances: number;
+  lastMonthIncome: number;
+}
 
-export function StatsGrid() {
+export function StatsGrid({ 
+  totalProperties, 
+  pendingApplications, 
+  scheduledMaintenances, 
+  lastMonthIncome 
+}: StatsGridProps) {
+  
+  // Formatear el ingreso como moneda
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const stats = [
+    {
+      title: "Propiedades Publicadas",
+      value: totalProperties.toString(),
+      icon: "home" as const,
+      color: "#A346E6", // lavender-indigo
+      bgColor: "#A346E6",
+    },
+    {
+      title: "Solicitudes Pendientes",
+      value: pendingApplications.toString(),
+      icon: "mail" as const,
+      color: "#531a99", // violet original
+      bgColor: "#531a99",
+    },
+    {
+      title: "Pagos Este Mes",
+      value: formatCurrency(lastMonthIncome),
+      icon: "card" as const,
+      color: "#BD93EF", // lavender-bright
+      bgColor: "#BD93EF",
+    },
+    {
+      title: "Mantenimientos",
+      value: scheduledMaintenances.toString(),
+      icon: "construct" as const,
+      color: "#320964", // deep-violet
+      bgColor: "#320964",
+    },
+  ];
+
   return (
     <View className="flex-row flex-wrap gap-4">
       {stats.map((stat, index) => (
