@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import {useState, useEffect, useMemo} from 'react'
 import {
   View,
   Text,
@@ -7,21 +7,25 @@ import {
   TextInput,
   FlatList,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { AdminStatsGrid } from './';
+import { getAllUsers } from '../../libs/admin/api-service';
 
-// Tipos para los usuarios
+// Tipos para los usuarios - actualizado para coincidir con la respuesta del backend
 interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
   phone: string;
-  type: 'Inquilino' | 'Propietario';
-  status: 'Activo' | 'Pendiente' | 'Inactivo';
-  registrationDate: string;
-  properties: number;
-  totalPaid: number;
+  role: string;
+  status: string;
+  verificationCode: string | null;
+  creation_date: Date;
+  // Campos adicionales para la UI (se pueden calcular o agregar desde el backend)
+  properties?: number;
+  totalPaid?: number;
   solicitudPropietario?: {
     id: string;
     estado: 'pendiente' | 'en_revision' | 'aprobada' | 'rechazada' | 'documentacion_incompleta';
@@ -29,85 +33,6 @@ interface User {
   };
 }
 
-// Mock data - en una app real esto vendría de tu API
-const mockUsers: User[] = [
-  {
-    id: 1,
-    name: "Ana García",
-    email: "ana.garcia@email.com",
-    phone: "+34 612 345 678",
-    type: "Inquilino",
-    status: "Activo",
-    registrationDate: "2024-01-15",
-    properties: 1,
-    totalPaid: 2400,
-  },
-  {
-    id: 2,
-    name: "Carlos Rodríguez",
-    email: "carlos.rodriguez@email.com",
-    phone: "+34 623 456 789",
-    type: "Propietario",
-    status: "Activo",
-    registrationDate: "2024-02-03",
-    properties: 3,
-    totalPaid: 0,
-  },
-  {
-    id: 3,
-    name: "María López",
-    email: "maria.lopez@email.com",
-    phone: "+34 634 567 890",
-    type: "Inquilino",
-    status: "Pendiente",
-    registrationDate: "2024-03-10",
-    properties: 1,
-    totalPaid: 800,
-    solicitudPropietario: {
-      id: "sol_001",
-      estado: "pendiente",
-      fecha_solicitud: "2024-03-20T10:30:00Z"
-    }
-  },
-  {
-    id: 4,
-    name: "José Martínez",
-    email: "jose.martinez@email.com",
-    phone: "+34 645 678 901",
-    type: "Propietario",
-    status: "Activo",
-    registrationDate: "2024-01-28",
-    properties: 2,
-    totalPaid: 0,
-  },
-  {
-    id: 5,
-    name: "Laura Sánchez",
-    email: "laura.sanchez@email.com",
-    phone: "+34 656 789 012",
-    type: "Inquilino",
-    status: "Inactivo",
-    registrationDate: "2023-12-05",
-    properties: 0,
-    totalPaid: 1200,
-    solicitudPropietario: {
-      id: "sol_002",
-      estado: "en_revision",
-      fecha_solicitud: "2024-03-18T14:15:00Z"
-    }
-  },
-  {
-    id: 6,
-    name: "David Fernández",
-    email: "david.fernandez@email.com",
-    phone: "+34 667 890 123",
-    type: "Propietario",
-    status: "Activo",
-    registrationDate: "2024-02-20",
-    properties: 1,
-    totalPaid: 0,
-  },
-];
 
 // Componente Badge para React Native
 const Badge: React.FC<{ 
@@ -196,12 +121,102 @@ export const UsersTable: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  
+  // Estados para la gestión de datos de la API
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredUsers = mockUsers.filter((user) => {
+  // Función para obtener usuarios de la API
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      console.log('🔄 Obteniendo usuarios desde la API...');
+      const response = await getAllUsers();
+      
+      if (response.success && response.data) {
+        console.log('✅ Usuarios obtenidos exitosamente:', response.data.length);
+        
+        // Mapear los datos del backend a la estructura esperada por la UI
+        const mappedUsers: User[] = response.data.map((user) => ({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          role: user.role,
+          status: user.status || 'Activo',
+          verificationCode: user.verificationCode || null,
+          creation_date: user.creation_date,
+          // Valores por defecto para campos que no vienen del backend
+          properties: 0, // Se puede calcular desde otra API si es necesario
+          totalPaid: 0,  // Se puede calcular desde otra API si es necesario
+        }));
+        
+        setUsers(mappedUsers);
+      } else {
+        console.error('❌ Error al obtener usuarios:', response.message);
+        setError(response.message || 'Error al cargar usuarios');
+      }
+    } catch (err) {
+      console.error('❌ Error en fetchUsers:', err);
+      setError('Error de conexión al cargar usuarios');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Cargar usuarios al montar el componente
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+    // Estadísticas calculadas
+    const userStats = useMemo(() => {
+      const total = users.length;
+      const owners = users.filter(p => p.status === 'Propietarios').length;
+      const activeUsers = users.filter(p => p.status === 'Usuarios Activos').length;
+      const tenants = users.filter(p => p.status === 'Inquilinos').length;
+    
+      return [
+        {
+          title: 'Total Usuarios',
+          value: total.toLocaleString(),
+          icon: 'users',
+          color: '#3b82f6',
+          bgColor: '#dbeafe'
+        },
+        {
+          title: 'Usuarios Activos',
+          value: activeUsers.toLocaleString(),
+          icon: 'check-circle',
+          color: '#10b981',
+          bgColor: '#d1fae5'
+        },
+        {
+          title: 'Propietarios',
+          value: owners.toLocaleString(),
+          icon: 'home',
+          color: '#f59e0b',
+          bgColor: '#fef3c7'
+        },
+        {
+          title: 'Inquilinos',
+          value: tenants.toLocaleString(),
+          icon: 'user',
+          color: '#8b5cf6',
+          bgColor: '#ede9fe'
+        }
+      ];
+    }, [users]);
+
+  // Filtrado de usuarios
+  const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = filterType === 'all' || user.type === filterType;
+    const matchesType = filterType === 'all' || user.role === filterType;
     const matchesStatus = filterStatus === 'all' || user.status === filterStatus;
 
     return matchesSearch && matchesType && matchesStatus;
@@ -220,8 +235,8 @@ export const UsersTable: React.FC = () => {
     }
   };
 
-  const getTypeBadge = (type: string) => {
-    return type === 'Propietario' ? (
+  const getTypeBadge = (role: string) => {
+    return role === 'owner' ? (
       <Badge text="Propietario" variant="primary" />
     ) : (
       <Badge text="Inquilino" variant="outline" />
@@ -253,7 +268,7 @@ export const UsersTable: React.FC = () => {
           <Text className="text-sm text-gray-500">ID: {user.id}</Text>
         </View>
         <View className="items-end space-y-1">
-          {getTypeBadge(user.type)}
+          {getTypeBadge(user.role)}
           {getStatusBadge(user.status)}
           <SolicitudBadge solicitud={user.solicitudPropietario} />
         </View>
@@ -279,12 +294,12 @@ export const UsersTable: React.FC = () => {
         </View>
         <View className="items-center">
           <Text className="text-xs text-gray-500">Total Pagado</Text>
-          <Text className="text-lg font-bold text-gray-800">€{user.totalPaid.toLocaleString()}</Text>
+          <Text className="text-lg font-bold text-gray-800">€{(user.totalPaid || 0).toLocaleString()}</Text>
         </View>
         <View className="items-center">
           <Text className="text-xs text-gray-500">Registro</Text>
           <Text className="text-sm font-medium text-gray-800">
-            {new Date(user.registrationDate).toLocaleDateString('es-ES')}
+            {new Date(user.creation_date).toLocaleDateString('es-ES')}
           </Text>
         </View>
       </View>
@@ -336,7 +351,7 @@ export const UsersTable: React.FC = () => {
         </View>
 
         {/* Stats Cards */}
-        <AdminStatsGrid variant="users" />
+        <AdminStatsGrid variant="custom" customStats={userStats} />
 
         {/* Filtros */}
         <View className="bg-white rounded-lg p-4 mb-4 shadow-sm">
@@ -359,18 +374,18 @@ export const UsersTable: React.FC = () => {
           {/* Filtros por tipo y estado */}
           <View className="flex-row justify-between">
             <Pressable 
-              onPress={() => setFilterType(filterType === 'all' ? 'Propietario' : filterType === 'Propietario' ? 'Inquilino' : 'all')}
+              onPress={() => setFilterType(filterType === 'all' ? 'owner' : filterType === 'owner' ? 'user' : 'all')}
               className={`flex-1 px-4 py-2 rounded-lg border ${
-                filterType === 'Propietario' ? 'bg-blue-100 border-blue-300' : 
-                filterType === 'Inquilino' ? 'bg-purple-100 border-purple-300' : 'bg-gray-100 border-gray-300'
+                filterType === 'owner' ? 'bg-blue-100 border-blue-300' : 
+                filterType === 'user' ? 'bg-purple-100 border-purple-300' : 'bg-gray-100 border-gray-300'
               }`}
             >
               <Text className={`text-sm font-medium text-center ${
-                filterType === 'Propietario' ? 'text-blue-800' : 
-                filterType === 'Inquilino' ? 'text-purple-800' : 'text-gray-700'
+                filterType === 'owner' ? 'text-blue-800' : 
+                filterType === 'user' ? 'text-purple-800' : 'text-gray-700'
               }`}>
                 {filterType === 'all' ? 'Tipo: Todos' : 
-                 filterType === 'Propietario' ? 'Propietarios' : 'Inquilinos'}
+                 filterType === 'owner' ? 'Propietarios' : 'Inquilinos'}
               </Text>
             </Pressable>
             
@@ -412,10 +427,30 @@ export const UsersTable: React.FC = () => {
         {/* Lista de usuarios */}
         <View className="mb-4">
           <Text className="text-lg font-semibold text-gray-800 mb-3">
-            Usuarios ({filteredUsers.length})
+            Usuarios ({loading ? '...' : filteredUsers.length})
           </Text>
           
-          {filteredUsers.length === 0 ? (
+          {loading ? (
+            <View className="bg-white rounded-lg p-8 items-center shadow-sm">
+              <ActivityIndicator size="large" color="#3b82f6" />
+              <Text className="text-gray-500 mt-4">
+                Cargando usuarios...
+              </Text>
+            </View>
+          ) : error ? (
+            <View className="bg-white rounded-lg p-8 items-center shadow-sm">
+              <FontAwesome name="exclamation-triangle" size={48} color="#ef4444" />
+              <Text className="text-red-600 mt-4 text-center font-medium">
+                {error}
+              </Text>
+              <Pressable
+                onPress={fetchUsers}
+                className="bg-red-100 px-4 py-2 rounded-lg mt-4"
+              >
+                <Text className="text-red-800 font-medium">Reintentar</Text>
+              </Pressable>
+            </View>
+          ) : filteredUsers.length === 0 ? (
             <View className="bg-white rounded-lg p-8 items-center shadow-sm">
               <FontAwesome name="users" size={48} color="#d1d5db" />
               <Text className="text-gray-500 mt-4">
@@ -426,7 +461,7 @@ export const UsersTable: React.FC = () => {
             <FlatList
               data={filteredUsers}
               renderItem={renderUserCard}
-              keyExtractor={(item) => item.id.toString()}
+              keyExtractor={(item) => item.id}
               scrollEnabled={false}
               showsVerticalScrollIndicator={false}
             />
