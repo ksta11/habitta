@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { View, Text, Pressable, Image } from 'react-native';
 import Input from '../../../../components/atoms/Input';
