@@ -12,6 +12,6 @@ export default function ProfileScreen() {
         <View className="flex-1 justify-center px-4 py-8">            
           <ScreenSettings />
         </View>
-      </ScrollView>
+    </ScrollView>
   );
 }

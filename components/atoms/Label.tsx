@@ -59,7 +59,7 @@ export default function Label({
         styles += 'text-yellow-500';
         break;
       default:
-        styles += 'text-gray-800';
+        styles += 'text-erie-black';
     }
 
     return styles;

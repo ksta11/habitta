@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 interface ButtonAtomProps {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'warning' | 'outline' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'warning' | 'outline' | 'ghost' | 'habitta-primary' | 'habitta-secondary' | 'habitta-outline';
   size?: 'small' | 'medium' | 'large';
   disabled?: boolean;
   loading?: boolean;
@@ -37,7 +37,10 @@ export default function ButtonAtom({
       success: 'bg-green-500 border-green-500 border-2',
       warning: 'bg-yellow-500 border-yellow-500 border-2',
       outline: 'bg-transparent border-blue-500 border-2',
-      ghost: 'bg-transparent border-transparent'
+      ghost: 'bg-transparent border-transparent',
+      'habitta-primary': 'bg-violet border-violet border-2',
+      'habitta-secondary': 'bg-lavender-indigo border-lavender-indigo border-2',
+      'habitta-outline': 'bg-white border-violet border-2'
     };
     
     return variants[variant];
@@ -52,7 +55,10 @@ export default function ButtonAtom({
       success: 'text-white',
       warning: 'text-white',
       outline: 'text-blue-500',
-      ghost: 'text-blue-500'
+      ghost: 'text-blue-500',
+      'habitta-primary': 'text-white',
+      'habitta-secondary': 'text-white',
+      'habitta-outline': 'text-violet'
     };
     
     return textColors[variant];
@@ -111,7 +117,8 @@ export default function ButtonAtom({
         <View className="flex-row items-center">
           <ActivityIndicator 
             size="small" 
-            color={variant === 'outline' || variant === 'ghost' ? '#3B82F6' : '#FFFFFF'}
+            color={variant === 'outline' || variant === 'ghost' || variant === 'habitta-outline' ? 
+              (variant === 'habitta-outline' ? '#531A99' : '#3B82F6') : '#FFFFFF'}
             style={{ marginRight: 8 }}
           />
           <Text 
@@ -131,7 +138,8 @@ export default function ButtonAtom({
             <Ionicons 
               name={icon} 
               size={contentSizes.iconSize} 
-              color={variant === 'outline' || variant === 'ghost' ? '#3B82F6' : '#FFFFFF'}
+              color={variant === 'outline' || variant === 'ghost' || variant === 'habitta-outline' ? 
+                (variant === 'habitta-outline' ? '#531A99' : '#3B82F6') : '#FFFFFF'}
               style={{ marginRight: 8 }}
             />
           )}
@@ -145,7 +153,8 @@ export default function ButtonAtom({
             <Ionicons 
               name={icon} 
               size={contentSizes.iconSize} 
-              color={variant === 'outline' || variant === 'ghost' ? '#3B82F6' : '#FFFFFF'}
+              color={variant === 'outline' || variant === 'ghost' || variant === 'habitta-outline' ? 
+                (variant === 'habitta-outline' ? '#531A99' : '#3B82F6') : '#FFFFFF'}
               style={{ marginLeft: 8 }}
             />
           )}

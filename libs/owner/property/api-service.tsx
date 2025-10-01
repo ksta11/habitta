@@ -1,4 +1,4 @@
-import { CreatePropertyDTO, PropertyImage, GetOwnerPropertiesResponse, GetPropertyByIdResponse, UpdatePropertyDTO, UpdatePropertyResponse } from '../../../interfaces/property/PropertyInterface';
+import { CreatePropertyDTO, PropertyImage, GetOwnerPropertiesResponse, GetPropertyByIdResponse, UpdatePropertyDTO, UpdatePropertyResponse, DeletePropertyResponse } from '../../../interfaces/property/PropertyInterface';
 import { uploadImageToCloudinary } from '../../cloudinary/api-service';
 import { useAuth } from '../../../contexts/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,20 +16,22 @@ export const createProperty = async (propertyData: CreatePropertyDTO) => {
 			console.log(`📸 Iniciando subida de ${propertyData.images.length} imágenes...`);
 			
 			for (const img of propertyData.images) {
-				// img ahora es un string (uri local o url remota)
-				if (typeof img === 'string' && img.startsWith('file://')) {
-					console.log('⏳ Subiendo imagen local:', img);
-					const url = await uploadImageToCloudinary(img);
+				// img ahora es un PropertyImage (objeto con url_image)
+				const imageUrl = img.url_image;
+				
+				if (typeof imageUrl === 'string' && imageUrl.startsWith('file://')) {
+					console.log('⏳ Subiendo imagen local:', imageUrl);
+					const url = await uploadImageToCloudinary(imageUrl);
 					if (url) {
 						uploadedImages.push({ url_image: url });
 						console.log('✅ Imagen subida exitosamente:', url);
 					} else {
-						console.log('❌ Error al subir imagen:', img);
+						console.log('❌ Error al subir imagen:', imageUrl);
 					}
-				} else if (typeof img === 'string') {
+				} else if (typeof imageUrl === 'string') {
 					// Si ya es una URL, solo agregarla
-					uploadedImages.push({ url_image: img });
-					console.log('🔗 URL existente agregada:', img);
+					uploadedImages.push({ url_image: imageUrl });
+					console.log('🔗 URL existente agregada:', imageUrl);
 				}
 			}
 			
@@ -85,20 +87,22 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
 			console.log(`📸 Procesando ${propertyData.images.length} imágenes...`);
 			
 			for (const img of propertyData.images) {
-				// img ahora es un string (uri local o url remota)
-				if (typeof img === 'string' && img.startsWith('file://')) {
-					console.log('⏳ Subiendo imagen local nueva:', img);
-					const url = await uploadImageToCloudinary(img);
+				// img ahora es un PropertyImage (objeto con url_image)
+				const imageUrl = img.url_image;
+				
+				if (typeof imageUrl === 'string' && imageUrl.startsWith('file://')) {
+					console.log('⏳ Subiendo imagen local nueva:', imageUrl);
+					const url = await uploadImageToCloudinary(imageUrl);
 					if (url) {
 						uploadedImages.push({ url_image: url });
 						console.log('✅ Nueva imagen subida exitosamente:', url);
 					} else {
-						console.log('❌ Error al subir imagen:', img);
+						console.log('❌ Error al subir imagen:', imageUrl);
 					}
-				} else if (typeof img === 'string') {
+				} else if (typeof imageUrl === 'string') {
 					// Si ya es una URL (imagen existente), solo agregarla
-					uploadedImages.push({ url_image: img });
-					console.log('🔗 Imagen existente mantenida:', img);
+					uploadedImages.push({ url_image: imageUrl });
+					console.log('🔗 Imagen existente mantenida:', imageUrl);
 				}
 			}
 			
@@ -298,6 +302,66 @@ export const getPropertyById = async (propertyId: string): Promise<GetPropertyBy
 		return {
 			success: false,
 			data: null,
+			message: error instanceof Error ? error.message : 'Error de conexión',
+		};
+	}
+};
+
+// Eliminar propiedad
+export const deleteProperty = async (propertyId: string): Promise<DeletePropertyResponse> => {
+	try {
+		console.log('🗑️ Iniciando eliminación de propiedad:', propertyId);
+		
+		// Obtener token para la autorización
+		const token = await AsyncStorage.getItem(TOKEN_KEY);
+		if (!token) {
+			console.log('❌ No se encontró token de autenticación');
+			return {
+				success: false,
+				message: 'Token de autenticación no encontrado',
+				statusCode: 401
+			};
+		}
+		
+		const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
+		const url = `${API_BASE_URL}/api/properties/${propertyId}`;
+		console.log('🌐 URL de eliminación:', url);
+		
+		const response = await fetch(url, {
+			method: 'DELETE',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${token}`,
+			},
+		});
+		
+		console.log('📡 Status de respuesta:', response.status);
+		
+		const data = await response.json();
+		console.log('📋 Respuesta del servidor:', data);
+		
+		if (!response.ok) {
+			console.log('❌ Error en la eliminación:', data.message);
+			return {
+				success: false,
+				statusCode: response.status,
+				message: data.message || 'Error al eliminar la propiedad',
+			};
+		}
+		
+		console.log('✅ Propiedad eliminada exitosamente');
+		
+		return {
+			success: true,
+			statusCode: response.status,
+			message: data.message || 'Propiedad eliminada exitosamente',
+		};
+		
+	} catch (error) {
+		console.error('💥 Error crítico al eliminar propiedad:', error);
+		return {
+			success: false,
+			statusCode: 500,
 			message: error instanceof Error ? error.message : 'Error de conexión',
 		};
 	}

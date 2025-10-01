@@ -1,5 +1,10 @@
 import { z } from 'zod';
 
+// Schema para PropertyImage
+const PropertyImageSchema = z.object({
+  url_image: z.string().url('URL de imagen inválida')
+});
+
 export const PropertySchema = z.object({
   title: z.string().min(3, 'El título es requerido'),
   description: z.string().min(5, 'La descripción es requerida'),
@@ -13,7 +18,7 @@ export const PropertySchema = z.object({
   bathrooms: z.number().min(0, 'Los baños son requeridos'),
   area: z.number().min(1, 'El área es requerida'),
   services: z.string().min(2, 'Los servicios son requeridos'),
-  images: z.array(z.string().url('URL de imagen inválida')).min(1, 'Agrega al menos una imagen'),
+  images: z.array(PropertyImageSchema).min(1, 'Agrega al menos una imagen'),
 });
 
 // Schema para CREAR propiedades (sin publication_status)

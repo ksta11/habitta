@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert, RefreshCon
 import { useRouter, useFocusEffect } from 'expo-router';
 import PropertyCard from '../../components/atoms/PropertyCard';
 import ButtonAtom from '../../components/atoms/ButtonAtom';
-import { getOwnerProperties } from '../../libs/owner/property/api-service';
+import { getOwnerProperties, deleteProperty } from '../../libs/owner/property/api-service';
 import { Property } from '../../interfaces/property/PropertyInterface';
 
 export default function PropertyScreen() {
@@ -36,6 +36,52 @@ export default function PropertyScreen() {
   const handleRefresh = async () => {
     setRefreshing(true);
     await loadProperties();
+  };
+
+  const handleDeleteProperty = async (propertyId: string, propertyTitle: string) => {
+    try {
+      console.log('🗑️ Iniciando eliminación de propiedad:', propertyId);
+      
+      const response = await deleteProperty(propertyId);
+      
+      if (response.success) {
+        console.log('✅ Propiedad eliminada exitosamente');
+        Alert.alert(
+          'Éxito',
+          response.message || 'La propiedad ha sido eliminada correctamente',
+          [
+            {
+              text: 'OK',
+              onPress: () => loadProperties() // Recargar la lista
+            }
+          ]
+        );
+      } else {
+        console.log('❌ Error al eliminar:', response.message);
+        Alert.alert('Error', response.message || 'No se pudo eliminar la propiedad');
+      }
+    } catch (error) {
+      console.error('💥 Error crítico al eliminar:', error);
+      Alert.alert('Error', 'Hubo un problema al eliminar la propiedad');
+    }
+  };
+
+  const showDeleteConfirmation = (propertyId: string, propertyTitle: string) => {
+    Alert.alert(
+      'Confirmar eliminación',
+      `¿Estás seguro de que quieres eliminar la propiedad "${propertyTitle}"?\n\nEsta acción no se puede deshacer.`,
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel'
+        },
+        {
+          text: 'Eliminar',
+          style: 'destructive',
+          onPress: () => handleDeleteProperty(propertyId, propertyTitle)
+        }
+      ]
+    );
   };
 
   useEffect(() => {
@@ -119,20 +165,34 @@ export default function PropertyScreen() {
                   }}
                 />
                 
-                {/* Botón de editar */}
-                <View className="mt-2">
-                  <ButtonAtom
-                    title="Editar Propiedad"
-                    onPress={() => {
-                      console.log(`Editando propiedad ${property.id}:`, property.title);
-                      router.push(`./edit/${property.id}`);
-                    }}
-                    variant="warning"
-                    size="medium"
-                    icon="create-outline"
-                    iconPosition="left"
-                    fullWidth={true}
-                  />
+                {/* Botones de editar y eliminar */}
+                <View className="mt-2 flex-row">
+                  <View className="flex-1 mr-2">
+                    <ButtonAtom
+                      title="Editar"
+                      onPress={() => {
+                        console.log(`Editando propiedad ${property.id}:`, property.title);
+                        router.push(`./edit/${property.id}`);
+                      }}
+                      variant="habitta-secondary"
+                      size="medium"
+                      icon="create-outline"
+                      iconPosition="left"
+                      fullWidth={true}
+                    />
+                  </View>
+                  
+                  <View className="flex-1">
+                    <ButtonAtom
+                      title="Eliminar"
+                      onPress={() => showDeleteConfirmation(property.id, property.title)}
+                      variant="danger"
+                      size="medium"
+                      icon="trash-outline"
+                      iconPosition="left"
+                      fullWidth={true}
+                    />
+                  </View>
                 </View>
               </View>
             );
@@ -144,7 +204,7 @@ export default function PropertyScreen() {
         <ButtonAtom
           title="Crear nueva propiedad"
           onPress={() => router.push('./create/Form')}
-          variant="primary"
+          variant="habitta-primary"
           size="large"
           icon="add-circle-outline"
           iconPosition="left"

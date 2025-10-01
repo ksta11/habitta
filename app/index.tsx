@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
 import { useRouter } from 'expo-router';
+import React, { useEffect } from 'react';
 import { View } from 'react-native';
-import { useAuth } from '../contexts/AuthContext';
 import Label from '../components/atoms/Label';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Index() {
   const router = useRouter();
@@ -12,7 +12,7 @@ export default function Index() {
     if (!isLoading) {
       if (isAuthenticated && user) {
         // Usuario autenticado, redirigir según el rol
-        let redirectPath: string;
+        let redirectPath: Parameters<typeof router.replace>[0];
         switch (user.role) {
           case 'admin':
             redirectPath = '/(admin)/home';

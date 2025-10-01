@@ -4,13 +4,20 @@ export default function PropertiesLayout() {
   return (
     <Stack
       screenOptions={{
-        headerShown: false,
-      }}>
-      <Stack.Screen 
-        name="index" 
-        options={{ 
-          headerShown: false 
-        }} 
+        headerStyle: {
+          backgroundColor: '#531A99',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+      }}
+    >
+      <Stack.Screen
+        name="index"
+        options={{
+          title: 'Propiedades',
+        }}
       />
       <Stack.Screen 
         name="create" 

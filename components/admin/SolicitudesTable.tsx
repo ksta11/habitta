@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { View, Text, ScrollView, Pressable, TextInput, Modal, Alert } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { AdminStatsGrid } from './AdminStatsGrid';
@@ -8,176 +8,9 @@ import {
   SolicitudDocumento,
   EstadisticasSolicitudes 
 } from '../../interfaces/SolicitudInterface';
+import { getAllApplications } from '../../libs/admin/api-service';
 
-// Datos mock de solicitudes de propietarios
-const mockSolicitudes: SolicitudPropietario[] = [
-  {
-    id: 'sol_001',
-    user_id: 'user_123',
-    user_name: 'Carlos Mendoza',
-    user_email: 'carlos.mendoza@email.com',
-    user_phone: '+34 666 777 888',
-    estado: 'pendiente',
-    fecha_solicitud: '2024-03-20T10:30:00Z',
-    documentos: [
-      {
-        id: 'doc_001',
-        tipo: 'dni',
-        nombre: 'DNI_Carlos_Mendoza.pdf',
-        url: 'https://example.com/docs/dni_carlos.pdf',
-        fecha_subida: '2024-03-20T10:30:00Z',
-        verificado: false
-      },
-      {
-        id: 'doc_002',
-        tipo: 'certificado_ingresos',
-        nombre: 'Certificado_Ingresos_2024.pdf',
-        url: 'https://example.com/docs/ingresos_carlos.pdf',
-        fecha_subida: '2024-03-20T10:32:00Z',
-        verificado: false
-      }
-    ],
-    informacion_adicional: {
-      experiencia_previa: true,
-      propiedades_a_publicar: 3,
-      motivo_solicitud: 'Quiero expandir mi negocio de alquileres vacacionales',
-      referencias: 'Propietario en Airbnb desde 2020'
-    }
-  },
-  {
-    id: 'sol_002',
-    user_id: 'user_456',
-    user_name: 'María García Ruiz',
-    user_email: 'maria.garcia@email.com',
-    user_phone: '+34 655 444 333',
-    estado: 'en_revision',
-    fecha_solicitud: '2024-03-18T14:15:00Z',
-    fecha_revision: '2024-03-19T09:00:00Z',
-    admin_revisor: 'admin_001',
-    documentos: [
-      {
-        id: 'doc_003',
-        tipo: 'dni',
-        nombre: 'DNI_Maria_Garcia.pdf',
-        url: 'https://example.com/docs/dni_maria.pdf',
-        fecha_subida: '2024-03-18T14:15:00Z',
-        verificado: true
-      },
-      {
-        id: 'doc_004',
-        tipo: 'declaracion_renta',
-        nombre: 'Declaracion_Renta_2023.pdf',
-        url: 'https://example.com/docs/renta_maria.pdf',
-        fecha_subida: '2024-03-18T14:20:00Z',
-        verificado: true
-      },
-      {
-        id: 'doc_005',
-        tipo: 'certificado_bancario',
-        nombre: 'Certificado_Bancario.pdf',
-        url: 'https://example.com/docs/banco_maria.pdf',
-        fecha_subida: '2024-03-18T14:25:00Z',
-        verificado: false
-      }
-    ],
-    informacion_adicional: {
-      experiencia_previa: false,
-      propiedades_a_publicar: 1,
-      motivo_solicitud: 'Herencia familiar, quiero alquilar el piso de mi abuela'
-    }
-  },
-  {
-    id: 'sol_003',
-    user_id: 'user_789',
-    user_name: 'Antonio López Silva',
-    user_email: 'antonio.lopez@email.com',
-    estado: 'aprobada',
-    fecha_solicitud: '2024-03-15T11:45:00Z',
-    fecha_revision: '2024-03-16T10:30:00Z',
-    fecha_decision: '2024-03-16T16:20:00Z',
-    admin_revisor: 'admin_002',
-    comentarios_admin: 'Documentación completa y en orden. Usuario con experiencia previa verificada.',
-    documentos: [
-      {
-        id: 'doc_006',
-        tipo: 'dni',
-        nombre: 'DNI_Antonio_Lopez.pdf',
-        url: 'https://example.com/docs/dni_antonio.pdf',
-        fecha_subida: '2024-03-15T11:45:00Z',
-        verificado: true
-      },
-      {
-        id: 'doc_007',
-        tipo: 'certificado_ingresos',
-        nombre: 'Certificado_Ingresos_Empresa.pdf',
-        url: 'https://example.com/docs/ingresos_antonio.pdf',
-        fecha_subida: '2024-03-15T11:50:00Z',
-        verificado: true
-      }
-    ],
-    informacion_adicional: {
-      experiencia_previa: true,
-      propiedades_a_publicar: 5,
-      motivo_solicitud: 'Empresa inmobiliaria establecida, queremos expandir a esta plataforma',
-      referencias: 'Inmobiliaria López & Asociados, 15 años de experiencia'
-    }
-  },
-  {
-    id: 'sol_004',
-    user_id: 'user_012',
-    user_name: 'Laura Fernández Mora',
-    user_email: 'laura.fernandez@email.com',
-    estado: 'rechazada',
-    fecha_solicitud: '2024-03-12T09:20:00Z',
-    fecha_revision: '2024-03-13T15:30:00Z',
-    fecha_decision: '2024-03-14T10:15:00Z',
-    admin_revisor: 'admin_001',
-    motivo_rechazo: 'Documentación insuficiente e inconsistencias en los datos proporcionados',
-    comentarios_admin: 'Se detectaron inconsistencias entre el DNI y el certificado de ingresos. Se recomienda volver a solicitar con documentación verificada.',
-    documentos: [
-      {
-        id: 'doc_008',
-        tipo: 'dni',
-        nombre: 'DNI_Laura_Fernandez.pdf',
-        url: 'https://example.com/docs/dni_laura.pdf',
-        fecha_subida: '2024-03-12T09:20:00Z',
-        verificado: false
-      }
-    ],
-    informacion_adicional: {
-      experiencia_previa: false,
-      propiedades_a_publicar: 2,
-      motivo_solicitud: 'Inversión en propiedades para alquiler'
-    }
-  },
-  {
-    id: 'sol_005',
-    user_id: 'user_345',
-    user_name: 'Roberto Sánchez Díaz',
-    user_email: 'roberto.sanchez@email.com',
-    estado: 'documentacion_incompleta',
-    fecha_solicitud: '2024-03-19T16:00:00Z',
-    fecha_revision: '2024-03-20T08:30:00Z',
-    admin_revisor: 'admin_002',
-    comentarios_admin: 'Falta certificado bancario y declaración de renta. DNI verificado correctamente.',
-    documentos: [
-      {
-        id: 'doc_009',
-        tipo: 'dni',
-        nombre: 'DNI_Roberto_Sanchez.pdf',
-        url: 'https://example.com/docs/dni_roberto.pdf',
-        fecha_subida: '2024-03-19T16:00:00Z',
-        verificado: true
-      }
-    ],
-    informacion_adicional: {
-      experiencia_previa: true,
-      propiedades_a_publicar: 2,
-      motivo_solicitud: 'Tengo dos apartamentos que quiero poner en alquiler a largo plazo',
-      referencias: 'Experiencia previa con otras plataformas de alquiler'
-    }
-  }
-];
+
 
 // Componente Badge para estado de solicitud
 interface EstadoBadgeProps {
@@ -279,15 +112,66 @@ export const SolicitudesTable: React.FC = () => {
 
   const [selectedSolicitud, setSelectedSolicitud] = useState<SolicitudPropietario | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  
+  // Estados para manejo de datos reales
+  const [solicitudes, setSolicitudes] = useState<SolicitudPropietario[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Función para cargar solicitudes desde el API
+  const loadSolicitudes = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      console.log('🔄 Cargando solicitudes desde el API...');
+      const response = await getAllApplications();
+      
+      if (response.success && response.data) {
+        console.log('✅ Solicitudes cargadas exitosamente:', response.data.length);
+        // Mapear los datos del API al formato esperado por el componente
+        const mappedSolicitudes: SolicitudPropietario[] = response.data.map((app: any) => ({
+          id: app.id,
+          user_id: app.renter?.id || '',
+          user_name: app.renter?.name || 'Usuario desconocido',
+          user_email: app.renter?.email || '',
+          user_phone: app.renter?.phone || '',
+          estado: app.status || 'pendiente',
+          fecha_solicitud: app.application_date || new Date().toISOString(),
+          documentos: [], // Los documentos se manejarían por separado si es necesario
+          informacion_adicional: {
+            experiencia_previa: false,
+            propiedades_a_publicar: 1,
+            motivo_solicitud: `Solicitud para propiedad: ${app.property?.title || 'Sin título'}`
+          }
+        }));
+        
+        setSolicitudes(mappedSolicitudes);
+      } else {
+        console.error('❌ Error en la respuesta del API:', response.message);
+        setError(response.message || 'Error al cargar las solicitudes');
+      }
+    } catch (err) {
+      console.error('❌ Error cargando solicitudes:', err);
+      setError('Error de conexión al cargar las solicitudes');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Cargar datos al montar el componente
+  useEffect(() => {
+    loadSolicitudes();
+  }, []);
 
   // Estadísticas calculadas
   const solicitudStats = useMemo(() => {
-    const total = mockSolicitudes.length;
-    const pendientes = mockSolicitudes.filter(s => s.estado === 'pendiente').length;
-    const en_revision = mockSolicitudes.filter(s => s.estado === 'en_revision').length;
-    const aprobadas = mockSolicitudes.filter(s => s.estado === 'aprobada').length;
-    const rechazadas = mockSolicitudes.filter(s => s.estado === 'rechazada').length;
-    const incompletas = mockSolicitudes.filter(s => s.estado === 'documentacion_incompleta').length;
+    const total = solicitudes.length;
+    const pendientes = solicitudes.filter(s => s.estado === 'pendiente').length;
+    const en_revision = solicitudes.filter(s => s.estado === 'en_revision').length;
+    const aprobadas = solicitudes.filter(s => s.estado === 'aprobada').length;
+    const rechazadas = solicitudes.filter(s => s.estado === 'rechazada').length;
+    const incompletas = solicitudes.filter(s => s.estado === 'documentacion_incompleta').length;
 
     const tasa_aprobacion = total > 0 ? Math.round((aprobadas / total) * 100) : 0;
 
@@ -321,11 +205,11 @@ export const SolicitudesTable: React.FC = () => {
         subtitle: 'Solicitudes aprobadas'
       }
     ];
-  }, []);
+  }, [solicitudes]);
 
   // Filtrado de solicitudes
   const filteredSolicitudes = useMemo(() => {
-    let filtered = mockSolicitudes.filter(solicitud => {
+    let filtered = solicitudes.filter(solicitud => {
       const matchesSearch = solicitud.user_name.toLowerCase().includes(filters.search.toLowerCase()) ||
                           solicitud.user_email.toLowerCase().includes(filters.search.toLowerCase());
       
@@ -489,13 +373,44 @@ export const SolicitudesTable: React.FC = () => {
         {/* Lista de solicitudes */}
         <View className="bg-white rounded-lg shadow-sm">
           <View className="p-6 border-b border-gray-200">
-            <Text className="text-lg font-semibold text-gray-800">
-              Solicitudes ({filteredSolicitudes.length})
-            </Text>
+            <View className="flex-row justify-between items-center">
+              <Text className="text-lg font-semibold text-gray-800">
+                Solicitudes ({filteredSolicitudes.length})
+              </Text>
+              {loading && (
+                <View className="flex-row items-center">
+                  <FontAwesome name="spinner" size={16} color="#3b82f6" />
+                  <Text className="text-blue-600 text-sm ml-2">Cargando...</Text>
+                </View>
+              )}
+            </View>
           </View>
 
           <View className="p-6">
-            {filteredSolicitudes.map((solicitud) => (
+            {error && (
+              <View className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                <View className="flex-row items-center">
+                  <FontAwesome name="exclamation-triangle" size={16} color="#dc2626" />
+                  <Text className="text-red-800 text-sm ml-2 flex-1">{error}</Text>
+                  <Pressable 
+                    className="bg-red-100 px-3 py-1 rounded"
+                    onPress={loadSolicitudes}
+                  >
+                    <Text className="text-red-800 text-xs font-medium">Reintentar</Text>
+                  </Pressable>
+                </View>
+              </View>
+            )}
+
+            {loading && filteredSolicitudes.length === 0 ? (
+              <View className="items-center py-12">
+                <FontAwesome name="spinner" size={48} color="#3b82f6" />
+                <Text className="text-gray-600 mt-4 text-center">
+                  Cargando solicitudes...
+                </Text>
+              </View>
+            ) : (
+              filteredSolicitudes.map((solicitud) => (
               <Pressable
                 key={solicitud.id}
                 className="border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50"
@@ -539,9 +454,10 @@ export const SolicitudesTable: React.FC = () => {
                   </Pressable>
                 </View>
               </Pressable>
-            ))}
+              ))
+            )}
 
-            {filteredSolicitudes.length === 0 && (
+            {filteredSolicitudes.length === 0 && !loading && (
               <View className="items-center py-12">
                 <FontAwesome name="file-text" size={48} color="#d1d5db" />
                 <Text className="text-gray-500 mt-4 text-center">
@@ -614,7 +530,7 @@ export const SolicitudesTable: React.FC = () => {
                   </ScrollView>
 
                   {(selectedSolicitud.estado === 'pendiente' || selectedSolicitud.estado === 'en_revision') && (
-                    <View className="flex-row mt-6 space-x-3">
+                    <View className="flex-row mt-6">
                       <Pressable 
                         className="flex-1 bg-green-600 py-3 rounded-lg mr-2"
                         onPress={() => handleAprobar(selectedSolicitud.id)}
