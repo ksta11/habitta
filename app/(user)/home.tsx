@@ -1,11 +1,17 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, ScrollView, Pressable, Alert, Image, Text, RefreshControl } from "react-native";
+import {
+  View,
+  ScrollView,
+  Pressable,
+  Alert,
+  Image,
+  Text,
+  RefreshControl,
+} from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import Label from "../../components/atoms/Label";
 import Input from "../../components/atoms/Input";
-import {
-  getAllProperties,
-} from "../../libs/owner/property/api-service";
+import { getAllProperties } from "../../libs/owner/property/api-service";
 import { Property } from "../../interfaces/property/PropertyInterface";
 
 // Iconos simulados con emojis
@@ -23,8 +29,6 @@ const categories = [
   { id: 4, name: "Apartaestudios de dos ambiente", icon: "🏘️", active: false },
   { id: 5, name: "Apartamentos duplex", icon: "🏠", active: false },
 ];
-
-
 
 export default function Home() {
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -49,14 +53,14 @@ export default function Home() {
 
   // Función helper para formatear el precio
   const formatPrice = (price: number): string => {
-    return `$${price.toLocaleString('es-MX')}`;
+    return `$${price.toLocaleString("es-MX")}`;
   };
 
   // Función helper para obtener la primera imagen
   const getPropertyImage = (property: Property): string => {
-    return property.images && property.images.length > 0 
-      ? property.images[0].url_image 
-      : 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=300&h=200&fit=crop'; // imagen por defecto
+    return property.images && property.images.length > 0
+      ? property.images[0].url_image
+      : "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=300&h=200&fit=crop"; // imagen por defecto
   };
 
   const loadProperties = async () => {
@@ -122,14 +126,14 @@ export default function Home() {
         </Pressable>
       </View>
 
-      <ScrollView 
-        className="flex-1" 
+      <ScrollView
+        className="flex-1"
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            colors={['#3B82F6']} // Android
+            colors={["#3B82F6"]} // Android
             tintColor="#3B82F6" // iOS
           />
         }
@@ -192,62 +196,66 @@ export default function Home() {
               </View>
             ) : (
               properties.map((property) => (
-              <Pressable
-                key={property.id}
-                onPress={() => navigateToProperty(property.id)}
-                className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden"
-              >
-                <View className="relative">
-                  <Image
-                    source={{ uri: getPropertyImage(property) }}
-                    className="w-full h-48"
-                    resizeMode="cover"
-                  />
-                  <Pressable
-                    className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm rounded-full p-2"
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      toggleFavorite(property.id);
-                    }}
-                  >
-                    <HeartIcon filled={favorites.includes(property.id)} />
-                  </Pressable>
-                </View>
-                <View className="p-4">
-                  <View className="flex-row items-start justify-between mb-2">
-                    <View className="flex-1">
+                <Pressable
+                  key={property.id}
+                  onPress={() => navigateToProperty(property.id)}
+                  className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden"
+                >
+                  <View className="relative">
+                    <Image
+                      source={{ uri: getPropertyImage(property) }}
+                      className="w-full h-48"
+                      resizeMode="cover"
+                    />
+                    <Pressable
+                      className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm rounded-full p-2"
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        toggleFavorite(property.id);
+                      }}
+                    >
+                      <HeartIcon filled={favorites.includes(property.id)} />
+                    </Pressable>
+                  </View>
+                  <View className="p-4">
+                    <View className="flex-row items-start justify-between mb-2">
+                      <View className="flex-1">
+                        <Label
+                          text={property.title}
+                          size="md"
+                          weight="semibold"
+                        />
+                      </View>
+                    </View>
+                    <View className="flex-row items-center gap-1 mb-2">
+                      <LocationIcon />
                       <Label
-                        text={property.title}
-                        size="md"
-                        weight="semibold"
+                        text={`${property.address}, ${property.city}`}
+                        size="sm"
+                        variant="default"
                       />
                     </View>
-                  </View>
-                  <View className="flex-row items-center gap-1 mb-2">
-                    <LocationIcon />
-                    <Label
-                      text={`${property.address}, ${property.city}`}
-                      size="sm"
-                      variant="default"
-                    />
-                  </View>
-                  <View className="flex-row items-center justify-between">
-                    <View className="flex-row items-center gap-1">
-                      <Text className="text-sm text-gray-600 capitalize">
-                        {property.type}
-                      </Text>
-                      <Text className="text-sm text-gray-400">•</Text>
-                      <Text className="text-sm text-gray-600">
-                        {property.rooms} hab • {property.bathrooms} baños
-                      </Text>
-                    </View>
-                    <View className="items-end">
-                      <Label text={formatPrice(property.price)} size="lg" weight="bold" />
-                      <Label text="/mes" size="sm" variant="default" />
+                    <View className="flex-row items-center justify-between">
+                      <View className="flex-row items-center gap-1">
+                        <Text className="text-sm text-gray-600 capitalize">
+                          {property.type}
+                        </Text>
+                        <Text className="text-sm text-gray-400">•</Text>
+                        <Text className="text-sm text-gray-600">
+                          {property.rooms} hab • {property.bathrooms} baños
+                        </Text>
+                      </View>
+                      <View className="items-end">
+                        <Label
+                          text={formatPrice(property.price)}
+                          size="lg"
+                          weight="bold"
+                        />
+                        <Label text="/mes" size="sm" variant="default" />
+                      </View>
                     </View>
                   </View>
-                </View>
-              </Pressable>
+                </Pressable>
               ))
             )}
           </View>
