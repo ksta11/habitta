@@ -67,6 +67,13 @@ export default function UserTabsLayout() {
             ),
           }}
         />
+
+        <Tabs.Screen
+          name="(home)"
+          options={{
+            href: null, 
+          }}
+        />
       </Tabs>
     </AuthGuard>
   );

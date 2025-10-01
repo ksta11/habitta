@@ -66,6 +66,12 @@ export interface GetOwnerPropertiesResponse {
   data: Property[];
   message?: string;
 }
+
+export interface GetAllPropertiesResponse {
+  success: boolean;
+  data: Property[];
+  message?: string;
+}
 // Interfaz extendida para gestión administrativa
 export interface AdminProperty extends Property {
   owner_name: string;

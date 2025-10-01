@@ -1,4 +1,4 @@
-import { CreatePropertyDTO, PropertyImage, GetOwnerPropertiesResponse, GetPropertyByIdResponse, UpdatePropertyDTO, UpdatePropertyResponse, DeletePropertyResponse } from '../../../interfaces/property/PropertyInterface';
+import { CreatePropertyDTO, PropertyImage, GetOwnerPropertiesResponse, GetAllPropertiesResponse, GetPropertyByIdResponse, UpdatePropertyDTO, UpdatePropertyResponse, DeletePropertyResponse } from '../../../interfaces/property/PropertyInterface';
 import { uploadImageToCloudinary } from '../../cloudinary/api-service';
 import { useAuth } from '../../../contexts/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -362,6 +362,64 @@ export const deleteProperty = async (propertyId: string): Promise<DeleteProperty
 		return {
 			success: false,
 			statusCode: 500,
+			message: error instanceof Error ? error.message : 'Error de conexión',
+		};
+	}
+};
+
+// Obtener todas las propiedades (para usuarios)
+export const getAllProperties = async (): Promise<GetAllPropertiesResponse> => {
+	try {
+		console.log('🏠 Iniciando obtención de todas las propiedades...');
+		
+		// Obtener token para la autorización (opcional según tu backend)
+		const token = await AsyncStorage.getItem(TOKEN_KEY);
+		
+		const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
+		const url = `${API_BASE_URL}/api/properties`;
+		console.log('🌐 URL de consulta:', url);
+		
+		// Headers con token si existe (algunos endpoints pueden no requerirlo)
+		const headers: Record<string, string> = {
+			'Content-Type': 'application/json',
+		};
+		
+		if (token) {
+			headers['Authorization'] = `Bearer ${token}`;
+		}
+		
+		const response = await fetch(url, {
+			method: 'GET',
+			headers,
+		});
+		
+		console.log('📡 Status de respuesta:', response.status);
+		
+		const data = await response.json();
+		console.log('📋 Respuesta completa:', data);
+		
+		if (!response.ok) {
+			console.log('❌ Error en la respuesta:', data.message);
+			return {
+				success: false,
+				data: [],
+				message: data.message || 'Error al obtener propiedades',
+			};
+		}
+		
+		console.log(`✅ Propiedades obtenidas exitosamente. Total: ${data.data ? data.data.length : 0}`);
+		
+		return {
+			success: true,
+			data: data.data || [],
+			message: data.message || 'Propiedades obtenidas exitosamente',
+		};
+		
+	} catch (error) {
+		console.error('💥 Error crítico al obtener todas las propiedades:', error);
+		return {
+			success: false,
+			data: [],
 			message: error instanceof Error ? error.message : 'Error de conexión',
 		};
 	}
