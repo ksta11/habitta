@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   View,
   ScrollView,
@@ -7,8 +7,11 @@ import {
   Image,
   Text,
   RefreshControl,
+  TextInput,
+  Modal,
 } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
+import { FontAwesome } from '@expo/vector-icons';
 import Label from "../../components/atoms/Label";
 import Input from "../../components/atoms/Input";
 import { getAllProperties } from "../../libs/owner/property/api-service";
@@ -23,12 +26,29 @@ const LocationIcon = () => <Text>📍</Text>;
 const UserIcon = () => <Text>👤</Text>;
 
 const categories = [
-  { id: 1, name: "Apartamentos", icon: "🏢", active: true },
-  { id: 2, name: "Casas", icon: "🏠", active: false },
-  { id: 3, name: "Apartaestudios de un ambiente", icon: "🏢", active: false },
-  { id: 4, name: "Apartaestudios de dos ambiente", icon: "🏘️", active: false },
-  { id: 5, name: "Apartamentos duplex", icon: "🏠", active: false },
+  { id: 1, name: "Apartamentos", icon: "🏢", value: "apartament" },
+  { id: 2, name: "Casas", icon: "🏠", value: "house" },
+  { id: 3, name: "Oficinas", icon: "🏢", value: "office" },
+  { id: 4, name: "Locales", icon: "🏪", value: "store" },
+  { id: 5, name: "Bodegas", icon: "🏭", value: "werehouse" },
 ];
+
+// Interfaces para filtros
+interface PropertyFilters {
+  searchTerm: string;
+  category: string;
+  city: string;
+  priceRange: {
+    min: number;
+    max: number;
+  };
+  rooms: number;
+  bathrooms: number;
+  areaRange: {
+    min: number;
+    max: number;
+  };
+}
 
 export default function Home() {
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -36,7 +56,82 @@ export default function Home() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  
+  // Estados para filtros
+  const [filters, setFilters] = useState<PropertyFilters>({
+    searchTerm: '',
+    category: 'todos',
+    city: 'todos',
+    priceRange: { min: 0, max: 5000000 }, // Ajustado para acomodar precios altos
+    rooms: 0,
+    bathrooms: 0,
+    areaRange: { min: 0, max: 500 }
+  });
+  
   const router = useRouter();
+
+  // Obtener ciudades únicas para el filtro (solo de propiedades publicadas)
+  const publishedProperties = useMemo(() => {
+    return properties.filter(property => property.publication_status === 'published');
+  }, [properties]);
+
+  const uniqueCities = useMemo(() => {
+    const cities = publishedProperties.map(p => p.city).filter(Boolean);
+    return [...new Set(cities)].sort();
+  }, [publishedProperties]);
+
+  // Filtrado de propiedades
+  const filteredProperties = useMemo(() => {
+    return publishedProperties.filter((property) => {
+      // Filtro por búsqueda de texto
+      const matchesSearch = !filters.searchTerm || 
+        property.title.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+        property.address.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+        property.city.toLowerCase().includes(filters.searchTerm.toLowerCase());
+
+      // Filtro por categoría
+      const matchesCategory = filters.category === 'todos' || property.type === filters.category;
+
+      // Filtro por ciudad
+      const matchesCity = filters.city === 'todos' || property.city === filters.city;
+
+      // Filtro por rango de precio
+      const matchesPrice = property.price >= filters.priceRange.min && 
+                          property.price <= filters.priceRange.max;
+
+      // Filtro por habitaciones
+      const matchesRooms = filters.rooms === 0 || property.rooms >= filters.rooms;
+
+      // Filtro por baños
+      const matchesBathrooms = filters.bathrooms === 0 || property.bathrooms >= filters.bathrooms;
+
+      // Filtro por área
+      const matchesArea = property.area >= filters.areaRange.min && 
+                         property.area <= filters.areaRange.max;
+
+      return matchesSearch && matchesCategory && matchesCity && 
+             matchesPrice && matchesRooms && matchesBathrooms && matchesArea;
+    });
+  }, [publishedProperties, filters]);
+
+  // Función para resetear filtros
+  const resetFilters = () => {
+    setFilters({
+      searchTerm: '',
+      category: 'todos',
+      city: 'todos',
+      priceRange: { min: 0, max: 5000000 }, // Ajustado para acomodar precios altos
+      rooms: 0,
+      bathrooms: 0,
+      areaRange: { min: 0, max: 500 }
+    });
+  };
+
+  // Función para actualizar filtros
+  const updateFilter = (key: keyof PropertyFilters, value: any) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
 
   const toggleFavorite = (propertyId: string) => {
     setFavorites((prev) =>
@@ -142,8 +237,24 @@ export default function Home() {
         <View className="px-6 mb-6">
           <View className="flex-row gap-3">
             <View className="flex-1 relative">
-              <Input placeholder="¿Dónde quieres buscar?" />
+              <View className="flex-row items-center bg-gray-100 rounded-lg px-4 py-3">
+                <FontAwesome name="search" size={16} color="#6b7280" />
+                <TextInput
+                  placeholder="¿Dónde quieres buscar?"
+                  value={filters.searchTerm}
+                  onChangeText={(text) => updateFilter('searchTerm', text)}
+                  className="flex-1 ml-3 text-gray-800"
+                  placeholderTextColor="#9ca3af"
+                />
+              </View>
             </View>
+            <Pressable 
+              onPress={() => setShowFilters(true)}
+              className="bg-blue-600 px-4 py-3 rounded-lg flex-row items-center"
+            >
+              <FontAwesome name="filter" size={16} color="white" />
+              <Text className="text-white ml-2 font-medium">Filtros</Text>
+            </Pressable>
           </View>
         </View>
 
@@ -154,21 +265,33 @@ export default function Home() {
             showsHorizontalScrollIndicator={false}
             className="flex gap-3"
           >
+            <Pressable
+              onPress={() => updateFilter('category', 'todos')}
+              className={`flex-row items-center gap-2 px-4 py-2 rounded-full mr-3 ${
+                filters.category === 'todos' ? "bg-blue-600" : "bg-gray-100"
+              }`}
+            >
+              <Text>🏠</Text>
+              <Text className={`text-sm font-medium ${
+                filters.category === 'todos' ? "text-white" : "text-gray-700"
+              }`}>
+                Todos
+              </Text>
+            </Pressable>
             {categories.map((category) => (
               <Pressable
                 key={category.id}
+                onPress={() => updateFilter('category', category.value)}
                 className={`flex-row items-center gap-2 px-4 py-2 rounded-full mr-3 ${
-                  category.active ? "bg-blue-600" : "bg-gray-100"
+                  filters.category === category.value ? "bg-blue-600" : "bg-gray-100"
                 }`}
               >
                 <Text>{category.icon}</Text>
-                {category.active ? (
-                  <Text className="text-white text-sm font-medium">
-                    {category.name}
-                  </Text>
-                ) : (
-                  <Label text={category.name} size="sm" weight="medium" />
-                )}
+                <Text className={`text-sm font-medium ${
+                  filters.category === category.value ? "text-white" : "text-gray-700"
+                }`}>
+                  {category.name}
+                </Text>
               </Pressable>
             ))}
           </ScrollView>
@@ -177,7 +300,7 @@ export default function Home() {
         {/* Properties List */}
         <View className="px-6 pb-24">
           <View className="flex-row items-center justify-between mb-4">
-            <Label text="Propiedades destacadas" size="lg" weight="semibold" />
+            <Label text={`Propiedades (${filteredProperties.length})`} size="lg" weight="semibold" />
             <Pressable>
               <Text className="text-blue-600 text-sm">Ver todas</Text>
             </Pressable>
@@ -188,14 +311,25 @@ export default function Home() {
               <View className="flex-1 justify-center items-center py-20">
                 <Text className="text-gray-600">Cargando propiedades...</Text>
               </View>
-            ) : properties.length === 0 ? (
+            ) : filteredProperties.length === 0 ? (
               <View className="flex-1 justify-center items-center py-20">
-                <Text className="text-gray-600 text-center">
-                  No hay propiedades disponibles
+                <FontAwesome name="search" size={48} color="#d1d5db" />
+                <Text className="text-gray-600 text-center mt-4">
+                  {publishedProperties.length === 0 
+                    ? "No hay propiedades disponibles para alquiler" 
+                    : "No se encontraron propiedades con los filtros aplicados"}
                 </Text>
+                {publishedProperties.length > 0 && (
+                  <Pressable 
+                    onPress={resetFilters}
+                    className="bg-blue-100 px-4 py-2 rounded-lg mt-4"
+                  >
+                    <Text className="text-blue-800 font-medium">Limpiar filtros</Text>
+                  </Pressable>
+                )}
               </View>
             ) : (
-              properties.map((property) => (
+              filteredProperties.map((property) => (
                 <Pressable
                   key={property.id}
                   onPress={() => navigateToProperty(property.id)}
@@ -261,6 +395,215 @@ export default function Home() {
           </View>
         </View>
       </ScrollView>
+
+      {/* Modal de Filtros */}
+      <Modal
+        visible={showFilters}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowFilters(false)}
+      >
+        <View className="flex-1 bg-white">
+          {/* Header del Modal */}
+          <View className="flex-row items-center justify-between px-6 py-4 border-b border-gray-200">
+            <Text className="text-xl font-bold text-gray-800">Filtros</Text>
+            <Pressable onPress={() => setShowFilters(false)}>
+              <FontAwesome name="times" size={24} color="#6b7280" />
+            </Pressable>
+          </View>
+
+          <ScrollView className="flex-1 px-6 py-4">
+            {/* Filtro por Ciudad */}
+            <View className="mb-6">
+              <Text className="text-lg font-semibold text-gray-800 mb-3">Ciudad</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <Pressable
+                  onPress={() => updateFilter('city', 'todos')}
+                  className={`px-4 py-2 rounded-lg border mr-3 ${
+                    filters.city === 'todos' ? 'bg-blue-100 border-blue-300' : 'bg-gray-100 border-gray-300'
+                  }`}
+                >
+                  <Text className={`text-sm font-medium ${
+                    filters.city === 'todos' ? 'text-blue-800' : 'text-gray-700'
+                  }`}>
+                    Todas las ciudades
+                  </Text>
+                </Pressable>
+                {uniqueCities.map((city) => (
+                  <Pressable
+                    key={city}
+                    onPress={() => updateFilter('city', city)}
+                    className={`px-4 py-2 rounded-lg border mr-3 ${
+                      filters.city === city ? 'bg-blue-100 border-blue-300' : 'bg-gray-100 border-gray-300'
+                    }`}
+                  >
+                    <Text className={`text-sm font-medium ${
+                      filters.city === city ? 'text-blue-800' : 'text-gray-700'
+                    }`}>
+                      {city}
+                    </Text>
+                  </Pressable>
+                ))}
+              </ScrollView>
+            </View>
+
+            {/* Filtro por Precio */}
+            <View className="mb-6">
+              <Text className="text-lg font-semibold text-gray-800 mb-3">
+                Rango de Precio ($${filters.priceRange.min.toLocaleString()} - $${filters.priceRange.max.toLocaleString()})
+              </Text>
+              <View className="flex-row gap-3 mb-3">
+                <View className="flex-1">
+                  <Text className="text-sm text-gray-600 mb-2">Precio mínimo</Text>
+                  <TextInput
+                    value={filters.priceRange.min.toString()}
+                    onChangeText={(text) => {
+                      const value = parseInt(text) || 0;
+                      updateFilter('priceRange', { ...filters.priceRange, min: value });
+                    }}
+                    keyboardType="numeric"
+                    placeholder="0"
+                    className="border border-gray-300 rounded-lg px-3 py-2"
+                  />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-sm text-gray-600 mb-2">Precio máximo</Text>
+                  <TextInput
+                    value={filters.priceRange.max.toString()}
+                    onChangeText={(text) => {
+                      const value = parseInt(text) || 5000000;
+                      updateFilter('priceRange', { ...filters.priceRange, max: value });
+                    }}
+                    keyboardType="numeric"
+                    placeholder="5000000"
+                    className="border border-gray-300 rounded-lg px-3 py-2"
+                  />
+                </View>
+              </View>
+              
+              {/* Rangos de precio predefinidos */}
+              <View className="flex-row flex-wrap gap-2">
+                {[
+                  { label: "Hasta $500K", max: 500000 },
+                  { label: "$500K - $1M", min: 500000, max: 1000000 },
+                  { label: "$1M - $2M", min: 1000000, max: 2000000 },
+                  { label: "$2M - $5M", min: 2000000, max: 5000000 },
+                ].map((range, index) => (
+                  <Pressable
+                    key={index}
+                    onPress={() => updateFilter('priceRange', { 
+                      min: range.min || 0, 
+                      max: range.max 
+                    })}
+                    className="bg-gray-100 px-3 py-1 rounded-lg"
+                  >
+                    <Text className="text-gray-700 text-xs">{range.label}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
+
+            {/* Filtro por Habitaciones */}
+            <View className="mb-6">
+              <Text className="text-lg font-semibold text-gray-800 mb-3">Habitaciones mínimas</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {[0, 1, 2, 3, 4, 5].map((rooms) => (
+                  <Pressable
+                    key={rooms}
+                    onPress={() => updateFilter('rooms', rooms)}
+                    className={`px-4 py-2 rounded-lg border mr-3 ${
+                      filters.rooms === rooms ? 'bg-blue-100 border-blue-300' : 'bg-gray-100 border-gray-300'
+                    }`}
+                  >
+                    <Text className={`text-sm font-medium ${
+                      filters.rooms === rooms ? 'text-blue-800' : 'text-gray-700'
+                    }`}>
+                      {rooms === 0 ? 'Cualquiera' : `${rooms}+ hab`}
+                    </Text>
+                  </Pressable>
+                ))}
+              </ScrollView>
+            </View>
+
+            {/* Filtro por Baños */}
+            <View className="mb-6">
+              <Text className="text-lg font-semibold text-gray-800 mb-3">Baños mínimos</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {[0, 1, 2, 3, 4].map((bathrooms) => (
+                  <Pressable
+                    key={bathrooms}
+                    onPress={() => updateFilter('bathrooms', bathrooms)}
+                    className={`px-4 py-2 rounded-lg border mr-3 ${
+                      filters.bathrooms === bathrooms ? 'bg-blue-100 border-blue-300' : 'bg-gray-100 border-gray-300'
+                    }`}
+                  >
+                    <Text className={`text-sm font-medium ${
+                      filters.bathrooms === bathrooms ? 'text-blue-800' : 'text-gray-700'
+                    }`}>
+                      {bathrooms === 0 ? 'Cualquiera' : `${bathrooms}+ baños`}
+                    </Text>
+                  </Pressable>
+                ))}
+              </ScrollView>
+            </View>
+
+            {/* Filtro por Área */}
+            <View className="mb-6">
+              <Text className="text-lg font-semibold text-gray-800 mb-3">
+                Área (m²) ({filters.areaRange.min} - {filters.areaRange.max})
+              </Text>
+              <View className="flex-row gap-3 mb-3">
+                <View className="flex-1">
+                  <Text className="text-sm text-gray-600 mb-2">Área mínima</Text>
+                  <TextInput
+                    value={filters.areaRange.min.toString()}
+                    onChangeText={(text) => {
+                      const value = parseInt(text) || 0;
+                      updateFilter('areaRange', { ...filters.areaRange, min: value });
+                    }}
+                    keyboardType="numeric"
+                    placeholder="0"
+                    className="border border-gray-300 rounded-lg px-3 py-2"
+                  />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-sm text-gray-600 mb-2">Área máxima</Text>
+                  <TextInput
+                    value={filters.areaRange.max.toString()}
+                    onChangeText={(text) => {
+                      const value = parseInt(text) || 500;
+                      updateFilter('areaRange', { ...filters.areaRange, max: value });
+                    }}
+                    keyboardType="numeric"
+                    placeholder="500"
+                    className="border border-gray-300 rounded-lg px-3 py-2"
+                  />
+                </View>
+              </View>
+            </View>
+          </ScrollView>
+
+          {/* Footer del Modal */}
+          <View className="border-t border-gray-200 px-6 py-4">
+            <View className="flex-row gap-3">
+              <Pressable
+                onPress={resetFilters}
+                className="flex-1 bg-gray-100 py-3 rounded-lg items-center"
+              >
+                <Text className="text-gray-800 font-medium">Limpiar filtros</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setShowFilters(false)}
+                className="flex-1 bg-blue-600 py-3 rounded-lg items-center"
+              >
+                <Text className="text-white font-medium">
+                  Aplicar ({filteredProperties.length})
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
