@@ -14,7 +14,12 @@ import { useRouter, useFocusEffect } from "expo-router";
 import { FontAwesome } from '@expo/vector-icons';
 import Label from "../../components/atoms/Label";
 import Input from "../../components/atoms/Input";
-import { getAllProperties } from "../../libs/owner/property/api-service";
+import { 
+  searchProperties, 
+  getAllPublishedProperties, 
+  getAvailableCities,
+  PropertySearchFilters 
+} from "../../libs/user/property-search-service";
 import { Property } from "../../interfaces/property/PropertyInterface";
 
 // Iconos simulados con emojis
@@ -33,7 +38,7 @@ const categories = [
   { id: 5, name: "Bodegas", icon: "🏭", value: "werehouse" },
 ];
 
-// Interfaces para filtros
+// Interfaces para filtros (ajustada para coincidir con el backend)
 interface PropertyFilters {
   searchTerm: string;
   category: string;
@@ -52,18 +57,18 @@ interface PropertyFilters {
 
 export default function Home() {
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState("home");
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [availableCities, setAvailableCities] = useState<string[]>([]);
   
   // Estados para filtros
   const [filters, setFilters] = useState<PropertyFilters>({
     searchTerm: '',
     category: 'todos',
     city: 'todos',
-    priceRange: { min: 0, max: 5000000 }, // Ajustado para acomodar precios altos
+    priceRange: { min: 0, max: 5000000 },
     rooms: 0,
     bathrooms: 0,
     areaRange: { min: 0, max: 500 }
@@ -71,66 +76,136 @@ export default function Home() {
   
   const router = useRouter();
 
-  // Obtener ciudades únicas para el filtro (solo de propiedades publicadas)
-  const publishedProperties = useMemo(() => {
-    return properties.filter(property => property.publication_status === 'published');
-  }, [properties]);
+  // Función para cargar ciudades disponibles
+  const loadAvailableCities = async () => {
+    try {
+      const cities = await getAvailableCities();
+      setAvailableCities(cities);
+    } catch (error) {
+      console.error('Error al cargar ciudades:', error);
+    }
+  };
 
-  const uniqueCities = useMemo(() => {
-    const cities = publishedProperties.map(p => p.city).filter(Boolean);
-    return [...new Set(cities)].sort();
-  }, [publishedProperties]);
-
-  // Filtrado de propiedades
-  const filteredProperties = useMemo(() => {
-    return publishedProperties.filter((property) => {
-      // Filtro por búsqueda de texto
-      const matchesSearch = !filters.searchTerm || 
-        property.title.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-        property.address.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-        property.city.toLowerCase().includes(filters.searchTerm.toLowerCase());
-
-      // Filtro por categoría
-      const matchesCategory = filters.category === 'todos' || property.type === filters.category;
-
-      // Filtro por ciudad
-      const matchesCity = filters.city === 'todos' || property.city === filters.city;
-
-      // Filtro por rango de precio
-      const matchesPrice = property.price >= filters.priceRange.min && 
-                          property.price <= filters.priceRange.max;
-
-      // Filtro por habitaciones
-      const matchesRooms = filters.rooms === 0 || property.rooms >= filters.rooms;
-
-      // Filtro por baños
-      const matchesBathrooms = filters.bathrooms === 0 || property.bathrooms >= filters.bathrooms;
-
-      // Filtro por área
-      const matchesArea = property.area >= filters.areaRange.min && 
-                         property.area <= filters.areaRange.max;
-
-      return matchesSearch && matchesCategory && matchesCity && 
-             matchesPrice && matchesRooms && matchesBathrooms && matchesArea;
-    });
-  }, [publishedProperties, filters]);
+  // Función para aplicar filtros usando el backend
+  const applyFilters = async () => {
+    try {
+      setLoading(true);
+      console.log('🔍 Aplicando filtros:', filters);
+      
+      // Mapear filtros del frontend al formato del backend
+      const backendFilters: PropertySearchFilters = {};
+      
+      // Solo enviar filtros que tengan valores válidos
+      if (filters.city !== 'todos') {
+        backendFilters.city = filters.city;
+      }
+      
+      if (filters.priceRange.min > 0) {
+        backendFilters.minPrice = filters.priceRange.min;
+      }
+      
+      if (filters.priceRange.max < 5000000) {
+        backendFilters.maxPrice = filters.priceRange.max;
+      }
+      
+      if (filters.rooms > 0) {
+        backendFilters.minRooms = filters.rooms;
+      }
+      
+      if (filters.bathrooms > 0) {
+        backendFilters.minBathrooms = filters.bathrooms;
+      }
+      
+      if (filters.areaRange.min > 0) {
+        backendFilters.minArea = filters.areaRange.min;
+      }
+      
+      if (filters.areaRange.max < 500) {
+        backendFilters.maxArea = filters.areaRange.max;
+      }
+      
+      if (filters.category !== 'todos') {
+        backendFilters.type = filters.category;
+      }
+      
+      const response = await searchProperties(backendFilters);
+      
+      if (response.success) {
+        let filteredData = response.data;
+        
+        // Aplicar filtro de búsqueda por texto en el frontend (si el backend no lo soporta)
+        if (filters.searchTerm) {
+          filteredData = filteredData.filter(property =>
+            property.title.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+            property.address.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+            property.city.toLowerCase().includes(filters.searchTerm.toLowerCase())
+          );
+        }
+        
+        setProperties(filteredData);
+        console.log(`✅ ${filteredData.length} propiedades encontradas con filtros`);
+      } else {
+        console.log('❌ Error al aplicar filtros:', response.message);
+        Alert.alert('Error', response.message || 'No se pudieron aplicar los filtros');
+        setProperties([]);
+      }
+    } catch (error) {
+      console.error('💥 Error crítico al aplicar filtros:', error);
+      Alert.alert('Error', 'Error de conexión al aplicar filtros');
+      setProperties([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Función para resetear filtros
   const resetFilters = () => {
-    setFilters({
+    const defaultFilters = {
       searchTerm: '',
       category: 'todos',
       city: 'todos',
-      priceRange: { min: 0, max: 5000000 }, // Ajustado para acomodar precios altos
+      priceRange: { min: 0, max: 5000000 },
       rooms: 0,
       bathrooms: 0,
       areaRange: { min: 0, max: 500 }
-    });
+    };
+    setFilters(defaultFilters);
+    // Aplicar filtros después de resetear
+    setTimeout(() => applyFilters(), 100);
   };
 
   // Función para actualizar filtros
   const updateFilter = (key: keyof PropertyFilters, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  // Función para cargar propiedades iniciales
+  const loadProperties = async () => {
+    try {
+      console.log("🏠 Cargando propiedades iniciales...");
+      setLoading(true);
+      
+      const response = await getAllPublishedProperties();
+
+      if (response.success) {
+        setProperties(response.data);
+        console.log(`✅ ${response.data.length} propiedades cargadas exitosamente`);
+      } else {
+        console.log("❌ Error al cargar propiedades:", response.message);
+        Alert.alert(
+          "Error",
+          response.message || "No se pudieron cargar las propiedades"
+        );
+        setProperties([]);
+      }
+    } catch (error) {
+      console.error("💥 Error crítico:", error);
+      Alert.alert("Error", "Error de conexión al cargar las propiedades");
+      setProperties([]);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   };
 
   const toggleFavorite = (propertyId: string) => {
@@ -158,40 +233,40 @@ export default function Home() {
       : "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=300&h=200&fit=crop"; // imagen por defecto
   };
 
-  const loadProperties = async () => {
-    try {
-      console.log("🏠 Cargando propiedades...");
-      const response = await getAllProperties();
-
-      if (response.success) {
-        setProperties(response.data);
-        console.log(
-          `✅ ${response.data.length} propiedades cargadas exitosamente`
-        );
-      } else {
-        console.log("❌ Error al cargar propiedades:", response.message);
-        Alert.alert(
-          "Error",
-          response.message || "No se pudieron cargar las propiedades"
-        );
-      }
-    } catch (error) {
-      console.error("💥 Error crítico:", error);
-      Alert.alert("Error", "Error de conexión al cargar las propiedades");
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
-
   const handleRefresh = async () => {
     setRefreshing(true);
     await loadProperties();
   };
 
+  const handleApplyFilters = async () => {
+    await applyFilters();
+  };
+
+  // Cargar datos iniciales
   useEffect(() => {
     loadProperties();
+    loadAvailableCities();
   }, []);
+
+  // Aplicar filtros cuando cambien (con debounce para búsqueda)
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (filters.searchTerm !== '' || 
+          filters.category !== 'todos' || 
+          filters.city !== 'todos' ||
+          filters.priceRange.min > 0 ||
+          filters.priceRange.max < 5000000 ||
+          filters.rooms > 0 ||
+          filters.bathrooms > 0 ||
+          filters.areaRange.min > 0 ||
+          filters.areaRange.max < 500) {
+        applyFilters();
+      }
+    }, 500); // Debounce de 500ms para la búsqueda de texto
+
+    return () => clearTimeout(timeoutId);
+  }, [filters.searchTerm]);
+
   // Recargar propiedades cada vez que la pantalla recibe foco
   useFocusEffect(
     useCallback(() => {
@@ -245,6 +320,7 @@ export default function Home() {
                   onChangeText={(text) => updateFilter('searchTerm', text)}
                   className="flex-1 ml-3 text-gray-800"
                   placeholderTextColor="#9ca3af"
+                  onSubmitEditing={handleApplyFilters}
                 />
               </View>
             </View>
@@ -266,7 +342,10 @@ export default function Home() {
             className="flex gap-3"
           >
             <Pressable
-              onPress={() => updateFilter('category', 'todos')}
+              onPress={() => {
+                updateFilter('category', 'todos');
+                setTimeout(handleApplyFilters, 100);
+              }}
               className={`flex-row items-center gap-2 px-4 py-2 rounded-full mr-3 ${
                 filters.category === 'todos' ? "bg-blue-600" : "bg-gray-100"
               }`}
@@ -281,7 +360,10 @@ export default function Home() {
             {categories.map((category) => (
               <Pressable
                 key={category.id}
-                onPress={() => updateFilter('category', category.value)}
+                onPress={() => {
+                  updateFilter('category', category.value);
+                  setTimeout(handleApplyFilters, 100);
+                }}
                 className={`flex-row items-center gap-2 px-4 py-2 rounded-full mr-3 ${
                   filters.category === category.value ? "bg-blue-600" : "bg-gray-100"
                 }`}
@@ -300,7 +382,7 @@ export default function Home() {
         {/* Properties List */}
         <View className="px-6 pb-24">
           <View className="flex-row items-center justify-between mb-4">
-            <Label text={`Propiedades (${filteredProperties.length})`} size="lg" weight="semibold" />
+            <Label text={`Propiedades (${properties.length})`} size="lg" weight="semibold" />
             <Pressable>
               <Text className="text-blue-600 text-sm">Ver todas</Text>
             </Pressable>
@@ -311,15 +393,21 @@ export default function Home() {
               <View className="flex-1 justify-center items-center py-20">
                 <Text className="text-gray-600">Cargando propiedades...</Text>
               </View>
-            ) : filteredProperties.length === 0 ? (
+            ) : properties.length === 0 ? (
               <View className="flex-1 justify-center items-center py-20">
                 <FontAwesome name="search" size={48} color="#d1d5db" />
                 <Text className="text-gray-600 text-center mt-4">
-                  {publishedProperties.length === 0 
-                    ? "No hay propiedades disponibles para alquiler" 
-                    : "No se encontraron propiedades con los filtros aplicados"}
+                  {filters.searchTerm || filters.category !== 'todos' || filters.city !== 'todos' ||
+                   filters.priceRange.min > 0 || filters.priceRange.max < 5000000 ||
+                   filters.rooms > 0 || filters.bathrooms > 0 ||
+                   filters.areaRange.min > 0 || filters.areaRange.max < 500
+                    ? "No se encontraron propiedades con los filtros aplicados"
+                    : "No hay propiedades disponibles para alquiler"}
                 </Text>
-                {publishedProperties.length > 0 && (
+                {(filters.searchTerm || filters.category !== 'todos' || filters.city !== 'todos' ||
+                  filters.priceRange.min > 0 || filters.priceRange.max < 5000000 ||
+                  filters.rooms > 0 || filters.bathrooms > 0 ||
+                  filters.areaRange.min > 0 || filters.areaRange.max < 500) && (
                   <Pressable 
                     onPress={resetFilters}
                     className="bg-blue-100 px-4 py-2 rounded-lg mt-4"
@@ -329,7 +417,7 @@ export default function Home() {
                 )}
               </View>
             ) : (
-              filteredProperties.map((property) => (
+              properties.map((property: Property) => (
                 <Pressable
                   key={property.id}
                   onPress={() => navigateToProperty(property.id)}
@@ -429,7 +517,7 @@ export default function Home() {
                     Todas las ciudades
                   </Text>
                 </Pressable>
-                {uniqueCities.map((city) => (
+                {availableCities.map((city: string) => (
                   <Pressable
                     key={city}
                     onPress={() => updateFilter('city', city)}
@@ -593,11 +681,14 @@ export default function Home() {
                 <Text className="text-gray-800 font-medium">Limpiar filtros</Text>
               </Pressable>
               <Pressable
-                onPress={() => setShowFilters(false)}
+                onPress={() => {
+                  handleApplyFilters();
+                  setShowFilters(false);
+                }}
                 className="flex-1 bg-blue-600 py-3 rounded-lg items-center"
               >
                 <Text className="text-white font-medium">
-                  Aplicar ({filteredProperties.length})
+                  Aplicar ({properties.length})
                 </Text>
               </Pressable>
             </View>
