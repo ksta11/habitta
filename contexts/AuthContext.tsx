@@ -1,11 +1,13 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
+import React, { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import { LoginDTO, LoginResponse } from '../interfaces/LoginInterface';
 import { RegisterDTO, RegisterFormDTO } from '../interfaces/RegisterInterface';
 import { authenticationUser } from '../libs/auth/login/api-service';
 import { registerUser } from '../libs/auth/register/api-service';
-import { isTokenExpired, getTokenTimeToExpiry } from '../utils/Tokens';
+import { clearStoredPushToken, removePushTokenFromBackend, sendPushTokenToBackend } from '../libs/notifications/api-service';
+import { registerForPushNotificationsAsync } from '../utils/registerForPushNotificationAsync';
+import { getTokenTimeToExpiry, isTokenExpired } from '../utils/Tokens';
 
 // Tipos para el contexto
 interface User {
@@ -90,6 +92,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   
 
+  // Función para enviar push token tras autenticación
+  const sendPushTokenOnAuth = async () => {
+    try {
+      const pushToken = await registerForPushNotificationsAsync();
+      if (pushToken) {
+        await sendPushTokenToBackend(pushToken);
+        console.log('📤 Push token enviado tras autenticación');
+      }
+    } catch (error) {
+      console.error('❌ Error al enviar push token tras autenticación:', error);
+    }
+  };
+
   // Función para iniciar la verificación periódica del token
   const startTokenExpirationCheck = () => {
     if (!token) return;
@@ -155,6 +170,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Limpiar almacenamiento
       await clearStoredAuth();
       
+      // Limpiar push token local (no intentamos eliminarlo del backend porque el token ya expiró)
+      await clearStoredPushToken();
+      
       // Detener verificaciones
       stopTokenExpirationCheck();
       
@@ -191,6 +209,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setToken(storedToken);
         setUser(userData);
         console.log('✅ Datos de autenticación cargados:', userData.email);
+        
+        // Enviar push token al backend tras restaurar sesión
+        sendPushTokenOnAuth();
       } else {
         console.log('ℹ️ No hay datos de autenticación almacenados');
       }
@@ -246,8 +267,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setToken(result.token);
         setUser(result.user);
         
+        // Enviar push token al backend tras login exitoso
+        sendPushTokenOnAuth();
+        
         // Redirigir según el rol
-        let redirectPath: string;
+        let redirectPath: Parameters<typeof router.replace>[0];
         switch (result.user.role) {
           case 'admin':
             redirectPath = '/(admin)/home';
@@ -314,6 +338,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       console.log('🚪 Cerrando sesión...');
       
+      // Eliminar push token del backend antes de limpiar el token de auth
+      await removePushTokenFromBackend();
+      
       // Detener verificación de token
       stopTokenExpirationCheck();
       
@@ -323,6 +350,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // Limpiar almacenamiento
       await clearStoredAuth();
+      
+      // Limpiar push token local
+      await clearStoredPushToken();
       
       // Redirigir al login
       router.replace('/auth/login');

@@ -12,6 +12,18 @@ import {
   Nunito_700Bold,
 } from "@expo-google-fonts/nunito";
 import * as SplashScreen from "expo-splash-screen";
+import { NotificationProvider } from "../contexts/NotificationContext";
+import * as Notifications from 'expo-notifications';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -47,26 +59,28 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <StatusBar style="light" backgroundColor="#7C3AED" />
-      <Stack screenOptions={{ headerShown: false }}>
-        {/* Pantalla principal */}
-        <Stack.Screen name="index" />
-        
-        {/* Grupo de autenticación */}
-        <Stack.Screen 
-          name="auth" 
-          options={{
-            headerShown: false,
-          }}
-        />
-        
-        {/* Rutas protegidas */}
-        <Stack.Screen name="(user)" />
-        <Stack.Screen name="(admin)" />
-        <Stack.Screen name="(owner)" />
-      </Stack>
-    </AuthProvider>
+    <NotificationProvider>
+      <AuthProvider>
+        <StatusBar style="light" backgroundColor="#7C3AED" />
+        <Stack screenOptions={{ headerShown: false }}>
+          {/* Pantalla principal */}
+          <Stack.Screen name="index" />
+          
+          {/* Grupo de autenticación */}
+          <Stack.Screen 
+            name="auth" 
+            options={{
+              headerShown: false,
+            }}
+          />
+          
+          {/* Rutas protegidas */}
+          <Stack.Screen name="(user)" />
+          <Stack.Screen name="(admin)" />
+          <Stack.Screen name="(owner)" />
+        </Stack>
+      </AuthProvider>
+    </NotificationProvider>
   );
 }
 
