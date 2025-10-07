@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import ImageUploader from './ImageUploader';
+import { useState } from 'react';
+import { Image, ScrollView, Text, View } from 'react-native';
+import ImageUploader from '../components/atoms/ImageUploader';
 
 export default function ImageUploaderExample() {
   const [selectedImages, setSelectedImages] = useState<ImagePicker.ImagePickerAsset[]>([]);

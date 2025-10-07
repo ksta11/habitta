@@ -1,5 +1,5 @@
-import { GetOwnerApplicationsResponse, UpdateApplicationStatusDTO, UpdateApplicationStatusResponse } from '../../../interfaces/application/ApplicationInterface';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CreateApplicationDTO, CreateApplicationResponse, GetOwnerApplicationsResponse, UpdateApplicationStatusDTO, UpdateApplicationStatusResponse } from '../../interfaces/application/ApplicationInterface';
 
 const TOKEN_KEY = '@habitta_token';
 const USER_KEY = '@habitta_user';
@@ -119,6 +119,69 @@ export const updateApplicationStatus = async (applicationId: string, statusData:
 		
 	} catch (error) {
 		console.error('💥 Error crítico al actualizar estado de aplicación:', error);
+		return {
+			success: false,
+			statusCode: 500,
+			message: error instanceof Error ? error.message : 'Error de conexión',
+		};
+	}
+};
+
+// Crear nueva aplicación
+export const createApplication = async (applicationData: CreateApplicationDTO): Promise<CreateApplicationResponse> => {
+	try {
+		console.log('📝 Iniciando creación de nueva aplicación...');
+		console.log('📋 Datos de aplicación:', applicationData);
+		
+		// Obtener token para la autorización
+		const token = await AsyncStorage.getItem(TOKEN_KEY);
+		if (!token) {
+			console.log('❌ No se encontró token de autenticación');
+			return {
+				success: false,
+				message: 'Token de autenticación no encontrado',
+				statusCode: 401
+			};
+		}
+		
+		const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
+		const url = `${API_BASE_URL}/api/applications/`;
+		console.log('🌐 URL de creación:', url);
+		
+		const response = await fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${token}`,
+			},
+			body: JSON.stringify(applicationData),
+		});
+		
+		console.log('📡 Status de respuesta:', response.status);
+		
+		const data = await response.json();
+		console.log('📋 Respuesta del servidor:', data);
+		
+		if (!response.ok) {
+			console.log('❌ Error en la creación:', data.message);
+			return {
+				success: false,
+				statusCode: response.status,
+				message: data.message || 'Error al crear la aplicación',
+			};
+		}
+		
+		console.log('✅ Aplicación creada exitosamente');
+		
+		return {
+			success: true,
+			statusCode: response.status,
+			data: data.data,
+			message: data.message || 'Aplicación creada exitosamente',
+		};
+		
+	} catch (error) {
+		console.error('💥 Error crítico al crear aplicación:', error);
 		return {
 			success: false,
 			statusCode: 500,

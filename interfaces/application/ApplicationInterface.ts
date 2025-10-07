@@ -45,3 +45,16 @@ export interface UpdateApplicationStatusResponse {
   message: string;
   statusCode?: number;
 }
+
+// Interfaces para crear una nueva aplicación
+export interface CreateApplicationDTO {
+  id_property: string;
+  description: string;
+}
+
+export interface CreateApplicationResponse {
+  success: boolean;
+  data?: Application;
+  message: string;
+  statusCode?: number;
+}

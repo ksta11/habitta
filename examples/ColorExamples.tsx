@@ -1,7 +1,6 @@
-import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
-import Input from './Input';
-import PickerAtom from './Picker';
+import { ScrollView, Text, View } from 'react-native';
+import Input from '../components/atoms/Input';
+import PickerAtom from '../components/atoms/Picker';
 
 // Ejemplo de uso de props de color para los componentes atómicos
 export default function ColorExamples() {
