@@ -1,14 +1,13 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { Controller } from 'react-hook-form';
+import { Text, View } from 'react-native';
+import ButtonAtom from '../../../../components/atoms/ButtonAtom';
 import Input from '../../../../components/atoms/Input';
 import ProgressBar from '../../../../components/atoms/ProgressBar';
-import ButtonAtom from '../../../../components/atoms/ButtonAtom';
 import { FormStepProps } from '../../../../interfaces/property/types';
 
 export default function ScreenStep1({
-  register,
-  setValue,
-  watch,
+  control,
   formState,
   nextStep,
   prevStep,
@@ -18,7 +17,7 @@ export default function ScreenStep1({
 }: FormStepProps) {
   const { errors } = formState;
   return (
-    <View className="flex-1 bg-white-traffic p-4">
+    <View className="flex-1 bg-white-traffic p-4 mt-10">
       <ProgressBar
         steps={[
           { icon: 'home-outline', title: 'General', description: 'Información básica' },
@@ -28,53 +27,73 @@ export default function ScreenStep1({
         currentStep={1}
       />
       <Text className="text-2xl font-bold my-4">Nueva Propiedad - Paso 1</Text>
-      <Input
-        label="Título"
-        placeholder="Título"
-        value={watch('title')}
-        onChangeText={text => setValue('title', text)}
-        error={errors.title?.message}
-        borderColor="#A346E6"
-        backgroundColor="#F6F6F6"
-        labelColor="#A346E6"
-        textColor="#1F1F1F"
-        {...register('title')}
+      <Controller
+        name="title"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <Input
+            label="Título"
+            placeholder="Título"
+            value={value}
+            onChangeText={onChange}
+            error={errors.title?.message}
+            borderColor="#A346E6"
+            backgroundColor="#F6F6F6"
+            labelColor="#A346E6"
+            textColor="#1F1F1F"
+          />
+        )}
       />
-      <Input
-        label="Descripción"
-        placeholder="Descripción"
-        value={watch('description')}
-        onChangeText={text => setValue('description', text)}
-        error={errors.description?.message}
-        borderColor="#A346E6"
-        backgroundColor="#F6F6F6"
-        labelColor="#A346E6"
-        textColor="#1F1F1F"
-        {...register('description')}
+      <Controller
+        name="description"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <Input
+            label="Descripción"
+            placeholder="Descripción"
+            value={value}
+            onChangeText={onChange}
+            error={errors.description?.message}
+            borderColor="#A346E6"
+            backgroundColor="#F6F6F6"
+            labelColor="#A346E6"
+            textColor="#1F1F1F"
+          />
+        )}
       />
-      <Input
-        label="Ciudad"
-        placeholder="Ciudad"
-        value={watch('city')}
-        onChangeText={text => setValue('city', text)}
-        error={errors.city?.message}
-        borderColor="#A346E6"
-        backgroundColor="#F6F6F6"
-        labelColor="#A346E6"
-        textColor="#1F1F1F"
-        {...register('city')}
+      <Controller
+        name="city"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <Input
+            label="Ciudad"
+            placeholder="Ciudad"
+            value={value}
+            onChangeText={onChange}
+            error={errors.city?.message}
+            borderColor="#A346E6"
+            backgroundColor="#F6F6F6"
+            labelColor="#A346E6"
+            textColor="#1F1F1F"
+          />
+        )}
       />
-      <Input
-        label="Dirección"
-        placeholder="Dirección"
-        value={watch('address')}
-        onChangeText={text => setValue('address', text)}
-        error={errors.address?.message}
-        borderColor="#A346E6"
-        backgroundColor="#F6F6F6"
-        labelColor="#A346E6"
-        textColor="#1F1F1F"
-        {...register('address')}
+      <Controller
+        name="address"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <Input
+            label="Dirección"
+            placeholder="Dirección"
+            value={value}
+            onChangeText={onChange}
+            error={errors.address?.message}
+            borderColor="#A346E6"
+            backgroundColor="#F6F6F6"
+            labelColor="#A346E6"
+            textColor="#1F1F1F"
+          />
+        )}
       />
 
       <View className="flex-row justify-between">
@@ -92,7 +111,7 @@ export default function ScreenStep1({
         <View className="flex-1 ml-2">
           <ButtonAtom
             title="Siguiente"
-            onPress={nextStep}
+            onPress={onSubmit}
             variant="primary"
             size="large"
             icon="arrow-forward-outline"

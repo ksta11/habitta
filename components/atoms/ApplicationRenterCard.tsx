@@ -1,19 +1,23 @@
 import React from 'react';
-import { View, Text, Image } from 'react-native';
+import { Image, Text, View } from 'react-native';
+import { RenterApplication } from '../../interfaces/application/RenterApplicationInterface';
 import ButtonAtom from './ButtonAtom';
 import Label from './Label';
-import { RenterApplication } from '../../interfaces/application/RenterApplicationInterface';
 
 interface ApplicationRenterCardProps {
   application: RenterApplication;
   onAccept?: (applicationId: string) => void;
   onWithdraw?: (applicationId: string, propertyTitle: string) => void;
+  onUploadDocuments?: (applicationId: string) => void;
+  onTerminate?: (applicationId: string, propertyTitle: string) => void;
 }
 
 export default function ApplicationRenterCard({
   application,
   onAccept,
   onWithdraw,
+  onUploadDocuments,
+  onTerminate,
 }: ApplicationRenterCardProps) {
   
   const getStatusColor = (status: string) => {
@@ -24,6 +28,12 @@ export default function ApplicationRenterCard({
         return 'text-red-600';
       case 'pre_approved':
         return 'text-blue-600';
+      case 'documents_required':
+        return 'text-orange-600';
+      case 'signed':
+        return 'text-emerald-600';
+      case 'terminated':
+        return 'text-gray-800';
       case 'withdrawn':
         return 'text-gray-600';
       default:
@@ -39,6 +49,12 @@ export default function ApplicationRenterCard({
         return 'Rechazada';
       case 'pre_approved':
         return 'Pre-aprobada';
+      case 'documents_required':
+        return 'Documentos Requeridos';
+      case 'signed':
+        return 'Firmada';
+      case 'terminated':
+        return 'Terminada';
       case 'withdrawn':
         return 'Retirada';
       default:
@@ -54,6 +70,12 @@ export default function ApplicationRenterCard({
         return 'bg-red-50';
       case 'pre_approved':
         return 'bg-blue-50';
+      case 'documents_required':
+        return 'bg-orange-50';
+      case 'signed':
+        return 'bg-emerald-50';
+      case 'terminated':
+        return 'bg-gray-100';
       case 'withdrawn':
         return 'bg-gray-50';
       default:
@@ -69,6 +91,35 @@ export default function ApplicationRenterCard({
             <View className="flex-1">
               <ButtonAtom
                 title="Cancelar Solicitud"
+                onPress={() => onWithdraw?.(application.id, application.property.title)}
+                variant="danger"
+                size="medium"
+                icon="close-outline"
+                iconPosition="left"
+                fullWidth={true}
+              />
+            </View>
+          </View>
+        );
+
+      case 'documents_required':
+        return (
+          <View className="flex-row">
+            <View className="flex-1 mr-3">
+              <ButtonAtom
+                title="Subir Documentos"
+                onPress={() => onUploadDocuments?.(application.id)}
+                variant="habitta-primary"
+                size="medium"
+                icon="cloud-upload-outline"
+                iconPosition="left"
+                fullWidth={true}
+              />
+            </View>
+            
+            <View className="flex-1">
+              <ButtonAtom
+                title="Retirar"
                 onPress={() => onWithdraw?.(application.id, application.property.title)}
                 variant="danger"
                 size="medium"
@@ -110,8 +161,42 @@ export default function ApplicationRenterCard({
         );
 
       case 'approved':
+        return (
+          <View className="flex-row">
+            <View className="flex-1">
+              <ButtonAtom
+                title="Retirar Solicitud"
+                onPress={() => onWithdraw?.(application.id, application.property.title)}
+                variant="danger"
+                size="medium"
+                icon="close-outline"
+                iconPosition="left"
+                fullWidth={true}
+              />
+            </View>
+          </View>
+        );
+
+      case 'signed':
+        return (
+          <View className="flex-row">
+            <View className="flex-1">
+              <ButtonAtom
+                title="Terminar Contrato"
+                onPress={() => onTerminate?.(application.id, application.property.title)}
+                variant="danger"
+                size="medium"
+                icon="close-circle-outline"
+                iconPosition="left"
+                fullWidth={true}
+              />
+            </View>
+          </View>
+        );
+
       case 'rejected':
       case 'withdrawn':
+      case 'terminated':
         return (
           <View className={`${getStatusBackgroundColor(application.status)} rounded-2xl p-3`}>
             <Text className="text-center text-gray-600 text-sm">
@@ -158,11 +243,11 @@ export default function ApplicationRenterCard({
       <View className="mb-4">
         <Label text="Información del Propietario" size="md" weight="semibold" />
         <View className="mt-2">
-          <Text className="text-base font-medium text-erie-black">
-            {application.property.owner.name}
+          <Text className="text-sm text-gray-600">
+            Nombre: {application.property.owner.name}
           </Text>
           <Text className="text-sm text-gray-600 mt-1">
-            {application.property.owner.phone}
+            Telefono: {application.property.owner.phone}
           </Text>
           <Text className="text-sm text-gray-600">
             Fecha de solicitud: {new Date(application.application_date).toLocaleDateString()}

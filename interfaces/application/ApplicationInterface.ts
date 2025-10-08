@@ -21,7 +21,7 @@ export interface Application {
   id: string;
   id_renter: string;
   id_property: string;
-  status: 'pending' | 'pre_approved' | 'approved' | 'rejected' | 'withdraw';
+  status: 'pending' | 'documents_required' | 'pre_approved' | 'approved' | 'signed' | 'rejected' | 'withdrawn' | 'terminated';
   description: string;
   application_date: string;
   renter: Renter;
@@ -35,7 +35,7 @@ export interface GetOwnerApplicationsResponse {
 }
 
 export interface UpdateApplicationStatusDTO {
-  status: 'pending' | 'pre_approved' | 'approved' | 'rejected' | 'withdraw';
+  status: 'pending' | 'documents_required' | 'pre_approved' | 'approved' | 'signed' | 'rejected' | 'withdrawn' | 'terminated';
   reason?: string;
 }
 
