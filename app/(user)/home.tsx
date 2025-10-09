@@ -13,7 +13,6 @@ import {
 import { useRouter, useFocusEffect } from "expo-router";
 import { FontAwesome } from '@expo/vector-icons';
 import Label from "../../components/atoms/Label";
-import Input from "../../components/atoms/Input";
 import { 
   searchProperties, 
   getAllPublishedProperties, 
@@ -144,6 +143,81 @@ export default function Home() {
         
         setProperties(filteredData);
         console.log(`✅ ${filteredData.length} propiedades encontradas con filtros`);
+      } else {
+        console.log('❌ Error al aplicar filtros:', response.message);
+        Alert.alert('Error', response.message || 'No se pudieron aplicar los filtros');
+        setProperties([]);
+      }
+    } catch (error) {
+      console.error('💥 Error crítico al aplicar filtros:', error);
+      Alert.alert('Error', 'Error de conexión al aplicar filtros');
+      setProperties([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Función para aplicar filtros con categoría específica (evita race condition)
+  const applyFiltersWithCategory = async (categoryValue: string) => {
+    try {
+      setLoading(true);
+      console.log('🔍 Aplicando filtros con categoría:', categoryValue);
+      
+      // Crear filtros temporales con la nueva categoría
+      const tempFilters = { ...filters, category: categoryValue };
+      
+      // Mapear filtros del frontend al formato del backend
+      const backendFilters: PropertySearchFilters = {};
+      
+      // Solo enviar filtros que tengan valores válidos
+      if (tempFilters.city !== 'todos') {
+        backendFilters.city = tempFilters.city;
+      }
+      
+      if (tempFilters.priceRange.min > 0) {
+        backendFilters.minPrice = tempFilters.priceRange.min;
+      }
+      
+      if (tempFilters.priceRange.max < 5000000) {
+        backendFilters.maxPrice = tempFilters.priceRange.max;
+      }
+      
+      if (tempFilters.rooms > 0) {
+        backendFilters.minRooms = tempFilters.rooms;
+      }
+      
+      if (tempFilters.bathrooms > 0) {
+        backendFilters.minBathrooms = tempFilters.bathrooms;
+      }
+      
+      if (tempFilters.areaRange.min > 0) {
+        backendFilters.minArea = tempFilters.areaRange.min;
+      }
+      
+      if (tempFilters.areaRange.max < 500) {
+        backendFilters.maxArea = tempFilters.areaRange.max;
+      }
+      
+      if (categoryValue !== 'todos') {
+        backendFilters.type = categoryValue;
+      }
+      
+      const response = await searchProperties(backendFilters);
+      
+      if (response.success) {
+        let filteredData = response.data;
+        
+        // Aplicar filtro de búsqueda por texto en el frontend (si el backend no lo soporta)
+        if (tempFilters.searchTerm) {
+          filteredData = filteredData.filter(property =>
+            property.title.toLowerCase().includes(tempFilters.searchTerm.toLowerCase()) ||
+            property.address.toLowerCase().includes(tempFilters.searchTerm.toLowerCase()) ||
+            property.city.toLowerCase().includes(tempFilters.searchTerm.toLowerCase())
+          );
+        }
+        
+        setProperties(filteredData);
+        console.log(`✅ ${filteredData.length} propiedades encontradas con categoría: ${categoryValue}`);
       } else {
         console.log('❌ Error al aplicar filtros:', response.message);
         Alert.alert('Error', response.message || 'No se pudieron aplicar los filtros');
@@ -344,7 +418,7 @@ export default function Home() {
             <Pressable
               onPress={() => {
                 updateFilter('category', 'todos');
-                setTimeout(handleApplyFilters, 100);
+                applyFiltersWithCategory('todos');
               }}
               className={`flex-row items-center gap-2 px-4 py-2 rounded-full mr-3 ${
                 filters.category === 'todos' ? "bg-blue-600" : "bg-gray-100"
@@ -362,7 +436,7 @@ export default function Home() {
                 key={category.id}
                 onPress={() => {
                   updateFilter('category', category.value);
-                  setTimeout(handleApplyFilters, 100);
+                  applyFiltersWithCategory(category.value);
                 }}
                 className={`flex-row items-center gap-2 px-4 py-2 rounded-full mr-3 ${
                   filters.category === category.value ? "bg-blue-600" : "bg-gray-100"
