@@ -20,15 +20,17 @@ export default function PropertiesLayout() {
         }}
       />
       <Stack.Screen 
-        name="create" 
+        name="create/Form" 
         options={{ 
-          headerShown: false 
+          headerShown: false,
+          title: 'Crear Propiedad'
         }} 
       />
       <Stack.Screen 
-        name="edit" 
+        name="edit/[id]" 
         options={{ 
-          headerShown: false 
+          headerShown: false,
+          title: 'Editar Propiedad'
         }} 
       />
     </Stack>

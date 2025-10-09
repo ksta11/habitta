@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, ScrollView, Pressable, Image, Text, Alert, ActivityIndicator, FlatList, Dimensions } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, Dimensions, FlatList, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import Button from '../../../components/atoms/Button';
-import { getPropertyById } from '../../../libs/owner/property/api-service';
 import { Property } from '../../../interfaces/property/PropertyInterface';
+import { getPropertyById } from '../../../libs/owner/property/api-service';
+import ContactHostModal from '../../../modules/user/home/ContactHostModal';
 
 const ArrowLeftIcon = () => <Text>←</Text>;
 const HeartIcon = ({ filled }: { filled: boolean }) => <Text>{filled ? '❤️' : '🤍'}</Text>;
@@ -35,6 +36,7 @@ export default function PropertyDetails() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isContactModalVisible, setIsContactModalVisible] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
   console.log('PropertyDetails - ID recibido:', id);
@@ -108,6 +110,8 @@ export default function PropertyDetails() {
     );
   }
 
+
+
   if (!property) {
     return (
       <View className="flex-1 justify-center items-center bg-white">
@@ -129,6 +133,19 @@ export default function PropertyDetails() {
 
   const goBack = () => {
     router.back();
+  };
+
+  const contactHost = () => {
+    setIsContactModalVisible(true);
+  };
+
+  const handleApplicationSuccess = () => {
+    // Callback opcional para cuando se crea exitosamente la aplicación
+    console.log('✅ Aplicación creada exitosamente para la propiedad:', property?.title);
+  };
+
+  const handleCloseModal = () => {
+    setIsContactModalVisible(false);
   };
 
   return (
@@ -333,11 +350,20 @@ export default function PropertyDetails() {
           <View className="flex-1">
             <Button
               title="Contactar anfitrión"
-              onPress={() => console.log('Contactar anfitrión')}
+              onPress={contactHost}
             />
           </View>
         </View>
       </View>
+
+      {/* Contact Host Modal */}
+      <ContactHostModal
+        visible={isContactModalVisible}
+        onClose={handleCloseModal}
+        propertyTitle={property?.title || 'esta propiedad'}
+        propertyId={property?.id || ''}
+        onSuccess={handleApplicationSuccess}
+      />
     </View>
   );
 }

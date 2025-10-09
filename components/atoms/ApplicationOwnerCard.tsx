@@ -1,23 +1,31 @@
 import React from 'react';
-import { View, Text, Image } from 'react-native';
+import { Image, Text, View } from 'react-native';
+import { Application } from '../../interfaces/application/ApplicationInterface';
 import ButtonAtom from './ButtonAtom';
 import Label from './Label';
-import { Application } from '../../interfaces/application/ApplicationInterface';
 
 interface ApplicationOwnerCardProps {
   application: Application;
   onViewDetails?: (application: Application) => void;
+  onRequestDocuments?: (applicationId: string) => void;
+  onPreApprove?: (applicationId: string) => void;
   onApprove?: (applicationId: string) => void;
   onReject?: (applicationId: string, applicantName: string) => void;
   onCancel?: (applicationId: string, applicantName: string) => void;
+  onSign?: (applicationId: string) => void;
+  onTerminate?: (applicationId: string, applicantName: string) => void;
 }
 
 export default function ApplicationOwnerCard({
   application,
   onViewDetails,
+  onRequestDocuments,
+  onPreApprove,
   onApprove,
   onReject,
   onCancel,
+  onSign,
+  onTerminate,
 }: ApplicationOwnerCardProps) {
   
   const getStatusColor = (status: string) => {
@@ -28,7 +36,13 @@ export default function ApplicationOwnerCard({
         return 'text-red-600';
       case 'pre_approved':
         return 'text-blue-600';
-      case 'withdraw':
+      case 'documents_required':
+        return 'text-orange-600';
+      case 'signed':
+        return 'text-emerald-600';
+      case 'terminated':
+        return 'text-gray-800';
+      case 'withdrawn':
         return 'text-gray-600';
       default:
         return 'text-lavender-indigo';
@@ -43,7 +57,13 @@ export default function ApplicationOwnerCard({
         return 'Rechazada';
       case 'pre_approved':
         return 'Pre-aprobada';
-      case 'withdraw':
+      case 'documents_required':
+        return 'Documentos Requeridos';
+      case 'signed':
+        return 'Firmada';
+      case 'terminated':
+        return 'Terminada';
+      case 'withdrawn':
         return 'Retirada';
       default:
         return 'Pendiente';
@@ -58,7 +78,13 @@ export default function ApplicationOwnerCard({
         return 'bg-red-50';
       case 'pre_approved':
         return 'bg-blue-50';
-      case 'withdraw':
+      case 'documents_required':
+        return 'bg-orange-50';
+      case 'signed':
+        return 'bg-emerald-50';
+      case 'terminated':
+        return 'bg-gray-100';
+      case 'withdrawn':
         return 'bg-gray-50';
       default:
         return 'bg-gray-50';
@@ -72,11 +98,40 @@ export default function ApplicationOwnerCard({
           <View className="flex-row">
             <View className="flex-1 mr-2">
               <ButtonAtom
-                title="Ver Detalles"
-                onPress={() => onViewDetails?.(application)}
-                variant="habitta-secondary"
+                title="Solicitar Docs"
+                onPress={() => onRequestDocuments?.(application.id)}
+                variant="habitta-primary"
+                size="small"
+                icon="document-text-outline"
+                iconPosition="left"
+                fullWidth={true}
+              />
+            </View>
+            
+            <View className="flex-1">
+              <ButtonAtom
+                title="Rechazar"
+                onPress={() => onReject?.(application.id, application.renter.name)}
+                variant="danger"
                 size="medium"
-                icon="eye-outline"
+                icon="close-outline"
+                iconPosition="left"
+                fullWidth={true}
+              />
+            </View>
+          </View>
+        );
+
+      case 'documents_required':
+        return (
+          <View className="flex-row">
+            <View className="flex-1 mr-2">
+              <ButtonAtom
+                title="Pre-aprobar"
+                onPress={() => onPreApprove?.(application.id)}
+                variant="habitta-primary"
+                size="medium"
+                icon="checkmark-outline"
                 iconPosition="left"
                 fullWidth={true}
               />
@@ -114,8 +169,54 @@ export default function ApplicationOwnerCard({
         );
 
       case 'approved':
+        return (
+          <View className="flex-row">
+            <View className="flex-1 mr-2">
+              <ButtonAtom
+                title="Firmar"
+                onPress={() => onSign?.(application.id)}
+                variant="habitta-primary"
+                size="medium"
+                icon="create-outline"
+                iconPosition="left"
+                fullWidth={true}
+              />
+            </View>
+            
+            <View className="flex-1">
+              <ButtonAtom
+                title="Rechazar"
+                onPress={() => onReject?.(application.id, application.renter.name)}
+                variant="danger"
+                size="medium"
+                icon="close-outline"
+                iconPosition="left"
+                fullWidth={true}
+              />
+            </View>
+          </View>
+        );
+
+      case 'signed':
+        return (
+          <View className="flex-row">
+            <View className="flex-1">
+              <ButtonAtom
+                title="Terminar Contrato"
+                onPress={() => onTerminate?.(application.id, application.renter.name)}
+                variant="danger"
+                size="medium"
+                icon="close-circle-outline"
+                iconPosition="left"
+                fullWidth={true}
+              />
+            </View>
+          </View>
+        );
+
       case 'rejected':
-      case 'withdraw':
+      case 'withdrawn':
+      case 'terminated':
         return (
           <View className={`${getStatusBackgroundColor(application.status)} rounded-2xl p-3`}>
             <Text className="text-center text-gray-600 text-sm">

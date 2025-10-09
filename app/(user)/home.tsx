@@ -462,7 +462,7 @@ export default function Home() {
             </Pressable>
           </View>
 
-          <View className="space-y-4">
+          <View>
             {loading ? (
               <View className="flex-1 justify-center items-center py-20">
                 <Text className="text-gray-600">Cargando propiedades...</Text>
@@ -495,7 +495,7 @@ export default function Home() {
                 <Pressable
                   key={property.id}
                   onPress={() => navigateToProperty(property.id)}
-                  className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden"
+                  className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mt-4"
                 >
                   <View className="relative">
                     <Image

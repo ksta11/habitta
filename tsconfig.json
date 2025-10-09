@@ -17,5 +17,5 @@
     "contexts/**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+, "examples/ColorExamples.tsx", "examples/FileUploader.example.tsx", "examples/ImageUploader.example.tsx"  ]
 }

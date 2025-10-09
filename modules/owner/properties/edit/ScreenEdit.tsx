@@ -160,11 +160,11 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
   return (
     <ScrollView className="flex-1 bg-white-traffic">
       {/* Header minimalista */}
-      <View className="bg-lavender-indigo p-6 pt-12">
+      <View className="bg-lavender-indigo p-6 pt-10 flex-row">
         <Pressable onPress={() => router.back()} className="mb-2">
-          <Text className="text-white-traffic text-lg">←</Text>
+          <Text className="text-white-traffic text-2xl">←</Text>
         </Pressable>
-        <Text className="text-white-traffic text-2xl font-semibold">Editar</Text>
+        <Text className="text-white-traffic text-2xl font-semibold mt-2">  Editar</Text>
       </View>
       {/* Imágenes */}
       {property?.images && property.images.length > 0 && (

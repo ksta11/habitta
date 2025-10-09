@@ -1,19 +1,20 @@
-import { Stack } from "expo-router";
-import "../global.css";
-import { AuthProvider } from "../contexts/AuthContext";
-import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
-import { StatusBar as RNStatusBar, Platform } from "react-native";
-import { useFonts } from "expo-font";
 import {
   Nunito_400Regular,
   Nunito_500Medium,
   Nunito_600SemiBold,
   Nunito_700Bold,
 } from "@expo-google-fonts/nunito";
-import * as SplashScreen from "expo-splash-screen";
-import { NotificationProvider } from "../contexts/NotificationContext";
+import NetInfo from '@react-native-community/netinfo';
+import { useFonts } from "expo-font";
 import * as Notifications from 'expo-notifications';
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
+import { Alert, Platform, StatusBar as RNStatusBar } from "react-native";
+import { AuthProvider } from "../contexts/AuthContext";
+import { NotificationProvider } from "../contexts/NotificationContext";
+import "../global.css";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -32,6 +33,8 @@ export default function RootLayout() {
     Nunito_600SemiBold,
     Nunito_700Bold,
   });
+
+  const [connect, setConnect] = useState<boolean | undefined>(true);
 
   useEffect(() => {
     if (Platform.OS === 'ios') {
@@ -54,6 +57,33 @@ export default function RootLayout() {
     }
   }, [fontsLoaded]);
 
+
+  useEffect(() => {
+    const checkConnection = async () => {
+      const netInfoState = await NetInfo.fetch();
+      setConnect(netInfoState.isConnected ?? false);
+      if (netInfoState.isConnected === false) {
+        Alert.alert("Sin conexión", "No tienes conexión a internet. Algunas funciones pueden no estar disponibles.");
+      }
+    };
+    
+    checkConnection();
+
+    // Suscribirse a cambios de conexión
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setConnect(state.isConnected ?? false);
+      if (state.isConnected === false) {
+        Alert.alert("Sin conexión", "No tienes conexión a internet. Algunas funciones pueden no estar disponibles.");
+      }
+    });
+
+    // Cleanup al desmontar
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  
   if (!fontsLoaded) {
     return null;
   }

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
-import FileUploader from './FileUploader';
+import { useState } from 'react';
+import { ScrollView, Text, View } from 'react-native';
+import FileUploader from '../components/atoms/FileUploader';
 
 export default function FileUploaderExample() {
   const [selectedFiles, setSelectedFiles] = useState<DocumentPicker.DocumentPickerAsset[]>([]);
