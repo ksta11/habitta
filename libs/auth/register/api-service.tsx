@@ -26,6 +26,7 @@ export interface RegisterResponse {
     id: string;
     email: string;
     name: string;
+    status?: string;
   };
 }
 
@@ -67,11 +68,14 @@ export const registerUser = async (userData: RegisterDTO): Promise<RegisterRespo
       };
     }
 
+    // El backend a veces devuelve los datos dentro de data.data
+    const responseData = data.data || data;
+
     return {
       success: true,
       statusCode: 201,
       message: data.message || 'Usuario registrado exitosamente',
-      user: data.user
+      user: responseData.user
     };
     
   } catch (error) {

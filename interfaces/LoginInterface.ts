@@ -12,6 +12,7 @@ export interface LoginResponse {
     id: string;
     email: string;
     name: string;
+    status?: string;
     role: string;
     phone?: string;
     creation_date?: string;
