@@ -365,9 +365,17 @@ export default function Home() {
             />
           </View>
         </View>
-        <Pressable className="rounded-full p-2">
-          <UserIcon />
-        </Pressable>
+        <View className="flex-row items-center gap-2">
+          <Pressable 
+            onPress={() => router.push("/(user)/(review)")}
+            className="bg-green-600 px-3 py-1 rounded-lg"
+          >
+            <Text className="text-white text-xs font-medium">Reviews</Text>
+          </Pressable>
+          <Pressable className="rounded-full p-2">
+            <UserIcon />
+          </Pressable>
+        </View>
       </View>
 
       <ScrollView
