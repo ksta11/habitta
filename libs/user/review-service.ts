@@ -242,8 +242,8 @@ export const updateReview = async (reviewId: string, reviewData: UpdateReviewDat
     // Preparar datos según el esquema del backend
     const updateData = {
       comment: reviewData.comment || null,
-      rating: true, // Por ahora enviamos true por defecto ya que es requerido en el esquema
-      status: 'published' // Cambiar status a published al enviar
+      rating: true, 
+      status: 'published'
     };
 
     console.log('📤 Datos preparados según esquema del backend:', updateData);
