@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, ScrollView } from 'react-native';
-import ScreenSettings from '../../modules/user/userSettings/ScreenSettings';
+import { ScrollView, View } from 'react-native';
+import ScreenSettings from '../../../modules/owner/settings/ScreenSettings';
 
 export default function ProfileScreen() {
   return (

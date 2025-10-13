@@ -1,32 +1,24 @@
 import React from 'react';
 import { Image, Text, View } from 'react-native';
-import { Application } from '../../interfaces/application/ApplicationInterface';
-import ButtonAtom from './ButtonAtom';
-import Label from './Label';
+import ButtonAtom from '../../../components/atoms/ButtonAtom';
+import Label from '../../../components/atoms/Label';
+import { RenterApplication } from '../../../interfaces/application/RenterApplicationInterface';
 
-interface ApplicationOwnerCardProps {
-  application: Application;
-  onViewDetails?: (application: Application) => void;
-  onRequestDocuments?: (applicationId: string) => void;
-  onPreApprove?: (applicationId: string) => void;
-  onApprove?: (applicationId: string) => void;
-  onReject?: (applicationId: string, applicantName: string) => void;
-  onCancel?: (applicationId: string, applicantName: string) => void;
-  onSign?: (applicationId: string) => void;
-  onTerminate?: (applicationId: string, applicantName: string) => void;
+interface ApplicationRenterCardProps {
+  application: RenterApplication;
+  onAccept?: (applicationId: string) => void;
+  onWithdraw?: (applicationId: string, propertyTitle: string) => void;
+  onUploadDocuments?: (applicationId: string) => void;
+  onTerminate?: (applicationId: string, propertyTitle: string) => void;
 }
 
-export default function ApplicationOwnerCard({
+export default function ApplicationRenterCard({
   application,
-  onViewDetails,
-  onRequestDocuments,
-  onPreApprove,
-  onApprove,
-  onReject,
-  onCancel,
-  onSign,
+  onAccept,
+  onWithdraw,
+  onUploadDocuments,
   onTerminate,
-}: ApplicationOwnerCardProps) {
+}: ApplicationRenterCardProps) {
   
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -96,22 +88,10 @@ export default function ApplicationOwnerCard({
       case 'pending':
         return (
           <View className="flex-row">
-            <View className="flex-1 mr-2">
-              <ButtonAtom
-                title="Solicitar Docs"
-                onPress={() => onRequestDocuments?.(application.id)}
-                variant="habitta-primary"
-                size="small"
-                icon="document-text-outline"
-                iconPosition="left"
-                fullWidth={true}
-              />
-            </View>
-            
             <View className="flex-1">
               <ButtonAtom
-                title="Rechazar"
-                onPress={() => onReject?.(application.id, application.renter.name)}
+                title="Cancelar Solicitud"
+                onPress={() => onWithdraw?.(application.id, application.property.title)}
                 variant="danger"
                 size="medium"
                 icon="close-outline"
@@ -125,13 +105,13 @@ export default function ApplicationOwnerCard({
       case 'documents_required':
         return (
           <View className="flex-row">
-            <View className="flex-1 mr-2">
+            <View className="flex-1 mr-3">
               <ButtonAtom
-                title="Pre-aprobar"
-                onPress={() => onPreApprove?.(application.id)}
+                title="Subir Documentos"
+                onPress={() => onUploadDocuments?.(application.id)}
                 variant="habitta-primary"
                 size="medium"
-                icon="checkmark-outline"
+                icon="cloud-upload-outline"
                 iconPosition="left"
                 fullWidth={true}
               />
@@ -139,8 +119,8 @@ export default function ApplicationOwnerCard({
             
             <View className="flex-1">
               <ButtonAtom
-                title="Rechazar"
-                onPress={() => onReject?.(application.id, application.renter.name)}
+                title="Retirar"
+                onPress={() => onWithdraw?.(application.id, application.property.title)}
                 variant="danger"
                 size="medium"
                 icon="close-outline"
@@ -154,11 +134,23 @@ export default function ApplicationOwnerCard({
       case 'pre_approved':
         return (
           <View className="flex-row">
+            <View className="flex-1 mr-3">
+              <ButtonAtom
+                title="Aceptar"
+                onPress={() => onAccept?.(application.id)}
+                variant="habitta-primary"
+                size="medium"
+                icon="checkmark-outline"
+                iconPosition="left"
+                fullWidth={true}
+              />
+            </View>
+            
             <View className="flex-1">
               <ButtonAtom
-                title="Cancelar Pre-aprobación"
-                onPress={() => onCancel?.(application.id, application.renter.name)}
-                variant="habitta-outline"
+                title="Rechazar"
+                onPress={() => onWithdraw?.(application.id, application.property.title)}
+                variant="danger"
                 size="medium"
                 icon="close-outline"
                 iconPosition="left"
@@ -171,22 +163,10 @@ export default function ApplicationOwnerCard({
       case 'approved':
         return (
           <View className="flex-row">
-            <View className="flex-1 mr-2">
-              <ButtonAtom
-                title="Firmar"
-                onPress={() => onSign?.(application.id)}
-                variant="habitta-primary"
-                size="medium"
-                icon="create-outline"
-                iconPosition="left"
-                fullWidth={true}
-              />
-            </View>
-            
             <View className="flex-1">
               <ButtonAtom
-                title="Rechazar"
-                onPress={() => onReject?.(application.id, application.renter.name)}
+                title="Retirar Solicitud"
+                onPress={() => onWithdraw?.(application.id, application.property.title)}
                 variant="danger"
                 size="medium"
                 icon="close-outline"
@@ -203,7 +183,7 @@ export default function ApplicationOwnerCard({
             <View className="flex-1">
               <ButtonAtom
                 title="Terminar Contrato"
-                onPress={() => onTerminate?.(application.id, application.renter.name)}
+                onPress={() => onTerminate?.(application.id, application.property.title)}
                 variant="danger"
                 size="medium"
                 icon="close-circle-outline"
@@ -244,6 +224,9 @@ export default function ApplicationOwnerCard({
           <Text className="text-lg font-semibold text-erie-black">
             {application.property.title}
           </Text>
+          <Text className="text-sm text-gray-600 mt-1">
+            {application.property.address}
+          </Text>
           <Text className="text-xl font-bold text-lavender-indigo mt-1">
             ${application.property.price.toLocaleString()}/mes
           </Text>
@@ -256,18 +239,28 @@ export default function ApplicationOwnerCard({
         </View>
       </View>
 
-      {/* Info del Solicitante */}
+      {/* Info del Propietario */}
       <View className="mb-4">
-        <Label text="Información del Solicitante" size="md" weight="semibold" />
+        <Label text="Información del Propietario" size="md" weight="semibold" />
         <View className="mt-2">
-          <Text className="text-base font-medium text-erie-black">
-            {application.renter.name}
+          <Text className="text-sm text-gray-600">
+            Nombre: {application.property.owner.name}
           </Text>
           <Text className="text-sm text-gray-600 mt-1">
-            {application.renter.email}
+            Telefono: {application.property.owner.phone}
           </Text>
           <Text className="text-sm text-gray-600">
             Fecha de solicitud: {new Date(application.application_date).toLocaleDateString()}
+          </Text>
+        </View>
+      </View>
+
+      {/* Mi Mensaje */}
+      <View className="mb-4">
+        <Label text="Mi Mensaje" size="md" weight="semibold" />
+        <View className="bg-gray-50 rounded-2xl p-3 mt-2">
+          <Text className="text-sm text-gray-700">
+            "{application.description}"
           </Text>
         </View>
       </View>

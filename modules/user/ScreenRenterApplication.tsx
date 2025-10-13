@@ -1,9 +1,9 @@
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { Alert, RefreshControl, ScrollView, Text, View } from 'react-native';
-import ApplicationRenterCard from '../../components/atoms/ApplicationRenterCard';
 import { RenterApplication } from '../../interfaces/application/RenterApplicationInterface';
 import { getRenterApplications, updateRenterApplication } from '../../libs/userServices/application/api-service';
+import ApplicationRenterCard from './Atoms/ApplicationRenterCard';
 
 export default function ScreenRenterApplication() {
   const [refreshing, setRefreshing] = useState(false);
