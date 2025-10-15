@@ -11,11 +11,15 @@ export interface Review {
   weight: string;
   status: 'pending' | 'published';
   create_date: string;
+  // Campos adicionales retornados por el backend para mostrar en la UI de review
+  property_title?: string;
+  receiver_name?: string;
 }
 
 export interface UpdateReviewData {
   comment: string;
-  rating?: number;
+  // `rating` used as recommended flag: true -> recomendado, false -> no recomendado
+  rating?: boolean;
 }
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
@@ -242,7 +246,8 @@ export const updateReview = async (reviewId: string, reviewData: UpdateReviewDat
     // Preparar datos según el esquema del backend
     const updateData = {
       comment: reviewData.comment || null,
-      rating: true, 
+      // use provided boolean rating (recommended) if present, otherwise omit
+      rating: typeof reviewData.rating === 'boolean' ? reviewData.rating : undefined,
       status: 'published'
     };
 

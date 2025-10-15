@@ -5,6 +5,7 @@ export interface Renter {
   name: string;
   email: string;
   phone: string;
+  ratingAverage?: number;
 }
 
 export interface ApplicationProperty {

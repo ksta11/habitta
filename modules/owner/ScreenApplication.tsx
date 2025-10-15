@@ -46,7 +46,7 @@ export default function ScreenApplication() {
   const handleViewDetails = (application: Application) => {
     Alert.alert(
       'Detalles de Solicitud',
-      `Solicitante: ${application.renter.name}\n\nEmail: ${application.renter.email}\n\nTeléfono: ${application.renter.phone}\n\nFecha: ${new Date(application.application_date).toLocaleDateString()}\n\nMensaje:\n"${application.description}"`,
+      `Solicitante: ${application.renter.name}\n\nEmail: ${application.renter.email}\n\nTeléfono: ${application.renter.phone}${typeof application.renter.ratingAverage === 'number' ? `\n\nCalificación: ${Math.round(application.renter.ratingAverage)}%` : ''}\n\nFecha: ${new Date(application.application_date).toLocaleDateString()}\n\nMensaje:\n"${application.description}"`,
       [
         { text: 'Cerrar', style: 'cancel' }
       ]
