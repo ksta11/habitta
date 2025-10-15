@@ -8,10 +8,10 @@ import NetInfo from '@react-native-community/netinfo';
 import { useFonts } from "expo-font";
 import * as Notifications from 'expo-notifications';
 import { Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { Alert, Platform, StatusBar as RNStatusBar } from "react-native";
+import SplashScreen from "../components/SplashScreen/SplashScreen";
 import { AuthProvider } from "../contexts/AuthContext";
 import { NotificationProvider } from "../contexts/NotificationContext";
 import "../global.css";
@@ -33,6 +33,7 @@ export default function RootLayout() {
     Nunito_600SemiBold,
     Nunito_700Bold,
   });
+  const [isAppReady, setIsAppReady] = useState(false);
 
   const [connect, setConnect] = useState<boolean | undefined>(true);
 
@@ -46,14 +47,13 @@ export default function RootLayout() {
 
   useEffect(() => {
     async function prepare() {
-      await SplashScreen.preventAutoHideAsync();
+      // Esperar al menos 2 segundos para mostrar el splash screen
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setIsAppReady(true);
     }
-    prepare();
-  }, []);
-
-  useEffect(() => {
+    
     if (fontsLoaded) {
-      SplashScreen.hideAsync();
+      prepare();
     }
   }, [fontsLoaded]);
 
@@ -82,7 +82,10 @@ export default function RootLayout() {
       unsubscribe();
     };
   }, []);
-
+  
+  if (!fontsLoaded || !isAppReady) {
+    return <SplashScreen />;
+  }
   
   if (!fontsLoaded) {
     return null;

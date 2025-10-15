@@ -9,7 +9,7 @@
     "scheme": "habitta",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/lotties/Habitta.json",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -36,13 +36,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
-          "dark": {
-            "backgroundColor": "#000000"
-          }
+          "backgroundColor": "#360f67"
         }
       ],
       "expo-notifications"
