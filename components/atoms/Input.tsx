@@ -53,7 +53,7 @@ export default function Input({
     <View className="mb-4">
       {label && (
         <Text 
-          className="absolute left-4 top-4 bg-white px-1 text-xs z-10" 
+          className="absolute left-4 top-4 bg-white px-1 text-xs z-10 rounded-sm" 
           style={{
             transform: [{translateY: -10}],
             color: labelColor,

@@ -36,7 +36,7 @@ export default function ButtonAtom({
       danger: 'bg-red-500 border-red-500 border-2',
       success: 'bg-green-500 border-green-500 border-2',
       warning: 'bg-yellow-500 border-yellow-500 border-2',
-      outline: 'bg-transparent border-blue-500 border-2',
+      outline: 'bg-white-traffic border-blue-500 border-2',
       ghost: 'bg-transparent border-transparent',
       'habitta-primary': 'bg-violet border-violet border-2',
       'habitta-secondary': 'bg-lavender-indigo border-lavender-indigo border-2',

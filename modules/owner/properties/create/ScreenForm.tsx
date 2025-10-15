@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { View } from 'react-native';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CreatePropertySchema, CreatePropertyFormType } from '../../../../schemes/PropertySchema';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { View } from 'react-native';
+import { useAuth } from '../../../../contexts/AuthContext';
+import { createProperty } from '../../../../libs/owner/property/api-service';
+import { CreatePropertyFormType, CreatePropertySchema } from '../../../../schemes/PropertySchema';
 import ScreenStep1 from './ScreenStep1';
 import ScreenStep2 from './ScreenStep2';
 import ScreenStep3 from './ScreenStep3';
-import { createProperty } from '../../../../libs/owner/property/api-service';
-import { useAuth } from '../../../../contexts/AuthContext';
-import { useRouter } from 'expo-router';
 
 const steps = [ScreenStep1, ScreenStep2, ScreenStep3];
 
@@ -37,7 +37,8 @@ export default function ScreenForm() {
   const { user } = useAuth();
   const form = useForm<CreatePropertyFormType>({
     resolver: zodResolver(CreatePropertySchema),
-    mode: 'onTouched',
+    mode: 'onSubmit', // Solo valida al hacer submit
+    reValidateMode: 'onBlur', // Revalida en blur después del primer submit
     defaultValues: {
       title: '',
       description: '',
@@ -55,29 +56,42 @@ export default function ScreenForm() {
 
   const StepComponent = steps[currentStep];
 
-  const nextStep = async () => {
-    const fields: FieldName[] = stepFields[currentStep];
-    const valid = await form.trigger(fields);
-    if (valid) {
-      setCurrentStep((s) => Math.min(s + 1, steps.length - 1));
-    }
-  };
-  
-  const prevStep = () => {
-    if (currentStep === 0) {
-      // Si estamos en el primer step, resetear formulario y volver a la pantalla anterior
-      form.reset();
-      router.back();
+  // Lógica para enviar el formulario
+  const router = useRouter();
+
+  // Función para validar step y avanzar
+  const handleStepSubmit = async () => {
+    console.log(`🔍 Validando step ${currentStep + 1}...`);
+    
+    // Si es el último step, enviar el formulario completo
+    if (currentStep === steps.length - 1) {
+      console.log('📤 Último step, enviando formulario...');
+      // Para el último step, validar todo el formulario y enviar
+      const isValid = await form.trigger();
+      if (isValid) {
+        const data = form.getValues();
+        await submitForm(data);
+      } else {
+        console.log('❌ Formulario completo tiene errores:', form.formState.errors);
+      }
     } else {
-      // Si no, ir al step anterior
-      setCurrentStep((s) => Math.max(s - 1, 0));
+      // Si no es el último step, validar solo campos del step actual
+      const fields: FieldName[] = stepFields[currentStep];
+      console.log('🔍 Validando campos:', fields);
+      
+      const valid = await form.trigger(fields);
+      
+      if (valid) {
+        console.log(`✅ Step ${currentStep + 1} válido, avanzando...`);
+        setCurrentStep((s) => Math.min(s + 1, steps.length - 1));
+      } else {
+        console.log(`❌ Step ${currentStep + 1} tiene errores:`, form.formState.errors);
+      }
     }
   };
 
-  // Lógica para enviar el formulario
-  const router = useRouter();
-  
-  const onSubmit = form.handleSubmit(async (data) => {
+  // Lógica para enviar el formulario completo
+  const submitForm = async (data: CreatePropertyFormType) => {
     try {
       const propertyData = { ...data, id_owner: user?.id };
       const result = await createProperty(propertyData);
@@ -94,15 +108,26 @@ export default function ScreenForm() {
     } catch (error) {
       console.log('💥 Error inesperado:', error);
     }
-  });
+  };
+  
+  const prevStep = () => {
+    if (currentStep === 0) {
+      // Si estamos en el primer step, resetear formulario y volver a la pantalla anterior
+      form.reset();
+      router.back();
+    } else {
+      // Si no, ir al step anterior
+      setCurrentStep((s) => Math.max(s - 1, 0));
+    }
+  };
 
   return (
     <View style={{ flex: 1 }}>
       <StepComponent
         {...form}
-        nextStep={nextStep}
+        nextStep={() => {}} // Ya no se usa directamente
         prevStep={prevStep}
-        onSubmit={onSubmit}
+        onSubmit={handleStepSubmit}
         isLastStep={currentStep === steps.length - 1}
         isFirstStep={currentStep === 0}
       />

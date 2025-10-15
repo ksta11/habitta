@@ -1,16 +1,20 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert, RefreshControl } from 'react-native';
-import { useRouter, useFocusEffect } from 'expo-router';
-import PropertyCard from '../../components/atoms/PropertyCard';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, FlatList, Text, View } from 'react-native';
 import ButtonAtom from '../../components/atoms/ButtonAtom';
-import { getOwnerProperties, deleteProperty } from '../../libs/owner/property/api-service';
+import OptionModal from '../../components/atoms/OptionModal';
 import { Property } from '../../interfaces/property/PropertyInterface';
+import { getOwnerStatus } from '../../libs/owner/api-service';
+import { deleteProperty, getOwnerProperties } from '../../libs/owner/property/api-service';
+import PropertyCard from './Atoms/PropertyCard';
 
 export default function PropertyScreen() {
   const router = useRouter();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [showOptionModal, setShowOptionModal] = useState(false);
+  const [checkingStatus, setCheckingStatus] = useState(false);
 
   const loadProperties = async () => {
     try {
@@ -96,6 +100,30 @@ export default function PropertyScreen() {
     }, [])
   );
 
+  // Handler extraído para la acción de crear nueva propiedad
+  const handleCreatePropertyPress = useCallback(async () => {
+    setCheckingStatus(true);
+    try {
+      const statusResp = await getOwnerStatus();
+      if (statusResp.success && statusResp.data) {
+        if (statusResp.data.status === 'Verified') {
+          router.push('./create/Form');
+        } else {
+          // Solo mostrar el OptionModal cuando la consulta haya sido exitosa
+          setShowOptionModal(true);
+        }
+      } else {
+        // Respuesta no exitosa: mostrar alerta con el mensaje
+        Alert.alert('Error', statusResp.message || 'No se pudo obtener el estado del propietario');
+      }
+    } catch (err) {
+      console.error('Error al consultar status del propietario:', err);
+      Alert.alert('Error', err instanceof Error ? err.message : 'Error al consultar el estado del propietario');
+    } finally {
+      setCheckingStatus(false);
+    }
+  }, [router]);
+
   const formatPropertyData = (property: Property) => {
     // Función para formatear los datos de la propiedad para el card
     return {
@@ -136,21 +164,17 @@ export default function PropertyScreen() {
           </Text>
         </View>
       ) : (
-        <ScrollView 
+        <FlatList
+          data={properties}
+          keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              colors={['#3b82f6']}
-              tintColor="#3b82f6"
-            />
-          }
-        >
-          {properties.map((property) => {
-            const formattedData = formatPropertyData(property);
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          contentContainerStyle={{ paddingBottom: 24 }}
+          renderItem={({ item }) => {
+            const formattedData = formatPropertyData(item);
             return (
-              <View key={property.id} className="mb-4">
+              <View key={item.id} className="mb-4">
                 <PropertyCard
                   price={formattedData.price}
                   address={formattedData.address}
@@ -159,20 +183,20 @@ export default function PropertyScreen() {
                   rooms={formattedData.rooms}
                   imageUrl={formattedData.imageUrl}
                   onPress={() => {
-                    console.log(`Propiedad ${property.id} seleccionada:`, property.title);
+                    console.log(`Propiedad ${item.id} seleccionada:`, item.title);
                     // Aquí puedes navegar a los detalles de la propiedad
-                    // router.push(`/property/${property.id}`);
+                    // router.push(`/property/${item.id}`);
                   }}
                 />
-                
+
                 {/* Botones de editar y eliminar */}
                 <View className="mt-2 flex-row">
                   <View className="flex-1 mr-2">
                     <ButtonAtom
                       title="Editar"
                       onPress={() => {
-                        console.log(`Editando propiedad ${property.id}:`, property.title);
-                        router.push(`./edit/${property.id}`);
+                        console.log(`Editando propiedad ${item.id}:`, item.title);
+                        router.push(`./edit/${item.id}`);
                       }}
                       variant="habitta-secondary"
                       size="medium"
@@ -185,7 +209,7 @@ export default function PropertyScreen() {
                   <View className="flex-1">
                     <ButtonAtom
                       title="Eliminar"
-                      onPress={() => showDeleteConfirmation(property.id, property.title)}
+                      onPress={() => showDeleteConfirmation(item.id, item.title)}
                       variant="danger"
                       size="medium"
                       icon="trash-outline"
@@ -196,19 +220,34 @@ export default function PropertyScreen() {
                 </View>
               </View>
             );
-          })}
-        </ScrollView>
+          }}
+        />
       )}
       
       <View className="mt-4">
         <ButtonAtom
           title="Crear nueva propiedad"
-          onPress={() => router.push('./create/Form')}
+          onPress={handleCreatePropertyPress}
+          loading={checkingStatus}
           variant="habitta-primary"
           size="large"
           icon="add-circle-outline"
           iconPosition="left"
           fullWidth={true}
+        />
+        
+        <OptionModal
+          visible={showOptionModal}
+          title="Verificar identidad"
+          message="Tu cuenta no está verificada. Para crear una propiedad debes verificar tu identidad. ¿Deseas comenzar el proceso ahora?"
+          onCancel={() => setShowOptionModal(false)}
+          onConfirm={() => {
+            setShowOptionModal(false);
+            // Ajusta la ruta si tu pantalla de verificación tiene otro path
+            router.push('../(settings)/upload/verifyIdentity');
+          }}
+          cancelText="Más tarde"
+          confirmText="Verificar identidad"
         />
       </View>
     </View>

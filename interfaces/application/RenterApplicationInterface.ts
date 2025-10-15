@@ -22,7 +22,7 @@ export interface RenterApplication {
   id: string;
   id_renter: string;
   id_property: string;
-  status: 'pending' | 'pre_approved' | 'approved' | 'rejected' | 'withdrawn';
+  status: 'pending' | 'documents_required' | 'pre_approved' | 'approved' | 'signed' | 'rejected' | 'withdrawn' | 'terminated';
   description: string;
   application_date: string;
   property: RenterApplicationProperty;

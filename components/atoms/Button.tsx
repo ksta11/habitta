@@ -5,7 +5,7 @@ interface ButtonProps {
   title: string;
   onPress: () => void;
   disabled?: boolean;
-  variant?: 'primary' | 'secondary' | 'outline';
+  variant?: 'primary' | 'secondary' | 'outline' | 'violet' | 'violet-outline';
   size?: 'sm' | 'md' | 'lg';
 }
 
@@ -42,6 +42,12 @@ export default function Button({
         case 'outline':
           baseStyles += ' bg-transparent border-2 border-blue-500';
           break;
+        case 'violet':
+          baseStyles += ' bg-violet';
+          break;
+        case 'violet-outline':
+          baseStyles += ' bg-transparent border-2 border-violet';
+          break;
         default:
           baseStyles += ' bg-blue-500';
       }
@@ -70,6 +76,8 @@ export default function Button({
       textStyles += ' text-gray-500';
     } else if (variant === 'outline') {
       textStyles += ' text-blue-500';
+    } else if (variant === 'violet-outline') {
+      textStyles += ' text-violet';
     } else {
       textStyles += ' text-white';
     }
@@ -82,7 +90,6 @@ export default function Button({
       className={getButtonStyles()}
       onPress={onPress}
       disabled={disabled}
-      activeOpacity={0.8}
     >
       <Text className={getTextStyles()}>
         {title}

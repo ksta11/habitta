@@ -35,6 +35,19 @@ export default function AuthLayout() {
           headerBackVisible: false, // Ocultar el botón de back nativo
         }}
       />
+      <Stack.Screen 
+        name="verify" 
+        options={{
+          title: '', // Sin título para que no se vea texto
+          headerStyle: {
+            backgroundColor: '#7C3AED',
+          },
+          headerTintColor: '#FFFFFF',
+          headerShadowVisible: false,
+          headerTransparent: false, // Asegurar que no sea transparente para el color
+          headerBackVisible: false, // Ocultar el botón de back nativo
+        }}
+      />
     </Stack>
   );
 }

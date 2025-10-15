@@ -5,6 +5,7 @@ import { LoginDTO, LoginResponse } from '../interfaces/LoginInterface';
 import { RegisterDTO, RegisterFormDTO } from '../interfaces/RegisterInterface';
 import { authenticationUser } from '../libs/auth/login/api-service';
 import { registerUser } from '../libs/auth/register/api-service';
+import { confirmVerificationCode } from '../libs/auth/verify/api-service';
 import { clearStoredPushToken, removePushTokenFromBackend, sendPushTokenToBackend } from '../libs/notifications/api-service';
 import { registerForPushNotificationsAsync } from '../utils/registerForPushNotificationAsync';
 import { getTokenTimeToExpiry, isTokenExpired } from '../utils/Tokens';
@@ -30,6 +31,7 @@ interface AuthContextType {
   login: (credentials: LoginDTO) => Promise<{ success: boolean; message?: string }>;
   register: (userData: RegisterFormDTO) => Promise<{ success: boolean; message?: string }>;
   logout: () => Promise<void>;
+  confirmVerification: (userId: string, verificationCode: string) => Promise<{ success: boolean; message?: string }>;
   
   // Utilidades
   refreshUser: () => Promise<void>;
@@ -257,19 +259,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       const result: LoginResponse = await authenticationUser(credentials);
       
+      // Caso: usuario existe pero no está verificado
+      if (result.success && result.user && result.user.status === 'Unverified') {
+        console.log('⚠️ Cuenta no verificada - redirigiendo a verificación');
+
+        // No almacenamos token (el backend no lo proporciona en este caso)
+        setUser(result.user);
+
+        // Redirigir a la ruta dinámica de verificación usando el id del usuario
+        const verifyPath = `/auth/verify/${result.user.id}`;
+        console.log('🚀 Redirigiendo a:', verifyPath);
+        router.replace({ pathname: '/auth/verify/[id]', params: { id: result.user.id } });
+
+        return { success: true, message: result.message };
+      }
+
+      // Caso normal: success + token + user (y usuario verificado)
       if (result.success && result.token && result.user) {
         console.log('✅ Login exitoso');
-        
+
         // Almacenar datos
         await storeAuth(result.token, result.user);
-        
+
         // Actualizar estado
         setToken(result.token);
         setUser(result.user);
-        
+
         // Enviar push token al backend tras login exitoso
         sendPushTokenOnAuth();
-        
+
         // Redirigir según el rol
         let redirectPath: Parameters<typeof router.replace>[0];
         switch (result.user.role) {
@@ -286,18 +304,61 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
         console.log('🚀 Redirigiendo a:', redirectPath);
         router.replace(redirectPath);
-        
+
         return { success: true, message: result.message };
-      } else {
-        console.log('❌ Login fallido:', result.message);
-        return { success: false, message: result.message };
       }
+
+      console.log('❌ Login fallido:', result.message);
+      return { success: false, message: result.message };
     } catch (error) {
       console.error('❌ Error en login:', error);
       return { 
         success: false, 
         message: error instanceof Error ? error.message : 'Error inesperado durante el login' 
       };
+    }
+  };
+
+  // Confirmar verificación de cuenta usando el código enviado al usuario
+  const confirmVerification = async (userId: string, verificationCode: string): Promise<{ success: boolean; message?: string }> => {
+    try {
+      const result = await confirmVerificationCode(userId, verificationCode);
+
+      // Log full result for debugging when something is unexpected
+      console.log('📣 confirmVerification result:', result);
+
+      if (!result.success) {
+        console.warn('⚠️ Confirm verification failed:', result);
+        return { success: false, message: result.message || JSON.stringify(result) };
+      }
+
+      if (result.token && result.user) {
+        await updateAuthData(result.token, result.user);
+        sendPushTokenOnAuth();
+
+        // Redirigir según rol
+        let redirectPath: Parameters<typeof router.replace>[0];
+        switch (result.user.role) {
+          case 'admin':
+            redirectPath = '/(admin)/home';
+            break;
+          case 'owner':
+            redirectPath = '/(owner)/(properties)';
+            break;
+          case 'user':
+          default:
+            redirectPath = '/(user)/home';
+            break;
+        }
+        router.replace(redirectPath);
+
+        return { success: true, message: result.message };
+      }
+
+      return { success: false, message: result.message || 'Respuesta inesperada del servidor' };
+    } catch (error) {
+      console.error('❌ Error al confirmar verificación:', error);
+      return { success: false, message: error instanceof Error ? error.message : 'Error inesperado' };
     }
   };
 
@@ -314,11 +375,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       const result = await registerUser(registerData);
       
-      if (result.success) {
-        console.log('✅ Registro exitoso');
-        
-        router.replace('/auth/login');
-        
+      if (result.success && result.user) {
+        console.log('✅ Registro exitoso - usuario creado');
+
+        // Colocar un usuario parcial en el contexto para que ScreenVerify pueda acceder si es necesario
+        const partialUser: User = {
+          id: result.user.id,
+          email: result.user.email,
+          name: result.user.name,
+          role: 'user'
+        };
+        setUser(partialUser);
+
+        // Redirigir directamente a la verificación usando la ruta dinámica
+        router.replace({ pathname: '/auth/verify/[id]', params: { id: result.user.id } });
+
         return { success: true, message: result.message };
       } else {
         console.log('❌ Registro fallido:', result.message);
@@ -431,6 +502,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Funciones
     login,
     register,
+    confirmVerification,
     logout,
     refreshUser,
     updateUserData,

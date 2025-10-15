@@ -13,6 +13,13 @@ const actions = [
     color: "bg-violet", // violet principal
   },
   {
+    title: "Ver Reviews",
+    description: "Gestionar reseñas",
+    icon: "chatbubbles" as const,
+    link: "/(owner)/(review)",
+    color: "bg-violet", // violet para mantener consistencia
+  },
+  {
     title: "Ver Estadísticas",
     description: "Reportes completos",
     icon: "bar-chart" as const,
@@ -39,7 +46,10 @@ export function QuickActions() {
           <Pressable 
             key={index} 
             className={`w-full justify-start h-auto p-4 mb-1 ${action.color} rounded-xl border-0`}
-            onPress={() => router.push(action.link)}
+            onPress={() => {
+              console.log('🚀 [QuickActions] Navegando a:', action.link);
+              router.push(action.link as any);
+            }}
           >
             <View className="flex-row items-center">
               <Ionicons name={action.icon} size={20} color="white" style={{ marginRight: 12 }} />

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Alert, RefreshControl } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import ApplicationRenterCard from '../../components/atoms/ApplicationRenterCard';
+import React, { useEffect, useState } from 'react';
+import { Alert, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { RenterApplication } from '../../interfaces/application/RenterApplicationInterface';
 import { getRenterApplications, updateRenterApplication } from '../../libs/userServices/application/api-service';
+import ApplicationRenterCard from './Atoms/ApplicationRenterCard';
 
 export default function ScreenRenterApplication() {
   const [refreshing, setRefreshing] = useState(false);
@@ -91,6 +91,52 @@ export default function ScreenRenterApplication() {
     );
   };
 
+  const handleUploadDocuments = async (applicationId: string) => {
+    // Función placeholder - sin funcionalidad como solicitaste
+    console.log('📄 Subir documentos para aplicación:', applicationId);
+    // Aquí iría la lógica para subir documentos en el futuro
+  };
+
+  const handleTerminate = async (applicationId: string, propertyTitle: string) => {
+    Alert.alert(
+      'Terminar Contrato',
+      `¿Estás seguro de que quieres terminar el contrato para "${propertyTitle}"?`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Terminar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              console.log('🔄 Terminando contrato:', applicationId);
+              
+              const response = await updateRenterApplication(applicationId, { status: 'terminated' });
+              
+              if (response.success) {
+                console.log('✅ Contrato terminado exitosamente');
+                
+                Alert.alert(
+                  'Contrato Terminado',
+                  'El contrato ha sido terminado.',
+                  [{ text: 'OK' }]
+                );
+                
+                await loadApplications();
+                
+              } else {
+                console.log('❌ Error al terminar contrato:', response.message);
+                Alert.alert('Error', response.message);
+              }
+            } catch (error) {
+              console.error('💥 Error crítico al terminar contrato:', error);
+              Alert.alert('Error', 'Error de conexión al terminar el contrato');
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const handleWithdraw = async (applicationId: string, propertyTitle: string) => {
     Alert.alert(
       'Retirar Solicitud',
@@ -133,7 +179,9 @@ export default function ScreenRenterApplication() {
   };
 
   const pendingApplications = applications.filter(app => app.status === 'pending');
+  const documentsRequiredApplications = applications.filter(app => app.status === 'documents_required');
   const preApprovedApplications = applications.filter(app => app.status === 'pre_approved');
+  const activeApplications = applications.filter(app => ['approved', 'signed'].includes(app.status));
 
   return (
     <View className="flex-1 bg-white-traffic">
@@ -141,7 +189,7 @@ export default function ScreenRenterApplication() {
       <View className="bg-lavender-indigo p-6 pt-12">
         <Text className="text-white-traffic text-2xl font-semibold">Mis Solicitudes</Text>
         <Text className="text-white-traffic text-sm opacity-80 mt-1">
-          {pendingApplications.length} pendientes, {preApprovedApplications.length} pre-aprobadas
+          {pendingApplications.length} pendientes • {documentsRequiredApplications.length} docs requeridos • {preApprovedApplications.length} pre-aprobadas • {activeApplications.length} activas
         </Text>
       </View>
 
@@ -178,6 +226,8 @@ export default function ScreenRenterApplication() {
               application={application}
               onAccept={handleAccept}
               onWithdraw={handleWithdraw}
+              onUploadDocuments={handleUploadDocuments}
+              onTerminate={handleTerminate}
             />
           ))
         )}
