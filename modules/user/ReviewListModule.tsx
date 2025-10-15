@@ -1,31 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  Alert,
-  ActivityIndicator,
-  SafeAreaView,
-} from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { useRouter, useSegments } from 'expo-router';
-import ReviewHeader from '../../components/molecules/ReviewHeader';
-import ReviewCard from '../../components/molecules/ReviewCard';
+import React, { useCallback, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import EmptyReviews from '../../components/molecules/EmptyReviews';
-import { getPendingReviewsAsAuthor, Review, debugTokenInfo } from '../../libs/user/review-service';
+import ReviewCard from '../../components/molecules/ReviewCard';
+import ReviewHeader from '../../components/molecules/ReviewHeader';
+import { debugTokenInfo, getPendingReviewsAsAuthor, Review } from '../../libs/user/review-service';
 
 export default function ReviewListModule() {
   const router = useRouter();
   const segments = useSegments();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   console.log('🎯 [ReviewListModule] Componente inicializado');
   console.log('🎯 [ReviewListModule] Segments:', segments);
 
-  useEffect(() => {
-    console.log('🎯 [ReviewListModule] useEffect ejecutándose...');
-    loadPendingReviews();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      console.log('🎯 [ReviewListModule] screen focused — cargando reviews...');
+      loadPendingReviews();
+    }, [])
+  );
 
   const loadPendingReviews = async () => {
     try {
@@ -61,6 +66,15 @@ export default function ReviewListModule() {
     } finally {
       console.log('🏁 [ReviewListModule] Finalizando carga, estableciendo loading a false...');
       setLoading(false);
+    }
+  };
+
+  const handleRefresh = async () => {
+    try {
+      setRefreshing(true);
+      await loadPendingReviews();
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -107,7 +121,7 @@ export default function ReviewListModule() {
         return 'Cancelación por inquilino';
       case 'cancelledByOwner':
         return 'Cancelación por propietario';
-      case 'completed':
+      case 'normal':
         return 'Alquiler completado';
       default:
         return 'Pendiente de revisión';
@@ -137,6 +151,14 @@ export default function ReviewListModule() {
       <ScrollView 
         className="flex-1 px-6 py-6"
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={["#531A99"]}
+            tintColor="#531A99"
+          />
+        }
       >
         {reviews.length === 0 ? (
           <EmptyReviews

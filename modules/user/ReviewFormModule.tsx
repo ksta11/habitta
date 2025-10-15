@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  ScrollView,
-  Alert,
-  StatusBar,
   ActivityIndicator,
+  Alert,
   SafeAreaView,
+  ScrollView,
+  StatusBar,
+  Switch,
+  Text,
+  View,
 } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import ReviewHeader from '../../components/molecules/ReviewHeader';
-import UserInfoCard from '../../components/molecules/UserInfoCard';
 import ReviewCommentInput from '../../components/molecules/ReviewCommentInput';
+import ReviewHeader from '../../components/molecules/ReviewHeader';
 import ReviewSubmitButton from '../../components/molecules/ReviewSubmitButton';
-import { getReview, updateReview, Review, debugTokenInfo } from '../../libs/user/review-service';
-import { getUserById } from '../../libs/userServices/api-service';
+import UserInfoCard from '../../components/molecules/UserInfoCard';
 import { UserDAO } from '../../interfaces/UserInterface';
+import { Review, debugTokenInfo, getReview, updateReview } from '../../libs/user/review-service';
+import { getUserById } from '../../libs/userServices/api-service';
 
 export default function ReviewFormModule() {
   const router = useRouter();
@@ -29,6 +30,8 @@ export default function ReviewFormModule() {
   const [receiverUser, setReceiverUser] = useState<UserDAO | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  // recommended: true => recomendado, false => no recomendado
+  const [recommended, setRecommended] = useState<boolean | null>(true);
 
   // Cargar datos de la review al montar el componente
   useEffect(() => {
@@ -132,6 +135,8 @@ export default function ReviewFormModule() {
       
       const reviewData = {
         comment: comment.trim(),
+        // pass recommended boolean explicitly so backend receives true/false
+        rating: typeof recommended === 'boolean' ? recommended : undefined,
       };
       
       console.log('📤 Datos a enviar:', reviewData);
@@ -190,6 +195,15 @@ export default function ReviewFormModule() {
       >
         {/* User Info */}
         <UserInfoCard receiverUser={receiverUser} />
+
+        {/* Recommended toggle */}
+        <View className="mb-6">
+          <Text className="text-lg font-semibold text-gray-900 mb-3">¿Recomendarías a este usuario?</Text>
+          <View className="flex-row items-center">
+            <Switch value={!!recommended} onValueChange={(v) => setRecommended(v)} />
+            <Text className="ml-3 text-sm text-gray-700">{recommended ? 'Recomendado' : 'No recomendado'}</Text>
+          </View>
+        </View>
 
         {/* Comment Input */}
         <ReviewCommentInput

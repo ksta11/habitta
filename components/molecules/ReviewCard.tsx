@@ -1,8 +1,8 @@
-import React from 'react';
-import { View, Text, Pressable } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { Card, CardContent } from '../atoms/Card';
+import React from 'react';
+import { Pressable, Text, View } from 'react-native';
 import { Review } from '../../libs/user/review-service';
+import { Card, CardContent } from '../atoms/Card';
 
 interface ReviewCardProps {
   review: Review;
@@ -27,7 +27,11 @@ export default function ReviewCard({
             </Text>
             <Text className="text-sm text-gray-600">
               Solicitud del {formatDate(review.create_date)}
+              {review.property_title ? ` · ${review.property_title}` : ''}
             </Text>
+            {review.receiver_name ? (
+              <Text className="text-sm text-gray-600">Receptor: {review.receiver_name}</Text>
+            ) : null}
           </View>
           <View className="bg-orange-100 px-2 py-1 rounded-full">
             <Text className="text-orange-800 text-xs font-medium">

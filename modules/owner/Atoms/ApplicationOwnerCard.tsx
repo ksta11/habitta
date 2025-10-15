@@ -263,6 +263,9 @@ export default function ApplicationOwnerCard({
           <Text className="text-base font-medium text-erie-black">
             {application.renter.name}
           </Text>
+          {typeof application.renter.ratingAverage === 'number' && (
+            <Text className="text-sm text-gray-600">Calificación: {Math.round(application.renter.ratingAverage)}%</Text>
+          )}
           <Text className="text-sm text-gray-600 mt-1">
             {application.renter.email}
           </Text>
