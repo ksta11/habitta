@@ -28,10 +28,15 @@ export default function HomeHeader({ onNavigateToReviews }: HomeHeaderProps) {
       </View>
       <View className="flex-row items-center gap-2">
         <Pressable 
-          onPress={onNavigateToReviews}
-          className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center shadow-sm"
+          onPress={() => {
+            console.log('🚀 [HomeHeader] Botón de inbox presionado, navegando a reviews...');
+            console.log('🚀 [HomeHeader] Ejecutando callback de navegación...');
+            onNavigateToReviews();
+            console.log('🚀 [HomeHeader] Callback ejecutado');
+          }}
+          className="w-10 h-10 bg-violet rounded-full flex items-center justify-center shadow-sm"
         >
-          <FontAwesome name="inbox" size={16} color="gray-700" />
+          <FontAwesome name="inbox" size={16} color="white" />
         </Pressable>
       </View>
     </View>

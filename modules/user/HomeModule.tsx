@@ -352,7 +352,12 @@ export default function HomeModule() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       {/* Header */}
-      <HomeHeader onNavigateToReviews={() => router.push("/(user)/(review)")} />
+      <HomeHeader onNavigateToReviews={() => {
+        console.log('🚀 [HomeModule] Función de navegación a reviews ejecutada');
+        console.log('🚀 [HomeModule] Navegando a: /(user)/(review)');
+        router.push("/(user)/(review)");
+        console.log('🚀 [HomeModule] router.push ejecutado');
+      }} />
 
       <ScrollView
         className="flex-1"

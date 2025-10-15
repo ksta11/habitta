@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   SafeAreaView,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useSegments } from 'expo-router';
 import ReviewHeader from '../../components/molecules/ReviewHeader';
 import ReviewCard from '../../components/molecules/ReviewCard';
 import EmptyReviews from '../../components/molecules/EmptyReviews';
@@ -15,52 +15,81 @@ import { getPendingReviewsAsAuthor, Review, debugTokenInfo } from '../../libs/us
 
 export default function ReviewListModule() {
   const router = useRouter();
+  const segments = useSegments();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
+  console.log('🎯 [ReviewListModule] Componente inicializado');
+  console.log('🎯 [ReviewListModule] Segments:', segments);
+
   useEffect(() => {
+    console.log('🎯 [ReviewListModule] useEffect ejecutándose...');
     loadPendingReviews();
   }, []);
 
   const loadPendingReviews = async () => {
     try {
-      console.log('🔄 Iniciando carga de reviews pendientes...');
+      console.log('🔄 [ReviewListModule] Iniciando carga de reviews pendientes...');
+      console.log('🔄 [ReviewListModule] Estado actual de loading:', loading);
       
       // Diagnóstico del token
+      console.log('🔍 [ReviewListModule] Ejecutando diagnóstico del token...');
       await debugTokenInfo();
       
       setLoading(true);
+      console.log('🔄 [ReviewListModule] Loading establecido a true, llamando servicio...');
+      
       const response = await getPendingReviewsAsAuthor();
       
-      console.log('📋 Respuesta del servicio:', response);
+      console.log('📋 [ReviewListModule] Respuesta completa del servicio:', JSON.stringify(response, null, 2));
       
       if (response.success) {
-        console.log('✅ Reviews cargadas exitosamente:', response.data);
-        console.log('📊 Cantidad de reviews:', response.data.length);
-        // El backend ya devuelve solo las reviews pendientes del usuario actual como author
+        console.log('✅ [ReviewListModule] Reviews cargadas exitosamente:', response.data);
+        console.log('📊 [ReviewListModule] Cantidad de reviews:', response.data.length);
+        console.log('📊 [ReviewListModule] Datos de cada review:', response.data.map(r => ({ id: r.id, status: r.status, context_type: r.context_type })));
+        
         setReviews(response.data);
       } else {
-        console.log('❌ Error al cargar reviews:', response.message);
+        console.log('❌ [ReviewListModule] Error al cargar reviews:', response.message);
+        console.log('❌ [ReviewListModule] Respuesta de error completa:', response);
         Alert.alert('Error', response.message || 'No se pudieron cargar las reviews');
       }
     } catch (error) {
-      console.error('💥 Error crítico al cargar reviews:', error);
+      console.error('💥 [ReviewListModule] Error crítico al cargar reviews:', error);
+      console.error('💥 [ReviewListModule] Stack trace:', error instanceof Error ? error.stack : 'No stack trace');
       Alert.alert('Error', 'Error al cargar las reviews pendientes');
     } finally {
+      console.log('🏁 [ReviewListModule] Finalizando carga, estableciendo loading a false...');
       setLoading(false);
     }
   };
 
   const navigateToReview = (review: Review) => {
-    console.log('🚀 Navegando a review con datos:', review);
+    console.log('🚀 [ReviewListModule] Navegando a review con datos:', review);
+    console.log('🚀 [ReviewListModule] Review ID:', review.id);
+    console.log('🚀 [ReviewListModule] Segments disponibles:', segments);
+    
+    // Detectar el contexto actual usando segments
+    const isOwnerContext = segments.some((segment: string) => segment === '(owner)');
+    console.log('🚀 [ReviewListModule] Es contexto owner?', isOwnerContext);
+    
+    let targetPath: string;
+    if (isOwnerContext) {
+      targetPath = `/(owner)/(review)/${review.id}`;
+      console.log('🚀 [ReviewListModule] Contexto owner detectado, usando:', targetPath);
+    } else {
+      targetPath = `/(user)/(review)/${review.id}`;
+      console.log('🚀 [ReviewListModule] Contexto user detectado, usando:', targetPath);
+    }
+    
     // Pasar los datos de la review como parámetros
     router.push({
-      pathname: `/(user)/(review)/[reviewId]`,
+      pathname: targetPath,
       params: { 
         reviewId: review.id,
         reviewData: JSON.stringify(review)
       }
-    });
+    } as any);
   };
 
   const formatDate = (dateString: string) => {
@@ -89,7 +118,7 @@ export default function ReviewListModule() {
     return (
       <SafeAreaView className="flex-1 bg-white">
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#3B82F6" />
+          <ActivityIndicator size="large" color="#531A99" />
           <Text className="text-gray-600 mt-4">Cargando reviews pendientes...</Text>
         </View>
       </SafeAreaView>

@@ -68,6 +68,14 @@ export default function OwnerTabsLayout() {
             ),
           }}
         />
+
+        {/* Ocultar ruta de reviews del tab bar */}
+        <Tabs.Screen
+          name="(review)"
+          options={{
+            href: null,
+          }}
+        />
       </Tabs>
     </AuthGuard>
   );
