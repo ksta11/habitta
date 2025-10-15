@@ -1,19 +1,19 @@
-import { Stack } from "expo-router";
-import "../global.css";
-import { AuthProvider } from "../contexts/AuthContext";
-import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
-import { StatusBar as RNStatusBar, Platform } from "react-native";
-import { useFonts } from "expo-font";
 import {
   Nunito_400Regular,
   Nunito_500Medium,
   Nunito_600SemiBold,
   Nunito_700Bold,
 } from "@expo-google-fonts/nunito";
-import * as SplashScreen from "expo-splash-screen";
-import { NotificationProvider } from "../contexts/NotificationContext";
+import { useFonts } from "expo-font";
 import * as Notifications from 'expo-notifications';
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
+import { Platform, StatusBar as RNStatusBar } from "react-native";
+import SplashScreen from "../components/SplashScreen/SplashScreen";
+import { AuthProvider } from "../contexts/AuthContext";
+import { NotificationProvider } from "../contexts/NotificationContext";
+import "../global.css";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -32,6 +32,7 @@ export default function RootLayout() {
     Nunito_600SemiBold,
     Nunito_700Bold,
   });
+  const [isAppReady, setIsAppReady] = useState(false);
 
   useEffect(() => {
     if (Platform.OS === 'ios') {
@@ -43,19 +44,18 @@ export default function RootLayout() {
 
   useEffect(() => {
     async function prepare() {
-      await SplashScreen.preventAutoHideAsync();
+      // Esperar al menos 2 segundos para mostrar el splash screen
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setIsAppReady(true);
     }
-    prepare();
-  }, []);
-
-  useEffect(() => {
+    
     if (fontsLoaded) {
-      SplashScreen.hideAsync();
+      prepare();
     }
   }, [fontsLoaded]);
 
-  if (!fontsLoaded) {
-    return null;
+  if (!fontsLoaded || !isAppReady) {
+    return <SplashScreen />;
   }
 
   return (
