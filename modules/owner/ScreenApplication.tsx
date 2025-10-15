@@ -1,9 +1,9 @@
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useState } from 'react';
 import { Alert, RefreshControl, ScrollView, Text, View } from 'react-native';
-import ApplicationOwnerCard from '../../components/atoms/ApplicationOwnerCard';
 import { Application } from '../../interfaces/application/ApplicationInterface';
 import { getOwnerApplications, updateApplicationStatus } from '../../libs/application/api-service';
+import ApplicationOwnerCard from './Atoms/ApplicationOwnerCard';
 
 export default function ScreenApplication() {
   const [refreshing, setRefreshing] = useState(false);

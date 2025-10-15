@@ -1,5 +1,5 @@
-import { OwnerDashboard } from '../../interfaces/OwnerDashboardInterface';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { OwnerDashboard } from '../../interfaces/OwnerDashboardInterface';
 
 const TOKEN_KEY = '@habitta_token';
 const USER_KEY = '@habitta_user';
@@ -106,5 +106,68 @@ export const getOwnerStats = async (): Promise<OwnerDashboard> => {
 				recentApplications: []
 			}
 		};
+	}
+};
+
+// Obtener estado del propietario
+export interface OwnerStatusResponse {
+	success: boolean;
+	message?: string;
+	data: {
+		id: string;
+		status: string;
+		isVerifiedOrPending: boolean;
+	} | null;
+}
+
+export const getOwnerStatus = async (): Promise<OwnerStatusResponse> => {
+	try {
+		console.log('🔎 Consultando estado del propietario...');
+
+		// Obtener token y usuario desde AsyncStorage
+		const token = await AsyncStorage.getItem(TOKEN_KEY);
+		if (!token) {
+			console.log('❌ Token de autenticación no encontrado');
+			return { success: false, message: 'Token de autenticación no encontrado', data: null };
+		}
+
+		const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
+		const url = `${API_BASE_URL}/api/users/owners/status`;
+		console.log('🌐 URL de consulta:', url);
+
+		const response = await fetch(url, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${token}`,
+			},
+		});
+
+		console.log('📡 Status de respuesta:', response.status);
+		const body = await response.json();
+		console.log('📨 Respuesta:', body);
+
+		if (!response.ok) {
+			console.log('❌ Error en la respuesta:', body?.message);
+			return { success: false, message: body?.message || 'Error al obtener el estado del propietario', data: null };
+		}
+
+		// Esperamos body.data con id, status e isVerifiedOrPending
+		const payload = body?.data || null;
+
+		return {
+			success: true,
+			message: body?.message || 'Estado obtenido correctamente',
+			data: payload
+				? {
+						id: String(payload.id),
+						status: String(payload.status),
+						isVerifiedOrPending: Boolean(payload.isVerifiedOrPending),
+					}
+				: null,
+		};
+	} catch (error) {
+		console.error('💥 Error al consultar estado del propietario:', error);
+		return { success: false, message: error instanceof Error ? error.message : 'Error de conexión', data: null };
 	}
 };

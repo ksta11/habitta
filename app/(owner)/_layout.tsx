@@ -25,7 +25,7 @@ export default function OwnerTabsLayout() {
           },
         }}
       >
-        {/* Tab Configuración */}
+        {/* Tab inicio */}
         <Tabs.Screen
           name="home"
           options={{
@@ -60,7 +60,7 @@ export default function OwnerTabsLayout() {
 
         {/* Tab Configuración */}
         <Tabs.Screen
-          name="settings"
+          name="(settings)"
           options={{
             title: "Ajustes",
             tabBarIcon: ({ color, size }) => (

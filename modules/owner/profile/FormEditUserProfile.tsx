@@ -7,16 +7,17 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 
-import { editUserProfileSchema, EditUserProfileDTO } from "../../../../schemes/EditUserProfileSchema";
+import { editUserProfileSchema, EditUserProfileDTO } from "../../../schemes/EditUserProfileSchema";
 
-import { getCurrentUserProfile, updateCurrentUserProfile, beAnOwner } from "../../../../libs/userServices/api-service";
+import { getCurrentUserProfile, updateCurrentUserProfile, beAnOwner } from "../../../libs/userServices/api-service";
 
-import { useAuth } from "../../../../contexts/AuthContext";
+import { useAuth } from "../../../contexts/AuthContext";
 
 // Atomic Design Components
-import LabeledInput from "../../../../components/molecules/LabeledInput";
-import PasswordInput from "../../../../components/molecules/PasswordInput";
-import ModernButton from "../../../../components/atoms/ModernButton";
+import LabeledInput from "../../../components/molecules/LabeledInput";
+import PasswordInput from "../../../components/molecules/PasswordInput";
+import ModernButton from "../../../components/atoms/ModernButton";
+import ConfirmModal from "../../../components/atoms/ConfirmModal";
 
 export default function FormEditUserProfile() {
   const router = useRouter();
@@ -29,6 +30,7 @@ export default function FormEditUserProfile() {
   const [isLoading, setIsLoading] = useState(true);
   const [becomeOwnerLoading, setBecomeOwnerLoading] = useState(false);
   const insets = useSafeAreaInsets();
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     if (Platform.OS === "android") {
@@ -301,8 +303,7 @@ export default function FormEditUserProfile() {
             <ModernButton
 
               title={becomeOwnerLoading ? "Converting..." : "Become a Owner"}
-
-              onPress={handleBecomeOwner}
+              onPress={() => setShowModal(true)}
               variant="secondary"
               disabled={becomeOwnerLoading}
               loading={becomeOwnerLoading}
@@ -422,6 +423,19 @@ export default function FormEditUserProfile() {
             }}
           />
         </View>
+        <ConfirmModal
+          visible={showModal}
+          title="Ser propietario"
+          message="¿Estás seguro de que deseas convertirte en propietario? Esta acción cambiará tu rol de forma irreversible y te permitirá gestionar propiedades."
+          requireConfirmInput="validar"
+          onCancel={() => setShowModal(false)}
+          onConfirm={() => {
+            setShowModal(false);
+            handleBecomeOwner();
+          }}
+          confirmText="Ser propietario"
+          cancelText="Cancelar"
+        />
       </ScrollView>
       </KeyboardAvoidingView>
     </View>

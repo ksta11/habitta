@@ -1,69 +1,53 @@
+import { Link, router } from 'expo-router';
 import React, { useState } from 'react';
-import { View, Pressable, Alert, ScrollView } from 'react-native';
-import { router, Link } from 'expo-router';
+import { Alert, Pressable, ScrollView, View } from 'react-native';
+import ConfirmModal from '../../../components/atoms/ConfirmModal';
+import Label from '../../../components/atoms/Label';
 import { useAuth } from '../../../contexts/AuthContext';
 import { deleteCurrentUserProfile } from '../../../libs/userServices/api-service';
-import Label from '../../../components/atoms/Label';
 
 const ScreenSettings = () => {
   const { logout } = useAuth();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDeleteAccount = () => {
-    Alert.alert(
-      'Eliminar Cuenta',
-      '¿Estás seguro que deseas eliminar tu cuenta? Esta acción no se puede deshacer y se perderán todos tus datos permanentemente.',
-      [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
-        {
-          text: 'Eliminar Cuenta',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              setIsDeleting(true);
-              console.log('🗑️ Iniciando eliminación de cuenta...');
-              
-              const result = await deleteCurrentUserProfile();
-              
-              if (result.verify) {
-                console.log('✅ Cuenta eliminada exitosamente');
-                Alert.alert(
-                  'Cuenta Eliminada',
-                  'Tu cuenta ha sido eliminada exitosamente. Serás redirigido al login.',
-                  [
-                    {
-                      text: 'OK',
-                      onPress: () => {
-                        router.replace('/auth/login');
-                      },
-                    },
-                  ]
-                );
-              } else {
-                console.log('❌ Error eliminando cuenta:', result.message);
-                Alert.alert(
-                  'Error',
-                  result.message || 'No se pudo eliminar la cuenta. Intenta de nuevo.',
-                  [{ text: 'OK' }]
-                );
-              }
-            } catch (error) {
-              console.error('❌ Error inesperado:', error);
-              Alert.alert(
-                'Error',
-                'Ocurrió un error inesperado. Intenta de nuevo.',
-                [{ text: 'OK' }]
-              );
-            } finally {
-              setIsDeleting(false);
-            }
-          },
-        },
-      ]
-    );
+    setConfirmVisible(true);
+  };
+
+  const [confirmVisible, setConfirmVisible] = useState(false);
+
+  const confirmDeleteAccount = async () => {
+    setConfirmVisible(false);
+    try {
+      setIsDeleting(true);
+      console.log('🗑️ Iniciando eliminación de cuenta...');
+
+      const result = await deleteCurrentUserProfile();
+
+      if (result.verify) {
+        console.log('✅ Cuenta eliminada exitosamente');
+        Alert.alert(
+          'Cuenta Eliminada',
+          'Tu cuenta ha sido eliminada exitosamente. Serás redirigido al login.',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                router.replace('/auth/login');
+              },
+            },
+          ]
+        );
+      } else {
+        console.log('❌ Error eliminando cuenta:', result.message);
+        Alert.alert('Error', result.message || 'No se pudo eliminar la cuenta. Intenta de nuevo.', [{ text: 'OK' }]);
+      }
+    } catch (error) {
+      console.error('❌ Error inesperado:', error);
+      Alert.alert('Error', 'Ocurrió un error inesperado. Intenta de nuevo.', [{ text: 'OK' }]);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const handleLogout = () => {
@@ -90,6 +74,7 @@ const ScreenSettings = () => {
 
 
   return (
+    <>
       <ScrollView 
         className="flex-1 bg-gray-50"
         contentContainerStyle={{ padding: 24 }}
@@ -144,9 +129,9 @@ const ScreenSettings = () => {
         <View className="mt-4 space-y-3">
           <Pressable 
             className="py-3 border-b border-gray-100"
-            // onPress={() => console.log('Centro de ayuda no implementado aún')}
+            onPress={() => router.push('/(owner)/(settings)/view/myDocuments')}
           >
-            <Label text="Centro de Ayuda" size="md" />
+            <Label text="Mi documentación" size="md" />
           </Pressable>
           
           <Pressable 
@@ -233,9 +218,21 @@ const ScreenSettings = () => {
           </Pressable>
         </View>
       </View>
-    </ScrollView>
+      </ScrollView>
+      <ConfirmModal
+        visible={confirmVisible}
+        title="Eliminar Cuenta"
+        message="¿Estás seguro que deseas eliminar tu cuenta? Esta acción no se puede deshacer y se perderán todos tus datos permanentemente."
+        onCancel={() => setConfirmVisible(false)}
+        onConfirm={confirmDeleteAccount}
+        requireConfirmInput="confirmar"
+        cancelText="Cancelar"
+        confirmText="Eliminar Cuenta"
+      />
+    </>
   );
 };
 
 export default ScreenSettings;
+
 
