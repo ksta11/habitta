@@ -1,10 +1,7 @@
-import React from 'react';
-import { View, Pressable, Text } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import Label from '../atoms/Label';
-
-// Iconos simulados con emojis
-const UserIcon = () => <Text>👤</Text>;
+import React from 'react';
+import { Pressable, Text, View } from 'react-native';
+import Label from '../../../components/atoms/Label';
 
 interface HomeHeaderProps {
   onNavigateToReviews: () => void;

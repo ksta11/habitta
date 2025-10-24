@@ -1,5 +1,5 @@
 import React from 'react';
-import ReviewFormModule from '../../../modules/user/ReviewFormModule';
+import ReviewFormModule from '../../../modules/user/ReviewForm';
 
 export default function OwnerReviewForm() {
   console.log('🎯 [OwnerReviewForm] Componente de entrada renderizado para owner');

@@ -11,12 +11,12 @@ import {
   View,
 } from 'react-native';
 import ReviewCommentInput from '../../components/molecules/ReviewCommentInput';
-import ReviewHeader from '../../components/molecules/ReviewHeader';
 import ReviewSubmitButton from '../../components/molecules/ReviewSubmitButton';
 import UserInfoCard from '../../components/molecules/UserInfoCard';
 import { UserDAO } from '../../interfaces/UserInterface';
 import { Review, debugTokenInfo, getReview, updateReview } from '../../libs/user/review-service';
 import { getUserById } from '../../libs/userServices/api-service';
+import ReviewHeader from './reviews/molecules/ReviewHeader';
 
 export default function ReviewFormModule() {
   const router = useRouter();
