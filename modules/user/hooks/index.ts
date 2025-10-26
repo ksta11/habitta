@@ -7,17 +7,21 @@
  */
 
 // Hooks de Reviews
-export { useReviews } from './useReviews';
 export { useReviewNavigation } from './useReviewNavigation';
+export { useReviews } from './useReviews';
 
 // Hooks de Properties
+export { useFavorites } from './useFavorites';
 export { useProperties } from './useProperties';
 export { usePropertyFilters } from './usePropertyFilters';
 export type { PropertyFilters } from './usePropertyFilters';
-export { useFavorites } from './useFavorites';
 export { usePropertyNavigation } from './usePropertyNavigation';
+
+// Hooks de Profile
+export { useEditUserProfile } from '../profile/hooks/useEditUserProfile';
+export { useProfile } from '../profile/hooks/useProfile';
 
 // Agregar aquí nuevos hooks cuando se creen:
 // export { useApplications } from './useApplications';
-// export { useProfile } from './useProfile';
+// export { useUserSettings } from './useUserSettings';
 

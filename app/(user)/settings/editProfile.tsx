@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 // import FormEditUserProfile from '../../modules/user/userSettings/userProfile/FormEditUserProfile';
-import ScreenEditUserProfile from '../../../modules/user/profile/ScreenEditUserProfile';
+import ScreenEditUserProfile from '../../../screens/user/EditUserProfileScreen';
 
 export default function LoginPage() {
   return (

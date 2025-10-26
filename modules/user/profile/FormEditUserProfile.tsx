@@ -1,44 +1,44 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, Pressable, StatusBar as RNStatusBar, Platform, ScrollView, KeyboardAvoidingView } from "react-native";
-import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import React, { useEffect } from "react";
+import {View,Text,Pressable,StatusBar as RNStatusBar,Platform,ScrollView, KeyboardAvoidingView,} from "react-native";
+import { Controller } from "react-hook-form";
 import { useRouter } from "expo-router";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-
-import { editUserProfileSchema, EditUserProfileDTO } from "../../../schemes/EditUserProfileSchema";
-
-import { getCurrentUserProfile, updateCurrentUserProfile, beAnOwner } from "../../../libs/userServices/api-service";
-
-import { useAuth } from "../../../contexts/AuthContext";
-
-// Atomic Design Components
 import LabeledInput from "../../../components/molecules/LabeledInput";
 import PasswordInput from "../../../components/molecules/PasswordInput";
 import ModernButton from "../../../components/atoms/ModernButton";
 import ConfirmModal from "../../../components/atoms/ConfirmModal";
+import { useEditUserProfile } from "../hooks";
 
 export default function FormEditUserProfile() {
   const router = useRouter();
-
-  const { updateAuthData, updateUserData } = useAuth();
-
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [becomeOwnerLoading, setBecomeOwnerLoading] = useState(false);
   const insets = useSafeAreaInsets();
-  const [showModal, setShowModal] = useState(false);
 
+  // === HOOK DE EDICIÓN DE PERFIL ===
+  const {
+    control,
+    handleSubmit,
+    errors,
+    isSubmitting,
+    isLoading,
+    submitError,
+    submitSuccess,
+    showPassword,
+    togglePasswordVisibility,
+    becomeOwnerLoading,
+    showModal,
+    setShowModal,
+    handleBecomeOwner,
+  } = useEditUserProfile();
+
+  // Configure Android Status Bar (iOS is handled by <StatusBar /> component)
   useEffect(() => {
     if (Platform.OS === "android") {
       RNStatusBar.setBackgroundColor("#7C3AED", true);
       RNStatusBar.setBarStyle("light-content", true);
     }
-    loadUserProfile();
-    
+
     // Cleanup function
     return () => {
       if (Platform.OS === "android") {
@@ -48,154 +48,12 @@ export default function FormEditUserProfile() {
     };
   }, []);
 
-  const loadUserProfile = async () => {
-    try {
-      setIsLoading(true);
-      const response = await getCurrentUserProfile();
-      if (response.user.id) {
-        // Cargar datos del usuario en el formulario
-        setValue('name', response.user.name);
-        setValue('email', response.user.email);
-        setValue('phone', response.user.phone || '');
-      }
-    } catch (error) {
-      console.error('Error cargando perfil:', error);
-      setSubmitError('Error al cargar el perfil del usuario');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    formState: { errors, isSubmitting },
-  } = useForm<EditUserProfileDTO>({
-    resolver: zodResolver(editUserProfileSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      phone: ""
-    },
-  });
-
-  const onSubmit: SubmitHandler<EditUserProfileDTO> = async (data) => {
-    try {
-      setSubmitError(null);
-      setSubmitSuccess(null);
-
-      console.log("📤 Datos a enviar:", data);
-
-      const result = await updateCurrentUserProfile(data);
-
-      console.log("📥 Respuesta del servidor:", result);
-      console.log("📥 Estructura de respuesta:", JSON.stringify(result, null, 2));
-
-      // Verificar si la respuesta es válida
-      if (result && typeof result === 'object') {
-        if (result.user && result.user.id) {
-          console.log("✅ Perfil actualizado exitosamente");
-          setSubmitSuccess("Perfil actualizado exitosamente");
-          
-          // Actualizar los datos del usuario en el contexto
-          try {
-            const updatedUser = {
-              id: result.user.id,
-              name: result.user.name,
-              email: result.user.email,
-              phone: result.user.phone,
-              role: result.user.role,
-              creation_date: result.user.creation_date?.toString() || new Date().toISOString()
-            };
-            
-            await updateUserData(updatedUser);
-            console.log("✅ Datos del usuario actualizados en el contexto");
-          } catch (error) {
-            console.error("❌ Error actualizando contexto:", error);
-          }
-          
-          // Limpiar password después de actualizar
-          setValue('password', '');
-        } else if (result.message) {
-          console.log("❌ Error del servidor:", result.message);
-          
-          // Verificar si es un error de autenticación
-          if (result.message.includes('sesión ha expirado') || result.message.includes('Token inválido')) {
-            setSubmitError("Tu sesión ha expirado. Serás redirigido al login...");
-            // El usuario será redirigido automáticamente por el servicio de API
-            return;
-          }
-          
-          setSubmitError(result.message);
-        } else {
-          console.log("❌ Respuesta inesperada del servidor");
-          setSubmitError("Respuesta inesperada del servidor");
-        }
-      } else {
-        console.log("❌ Respuesta inválida del servidor");
-        setSubmitError("Respuesta inválida del servidor");
-      }
-    } catch (error) {
-      console.error("❌ Error en el proceso:", error);
-      setSubmitError("Error inesperado. Intenta de nuevo.");
-    }
-  };
-
-  const handleBecomeOwner = async () => {
-    try {
-      setBecomeOwnerLoading(true);
-      setSubmitError(null);
-      setSubmitSuccess(null);
-
-      console.log('🏠 Intentando convertir usuario a propietario...');
-      
-      const result = await beAnOwner();
-      
-      if (result.success) {
-        console.log('✅ Usuario convertido a propietario exitosamente');
-        setSubmitSuccess(result.message || 'Ahora eres un propietario');
-        
-        // Si la respuesta incluye un nuevo token y datos de usuario, actualizarlos
-        if (result.data && result.data.token && result.data.user) {
-          console.log('🔄 Actualizando token y datos de usuario...');
-          
-          // Convertir el formato de usuario del servidor al formato esperado por el contexto
-          const updatedUser = {
-            id: result.data.user.id,
-            email: result.data.user.email,
-            name: result.data.user.name,
-            role: result.data.user.role,
-            phone: result.data.user.phone,
-            creation_date: result.data.user.creation_date
-          };
-
-          // Actualizar token y usuario en el contexto y AsyncStorage
-          await updateAuthData(result.data.token, updatedUser);
-          
-          console.log('✅ Token y usuario actualizados correctamente');
-        }
-        
-        // Redirigir al home de owner después de un breve delay
-        setTimeout(() => {
-          router.replace('/(owner)/(properties)');
-        }, 1500);
-      } else {
-        console.log('❌ Error al convertir usuario:', result.message);
-        setSubmitError(result.message || 'Error al convertir a propietario');
-      }
-    } catch (error) {
-      console.error('❌ Error en handleBecomeOwner:', error);
-      setSubmitError('Error inesperado. Intenta de nuevo.');
-    } finally {
-      setBecomeOwnerLoading(false);
-    }
-  };
-
   if (isLoading) {
     return (
-      <View className="flex-1 justify-center items-center" style={{ backgroundColor: "#7C3AED" }}>
+      <View
+        className="flex-1 justify-center items-center"
+        style={{ backgroundColor: "#7C3AED" }}
+      >
         <Text className="text-white text-lg">Cargando perfil...</Text>
       </View>
     );
@@ -287,158 +145,156 @@ export default function FormEditUserProfile() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1 w-full"
       >
-      <ScrollView
-        className="flex-1 bg-gray-50 px-6"
-        style={{
-          paddingTop: Platform.OS === "ios" ? 95 + insets.top : 85,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        <View
-          className="bg-white rounded-3xl p-6 shadow-lg"
-          style={{ marginTop: 20 }}
-        >
-          {/* Become Owner Button - Top */}
-          <View className="mb-6">
-            <ModernButton
-
-              title={becomeOwnerLoading ? "Converting..." : "Become a Owner"}
-              onPress={() => setShowModal(true)}
-              variant="secondary"
-              disabled={becomeOwnerLoading}
-              loading={becomeOwnerLoading}
-            />
-          </View>
-
-          {/* Success message */}
-          {submitSuccess && (
-            <View className="mb-4 p-3 bg-green-100 rounded-2xl">
-              <Text className="text-green-600 text-sm text-center">
-                {submitSuccess}
-              </Text>
-            </View>
-          )}
-
-          {/* Error general */}
-          {submitError && (
-            <View className="mb-4 p-3 bg-red-100 rounded-2xl">
-              <Text className="text-red-600 text-sm text-center">
-                {submitError}
-              </Text>
-            </View>
-          )}
-
-          {/* Name Input */}
-          <View className="mb-3">
-            <Controller
-              control={control}
-              name="name"
-              render={({ field: { onChange, value } }) => (
-                <LabeledInput
-                  label="Name"
-                  placeholder="Your full name"
-                  value={value || ''}
-                  onChangeText={onChange}
-                  error={errors.name?.message}
-                />
-              )}
-            />
-          </View>
-
-          {/* Email Input */}
-          <View className="mb-3">
-            <Controller
-              control={control}
-              name="email"
-              render={({ field: { onChange, value } }) => (
-                <LabeledInput
-                  label="Email"
-                  placeholder="your@email.com"
-                  value={value || ''}
-                  onChangeText={onChange}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  error={errors.email?.message}
-                />
-              )}
-            />
-          </View>
-
-          {/* Password Input */}
-          <View className="mb-3">
-            <Controller
-              control={control}
-              name="password"
-              render={({ field: { onChange, value } }) => (
-                <PasswordInput
-                  label="Password (leave empty to keep current)"
-                  placeholder="••••••••"
-                  value={value || ''}
-                  onChangeText={onChange}
-                  error={errors.password?.message}
-                  showPassword={showPassword}
-                  onTogglePassword={() => setShowPassword(!showPassword)}
-                />
-              )}
-            />
-          </View>
-
-          {/* Phone Input */}
-          <View className="mb-3">
-            <Controller
-              control={control}
-              name="phone"
-              render={({ field: { onChange, value } }) => (
-                <LabeledInput
-                  label="Phone"
-                  placeholder="Your phone number"
-                  value={value || ''}
-                  onChangeText={onChange}
-                  keyboardType="phone-pad"
-                  error={errors.phone?.message}
-                />
-              )}
-            />
-          </View>
-          {/* Save Changes Button */}
-          <View className="mb-4">
-            <ModernButton
-              title={isSubmitting ? "Saving..." : "Save Changes"}
-              onPress={handleSubmit(onSubmit)}
-              disabled={isSubmitting}
-              loading={isSubmitting}
-              variant="primary"
-            />
-          </View>
-        </View>
-
-        {/* Page indicator */}
-        <View className="flex-row justify-center mt-8 mb-4">
-          <View
-            className="rounded-full"
-            style={{
-              width: 32,
-              height: 4,
-              backgroundColor: "#D1D5DB",
-            }}
-          />
-        </View>
-        <ConfirmModal
-          visible={showModal}
-          title="Ser propietario"
-          message="¿Estás seguro de que deseas convertirte en propietario? Esta acción cambiará tu rol de forma irreversible y te permitirá gestionar propiedades."
-          requireConfirmInput="validar"
-          onCancel={() => setShowModal(false)}
-          onConfirm={() => {
-            setShowModal(false);
-            handleBecomeOwner();
+        <ScrollView
+          className="flex-1 bg-gray-50 px-6"
+          style={{
+            paddingTop: Platform.OS === "ios" ? 95 + insets.top : 85,
           }}
-          confirmText="Ser propietario"
-          cancelText="Cancelar"
-        />
-      </ScrollView>
+          showsVerticalScrollIndicator={false}
+        >
+          <View
+            className="bg-white rounded-3xl p-6 shadow-lg"
+            style={{ marginTop: 20 }}
+          >
+            {/* Become Owner Button - Top */}
+            <View className="mb-6">
+              <ModernButton
+                title={becomeOwnerLoading ? "Converting..." : "Become a Owner"}
+                onPress={() => setShowModal(true)}
+                variant="secondary"
+                disabled={becomeOwnerLoading}
+                loading={becomeOwnerLoading}
+              />
+            </View>
+
+            {/* Success message */}
+            {submitSuccess && (
+              <View className="mb-4 p-3 bg-green-100 rounded-2xl">
+                <Text className="text-green-600 text-sm text-center">
+                  {submitSuccess}
+                </Text>
+              </View>
+            )}
+
+            {/* Error general */}
+            {submitError && (
+              <View className="mb-4 p-3 bg-red-100 rounded-2xl">
+                <Text className="text-red-600 text-sm text-center">
+                  {submitError}
+                </Text>
+              </View>
+            )}
+
+            {/* Name Input */}
+            <View className="mb-3">
+              <Controller
+                control={control}
+                name="name"
+                render={({ field: { onChange, value } }) => (
+                  <LabeledInput
+                    label="Name"
+                    placeholder="Your full name"
+                    value={value || ""}
+                    onChangeText={onChange}
+                    error={errors.name?.message}
+                  />
+                )}
+              />
+            </View>
+
+            {/* Email Input */}
+            <View className="mb-3">
+              <Controller
+                control={control}
+                name="email"
+                render={({ field: { onChange, value } }) => (
+                  <LabeledInput
+                    label="Email"
+                    placeholder="your@email.com"
+                    value={value || ""}
+                    onChangeText={onChange}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    error={errors.email?.message}
+                  />
+                )}
+              />
+            </View>
+
+            {/* Password Input */}
+            <View className="mb-3">
+              <Controller
+                control={control}
+                name="password"
+                render={({ field: { onChange, value } }) => (
+                  <PasswordInput
+                    label="Password (leave empty to keep current)"
+                    placeholder="••••••••"
+                    value={value || ""}
+                    onChangeText={onChange}
+                    error={errors.password?.message}
+                    showPassword={showPassword}
+                    onTogglePassword={togglePasswordVisibility}
+                  />
+                )}
+              />
+            </View>
+
+            {/* Phone Input */}
+            <View className="mb-3">
+              <Controller
+                control={control}
+                name="phone"
+                render={({ field: { onChange, value } }) => (
+                  <LabeledInput
+                    label="Phone"
+                    placeholder="Your phone number"
+                    value={value || ""}
+                    onChangeText={onChange}
+                    keyboardType="phone-pad"
+                    error={errors.phone?.message}
+                  />
+                )}
+              />
+            </View>
+            {/* Save Changes Button */}
+            <View className="mb-4">
+              <ModernButton
+                title={isSubmitting ? "Saving..." : "Save Changes"}
+                onPress={handleSubmit}
+                disabled={isSubmitting}
+                loading={isSubmitting}
+                variant="primary"
+              />
+            </View>
+          </View>
+
+          {/* Page indicator */}
+          <View className="flex-row justify-center mt-8 mb-4">
+            <View
+              className="rounded-full"
+              style={{
+                width: 32,
+                height: 4,
+                backgroundColor: "#D1D5DB",
+              }}
+            />
+          </View>
+          <ConfirmModal
+            visible={showModal}
+            title="Ser propietario"
+            message="¿Estás seguro de que deseas convertirte en propietario? Esta acción cambiará tu rol de forma irreversible y te permitirá gestionar propiedades."
+            requireConfirmInput="validar"
+            onCancel={() => setShowModal(false)}
+            onConfirm={() => {
+              setShowModal(false);
+              handleBecomeOwner();
+            }}
+            confirmText="Ser propietario"
+            cancelText="Cancelar"
+          />
+        </ScrollView>
       </KeyboardAvoidingView>
     </View>
   );
 }
-

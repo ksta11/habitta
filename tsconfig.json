@@ -17,5 +17,5 @@
     "contexts/**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "examples/ColorExamples.tsx", "examples/FileUploader.example.tsx", "examples/ImageUploader.example.tsx", "screens/user/UserHomeScreen.tsx", "modules/user/home/UserHome.tsx"  ]
+, "examples/ColorExamples.tsx", "examples/FileUploader.example.tsx", "examples/ImageUploader.example.tsx", "screens/user/UserHomeScreen.tsx", "modules/user/home/UserHome.tsx", "screens/user/ProfileScreen.tsx", "screens/user/EditUserProfileScreen.tsx"  ]
 }
