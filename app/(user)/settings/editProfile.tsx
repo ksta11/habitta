@@ -1,7 +1,6 @@
 import React from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
-// import FormEditUserProfile from '../../modules/user/userSettings/userProfile/FormEditUserProfile';
-import ScreenEditUserProfile from '../../../screens/user/EditUserProfileScreen';
+import EditUserProfileScreen from '../../../modules/user/profile/EditUserProfileScreen';
 
 export default function LoginPage() {
   return (
@@ -15,7 +14,7 @@ export default function LoginPage() {
         showsVerticalScrollIndicator={false}
       >
         <View className="flex-1 justify-center py-8">            
-          <ScreenEditUserProfile />
+          <EditUserProfileScreen />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

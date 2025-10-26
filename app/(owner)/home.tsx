@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, ScrollView } from 'react-native';
-import ScreenHome from '../../modules/owner/ScreenHome';
+import { ScrollView, View } from 'react-native';
+import ScreenHome from '../../modules/owner/OwnerHome';
 
 export default function Dashboard() {
   return (

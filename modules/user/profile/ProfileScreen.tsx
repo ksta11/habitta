@@ -1,5 +1,5 @@
 import React from 'react';
-import Profile from '../../modules/user/profile/Profile';
+import Profile from './Profile';
 
 export default function ProfileScreen() {
   return <Profile />;

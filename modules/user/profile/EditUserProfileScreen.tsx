@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import FormEditUserProfile from '../../modules/user/profile/FormEditUserProfile';
+import FormEditUserProfile from './FormEditUserProfile';
 
 export default function ScreenEditUserProfile() {
   return (
