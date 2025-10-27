@@ -12,7 +12,7 @@ import PropertyAmenities from '../../../components/molecules/PropertyAmenities';
 import PropertyLocation from '../../../components/molecules/PropertyLocation';
 import PropertyInfoCard from '../../../components/molecules/PropertyInfoCard';
 import PropertyBottomActions from '../../../components/molecules/PropertyBottomActions';
-import ContactHostModal from './ContactHostModal';
+import ContactHostModal from '../Organisms/ContactHostModal';
 
 // Servicios que podrían tener las propiedades
 const defaultAmenities = [

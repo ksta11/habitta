@@ -238,7 +238,6 @@ export default function FiltersModal({
             <Pressable
               onPress={() => {
                 onApplyFilters();
-                onClose();
               }}
               className="flex-1 bg-violet py-3 rounded-lg items-center"
             >

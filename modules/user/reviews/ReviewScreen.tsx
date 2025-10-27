@@ -1,6 +1,6 @@
 import React from 'react';
-import ReviewListModule from '../../modules/user/ReviewListModule';
-import ReviewFormModule from '../../modules/user/ReviewFormModule';
+import ReviewListModule from './ReviewListModule';
+import ReviewFormModule from '../../modules/user/ReviewForm';
 
 interface ReviewScreenProps {
   view: 'list' | 'form';

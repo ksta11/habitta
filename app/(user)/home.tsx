@@ -1,6 +1,6 @@
 import React from "react";
-import HomeModule from "../../modules/user/HomeModule";
+import ScreenUserHome from "../../modules/user/home/UserHomeScreen";
 
 export default function Home() {
-  return <HomeModule />;
+  return <ScreenUserHome />;
 }

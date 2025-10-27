@@ -1,11 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, Alert, Pressable } from 'react-native';
+import React from 'react';
+import { View, Text, ScrollView, ActivityIndicator, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { getPropertyById, updateProperty } from '../../../../libs/owner/property/api-service';
-import { Property, UpdatePropertyDTO } from '../../../../interfaces/property/PropertyInterface';
-import { EditPropertySchema, EditPropertyFormType } from '../../../../schemes/PropertySchema';
+import { Controller } from 'react-hook-form';
+import { useEditProperty } from '../../hooks';
 import ImageCarousel from '../../../../components/atoms/ImageCarousel';
 import Input from '../../../../components/atoms/Input';
 import PickerAtom from '../../../../components/atoms/Picker';
@@ -18,120 +15,19 @@ interface ScreenEditProps {
 
 export default function ScreenEdit({ propertyId }: ScreenEditProps) {
   const router = useRouter();
-  const [property, setProperty] = useState<Property | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  // React Hook Form configuration
+  // === HOOK PERSONALIZADO ===
   const {
+    property,
+    loading,
     control,
     handleSubmit,
-    setValue,
-    formState: { errors, isSubmitting }
-  } = useForm<EditPropertyFormType>({
-    resolver: zodResolver(EditPropertySchema),
-    defaultValues: {
-      title: '',
-      description: '',
-      address: '',
-      city: '',
-      price: 0,
-      type: 'house',
-      rooms: 0,
-      bathrooms: 0,
-      area: 0,
-      services: '',
-      publication_status: 'published',
-      images: []
-    }
-  });
+    errors,
+    isSubmitting,
+    handleCancel,
+  } = useEditProperty(propertyId);
 
-  const loadProperty = async () => {
-    if (!propertyId) {
-      Alert.alert('Error', 'ID de propiedad no válido');
-      router.back();
-      return;
-    }
-
-    try {
-      console.log('🏠 Cargando propiedad con ID:', propertyId);
-      const response = await getPropertyById(propertyId);
-      
-      if (response.success && response.data) {
-        setProperty(response.data);
-        
-        // Fill form with property data
-        setValue('title', response.data.title);
-        setValue('description', response.data.description);
-        setValue('address', response.data.address);
-        setValue('city', response.data.city);
-        setValue('price', response.data.price);
-        setValue('type', response.data.type as 'house' | 'apartament' | 'store' | 'office' | 'werehouse');
-        setValue('rooms', response.data.rooms);
-        setValue('bathrooms', response.data.bathrooms);
-        setValue('area', response.data.area);
-        setValue('services', response.data.services);
-        setValue('publication_status', response.data.publication_status as 'published' | 'rented' | 'disabled');
-        setValue('images', response.data.images?.map(img => ({ url_image: img.url_image })) || []);
-        
-        console.log('✅ Propiedad cargada exitosamente:', response.data.title);
-      } else {
-        console.log('❌ Error al cargar propiedad:', response.message);
-        Alert.alert('Error', response.message || 'No se pudo cargar la propiedad');
-        router.back();
-      }
-    } catch (error) {
-      console.error('💥 Error crítico:', error);
-      Alert.alert('Error', 'Error de conexión al cargar la propiedad');
-      router.back();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadProperty();
-  }, [propertyId]);
-
-  const onSubmit = async (data: EditPropertyFormType) => {
-    try {
-      console.log('📝 Datos del formulario:', data);
-      
-      if (!property?.id) {
-        Alert.alert('Error', 'ID de propiedad no válido');
-        return;
-      }
-      
-      // Preparar datos para la API (agregar id_owner)
-      const updateData: UpdatePropertyDTO = {
-        ...data,
-        id_owner: property.id_owner
-      };
-      
-      console.log('🔄 Enviando actualización de propiedad...');
-      const response = await updateProperty(property.id, updateData);
-      
-      if (response.success) {
-        console.log('✅ Propiedad actualizada exitosamente');
-        Alert.alert(
-          'Éxito', 
-          response.message || 'Los cambios se han guardado correctamente',
-          [
-            {
-              text: 'OK',
-              onPress: () => router.back()
-            }
-          ]
-        );
-      } else {
-        console.log('❌ Error al actualizar:', response.message);
-        Alert.alert('Error', response.message || 'No se pudieron guardar los cambios');
-      }
-    } catch (error) {
-      console.error('💥 Error al guardar:', error);
-      Alert.alert('Error', 'Hubo un problema al guardar los cambios');
-    }
-  };
-
+  // === UI: LOADING STATE ===
   if (loading) {
     return (
       <View className="flex-1 bg-white justify-center items-center">
@@ -141,6 +37,7 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
     );
   }
 
+  // === UI: ERROR STATE ===
   if (!property) {
     return (
       <View className="flex-1 bg-white justify-center items-center">
@@ -414,7 +311,7 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
         <View className="flex-row mt-6">
           <ButtonAtom
             title={isSubmitting ? 'Guardando...' : 'Guardar'}
-            onPress={handleSubmit(onSubmit)}
+            onPress={handleSubmit}
             variant="habitta-primary"
             size="large"
             icon="save-outline"
@@ -426,20 +323,7 @@ export default function ScreenEdit({ propertyId }: ScreenEditProps) {
           
           <ButtonAtom
             title="Cancelar"
-            onPress={() => {
-              Alert.alert(
-                'Cancelar',
-                '¿Estás seguro de que quieres cancelar? Los cambios no guardados se perderán.',
-                [
-                  { text: 'No', style: 'cancel' },
-                  { 
-                    text: 'Sí, cancelar', 
-                    style: 'destructive',
-                    onPress: () => router.back()
-                  }
-                ]
-              );
-            }}
+            onPress={handleCancel}
             variant="secondary"
             size="large"
             icon="close-outline"

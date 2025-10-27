@@ -1,67 +1,37 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {View,Text,Pressable,StatusBar as RNStatusBar,Platform} from "react-native";
-import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import { useRouter } from "expo-router";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 
-import { loginSchema } from "../../../schemes/LoginSchema";
-import { LoginDTO } from "../../../interfaces/LoginInterface";
-import { useAuth } from "../../../contexts/AuthContext";
-
 import LabeledInput from "../../../components/molecules/LabeledInput";
 import PasswordInput from "../../../components/molecules/PasswordInput";
 import ModernButton from "../../../components/atoms/ModernButton";
+import { useLogin } from "../hooks";
 
 export default function FormLogin() {
   const router = useRouter();
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuth();
   const insets = useSafeAreaInsets();
 
-  useEffect(() => {
+  const {
+    control,
+    handleSubmit,
+    errors,
+    isSubmitting,
+    submitError,
+    showPassword,
+    togglePasswordVisibility,
+  } = useLogin();
+
+  React.useEffect(() => {
     if (Platform.OS === "android") {
       RNStatusBar.setBackgroundColor("#7C3AED", true);
       RNStatusBar.setBarStyle("light-content", true);
     }
   }, []);
-
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginDTO>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
-  const onSubmit: SubmitHandler<LoginDTO> = async (data) => {
-    try {
-      setSubmitError(null);
-
-      console.log("📨 Iniciando proceso de login...");
-      const result = await login(data);
-
-      if (result.success) {
-        console.log("✅ Login exitoso desde contexto");
-        // La navegación se maneja automáticamente en el contexto
-      } else {
-        console.log("❌ Login fallido:", result.message);
-        setSubmitError(result.message || "Error desconocido");
-      }
-    } catch (error) {
-      console.error("❌ Error en el proceso:", error);
-      setSubmitError("Error inesperado. Intenta de nuevo.");
-    }
-  };
 
   return (
     <View className="flex-1 w-full bg-violet" >
@@ -199,7 +169,7 @@ export default function FormLogin() {
                   onChangeText={onChange}
                   error={errors.password?.message}
                   showPassword={showPassword}
-                  onTogglePassword={() => setShowPassword(!showPassword)}
+                  onTogglePassword={togglePasswordVisibility}
                 />
               )}
             />
@@ -209,7 +179,7 @@ export default function FormLogin() {
           <View className="mb-4">
             <ModernButton
               title={isSubmitting ? "Signing in..." : "Sign In"}
-              onPress={handleSubmit(onSubmit)}
+              onPress={handleSubmit}
               disabled={isSubmitting}
               loading={isSubmitting}
               variant="primary"

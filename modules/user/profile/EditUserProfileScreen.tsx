@@ -1,5 +1,4 @@
-import React from 'react';
-import { View, KeyboardAvoidingView, Platform } from 'react-native';
+import { View } from 'react-native';
 import FormEditUserProfile from './FormEditUserProfile';
 
 export default function ScreenEditUserProfile() {
