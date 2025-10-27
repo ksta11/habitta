@@ -34,7 +34,6 @@ interface UseProfileReturn {
 }
 
 /**
- * 👤 Hook personalizado para manejar el perfil de usuario
  * 
  * Encapsula toda la lógica de:
  * - Carga automática del perfil al enfocar la pantalla (useFocusEffect)

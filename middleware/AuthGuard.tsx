@@ -1,6 +1,6 @@
 import React, { useEffect, ReactNode } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
-import { router } from 'expo-router';
+import { router, usePathname } from 'expo-router';
 import { useAuth } from '../contexts/AuthContext';
 import { isTokenExpired } from '../utils/Tokens';
 
@@ -15,12 +15,17 @@ interface AuthGuardProps {
  */
 export function AuthGuard({ children, requiredRole }: AuthGuardProps) {
   const { isAuthenticated, isLoading, user, token, logout } = useAuth();
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    // Evitar redirección si ya estamos en una ruta de autenticación
+    const isAuthRoute = pathname?.startsWith('/auth/');
+    
+    if (!isLoading && !isAuthenticated && !isAuthRoute) {
+      console.log('🔒 Usuario no autenticado - redirigiendo a login');
       router.replace('/auth/login');
     }
-  }, [isLoading, isAuthenticated]);
+  }, [isLoading, isAuthenticated, pathname]);
 
   useEffect(() => {
     // Verificar si el token ha expirado al montar el componente
