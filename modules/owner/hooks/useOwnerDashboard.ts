@@ -15,6 +15,7 @@ interface UseOwnerDashboardReturn {
   lastMonthIncome: number;
   monthlyIncome: Array<{ month: string; amount: number }>;
   recentApplications: any[];
+  occupiedVsTotal: { occupied: number; total: number };
 
   // Funciones
   loadOwnerStats: () => Promise<void>;
@@ -104,6 +105,7 @@ export const useOwnerDashboard = (): UseOwnerDashboardReturn => {
   const totalProperties = statsData?.data.totalProperties || 0;
   const pendingApplications = statsData?.data.pendingApplications || 0;
   const scheduledMaintenances = statsData?.data.scheduledMaintenances || 0;
+  const rentedProperties = statsData?.data.rentedProperties || 0;
 
   // Calcular ingresos del último mes
   const monthlyIncome = statsData?.data.monthlyIncome || [];
@@ -114,6 +116,12 @@ export const useOwnerDashboard = (): UseOwnerDashboardReturn => {
 
   const recentApplications = statsData?.data.recentApplications || [];
 
+  // Formato de ocupados vs total
+  const occupiedVsTotal = {
+    occupied: rentedProperties,
+    total: totalProperties,
+  };
+
   // Debug logs
   console.log("📊 Dashboard Stats:", {
     totalProperties,
@@ -122,6 +130,7 @@ export const useOwnerDashboard = (): UseOwnerDashboardReturn => {
     lastMonthIncome,
     monthlyIncomeCount: monthlyIncome.length,
     recentApplicationsCount: recentApplications.length,
+    occupiedVsTotal,
   });
 
   // === RETURN ===
@@ -138,6 +147,7 @@ export const useOwnerDashboard = (): UseOwnerDashboardReturn => {
     lastMonthIncome,
     monthlyIncome,
     recentApplications,
+    occupiedVsTotal,
 
     // Funciones
     loadOwnerStats,

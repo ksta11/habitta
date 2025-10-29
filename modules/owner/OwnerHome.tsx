@@ -18,6 +18,7 @@ export default function Dashboard() {
     lastMonthIncome,
     monthlyIncome,
     recentApplications,
+    occupiedVsTotal,
     loadOwnerStats,
   } = useOwnerDashboard();
 
@@ -62,6 +63,7 @@ export default function Dashboard() {
                       pendingApplications={pendingApplications}
                       scheduledMaintenances={scheduledMaintenances}
                       lastMonthIncome={lastMonthIncome}
+                      occupiedVsTotal={occupiedVsTotal}
                     />
                 </View>
                 <View>

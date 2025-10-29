@@ -3,6 +3,7 @@ export interface OwnerDashboard {
     message: string;
     data: {
         totalProperties: number;
+        rentedProperties: number;
         pendingApplications: number;
         scheduledMaintenances: number;
         monthlyIncome: {

@@ -8,7 +8,7 @@ export function DashboardHeader() {
     <View className="flex-row items-center justify-between">
       <View>
         <Text className="text-3xl font-bold text-erie-black">Bienvenido a Habitta</Text>
-        <Text className="text-gray-600 mt-1">Gestiona tus propiedades de manera eficiente</Text>
+        <Text className="text-gray-600 mt-1">Gestiona tus propiedades eficientemente</Text>
       </View>
       <View className="flex-row items-center gap-4">
         <View className="relative">
