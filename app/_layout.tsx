@@ -116,6 +116,3 @@ export default function RootLayout() {
     </NotificationProvider>
   );
 }
-
-
-

@@ -1,5 +1,5 @@
  import React from 'react';
-import { TextInput, View, Text } from 'react-native';
+import { Text, TextInput, View } from 'react-native';
 
 interface InputProps {
   label?: string;
@@ -9,6 +9,9 @@ interface InputProps {
   secureTextEntry?: boolean;
   error?: string;
   keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
+  // Límites de caracteres
+  minLength?: number;
+  maxLength?: number;
   // Color props
   borderColor?: string;
   backgroundColor?: string;
@@ -26,6 +29,9 @@ export default function Input({
   secureTextEntry = false,
   error,
   keyboardType = 'default',
+  // Límites de caracteres
+  minLength,
+  maxLength,
   // Color defaults
   borderColor = '#D1D5DB', // gray-300
   backgroundColor = '#FFFFFF', // white
@@ -34,6 +40,19 @@ export default function Input({
   errorColor = '#EF4444', // red-500
   placeholderColor = '#9CA3AF' // gray-400
 }: InputProps) {
+  /**
+   * Maneja el cambio de texto validando los límites
+   */
+  const handleTextChange = (text: string) => {
+    if (maxLength && text.length > maxLength) {
+      return; // No permite ingresar más caracteres
+    }
+    
+    if (onChangeText) {
+      onChangeText(text);
+    }
+  };
+
   const getBorderStyle = () => {
     if (error) {
       return {
@@ -71,10 +90,11 @@ export default function Input({
         }}
         placeholder={placeholder}
         value={value}
-        onChangeText={onChangeText}
+        onChangeText={handleTextChange}
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
         placeholderTextColor={placeholderColor}
+        maxLength={maxLength}
       />
       {error && (
         <Text 

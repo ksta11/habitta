@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, ScrollView, Pressable, TextInput, Image, ActivityIndicator, FlatList } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import React from 'react';
+import { ActivityIndicator, FlatList, Image, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { AdminProperty } from '../../interfaces/property/PropertyInterface';
+import { usePropertiesManagement } from '../../modules/admin/hooks';
 import { AdminStatsGrid } from './AdminStatsGrid';
-import { AdminProperty, PropertyFilters } from '../../interfaces/property/PropertyInterface';
-import { getAllProperties } from '../../libs/admin/api-service';
 
 // Componente Badge para estado
 interface BadgeProps {
@@ -69,101 +69,21 @@ const TypeBadge: React.FC<TypeBadgeProps> = ({ type }) => {
 };
 
 export const PropertiesTable: React.FC = () => {
-  // Estados para filtros
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState<string>('todos');
-  const [filterStatus, setFilterStatus] = useState<string>('todos');
-  
-  // Estados para la gestión de datos de la API
-  const [properties, setProperties] = useState<AdminProperty[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Función para obtener propiedades de la API
-  const fetchProperties = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      console.log('🔄 Obteniendo propiedades desde la API...');
-      const response = await getAllProperties();
-      
-      if (response.success && response.data) {
-        console.log('✅ Propiedades obtenidas exitosamente:', response.data.length);
-        setProperties(response.data);
-      } else {
-        console.error('❌ Error al obtener propiedades:', response.message);
-        setError(response.message || 'Error al cargar propiedades');
-      }
-    } catch (err) {
-      console.error('❌ Error en fetchProperties:', err);
-      setError('Error de conexión al cargar propiedades');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Cargar propiedades al montar el componente
-  useEffect(() => {
-    fetchProperties();
-  }, []);
-
-
-  
-  // Estadísticas calculadas
-  const propertyStats = useMemo(() => {
-    const total = properties.length;
-    const available = properties.filter(p => p.status === 'available').length;
-    const occupied = properties.filter(p => p.status === 'occupied').length;
-    const maintenance = properties.filter(p => p.status === 'maintenance').length;
-    const pending = properties.filter(p => p.status === 'pending').length;
-    const totalRevenue = properties
-      .filter(p => p.status === 'occupied')
-      .reduce((sum, p) => sum + (p.rental_price || 0), 0);
-  
-      return [
-        { 
-          title: 'Total Propiedades', 
-          value: total.toString(), 
-          icon: 'building', 
-          color: '#3b82f6',
-          subtitle: 'Propiedades registradas'
-        },
-        { 
-          title: 'Disponibles', 
-          value: available.toString(), 
-          icon: 'check-circle', 
-          color: '#10b981',
-          subtitle: 'Listas para alquilar'
-        },
-        { 
-          title: 'Ocupadas', 
-          value: occupied.toString(), 
-          icon: 'users', 
-          color: '#8b5cf6',
-          subtitle: 'Generando ingresos'
-        },
-        { 
-          title: 'Ingresos Mensuales', 
-          value: `€${totalRevenue.toLocaleString()}`, 
-          icon: 'euro', 
-          color: '#f59e0b',
-          subtitle: 'De propiedades ocupadas'
-        }
-    ];
-  }, [properties]);
-
-  // Filtrado de propiedades
-  const filteredProperties = properties.filter((property) => {
-    const matchesSearch =
-      (property.title?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-      (property.city?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-      (property.owner_name?.toLowerCase() || '').includes(searchTerm.toLowerCase());
-    const matchesType = filterType === 'todos' || property.type === filterType;
-    const matchesStatus = filterStatus === 'todos' || property.status === filterStatus;
-
-    return matchesSearch && matchesType && matchesStatus;
-  });
+  const {
+    properties,
+    loading,
+    error,
+    searchTerm,
+    filterType,
+    filterStatus,
+    filteredProperties,
+    propertyStats,
+    fetchProperties,
+    clearFilters,
+    cycleFilterType,
+    cycleFilterStatus,
+    setSearchTerm,
+  } = usePropertiesManagement();
 
   const renderPropertyCard = ({ item: property }: { item: AdminProperty }) => (
     <View className="bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-200">
@@ -297,7 +217,7 @@ export const PropertiesTable: React.FC = () => {
           {/* Filtros por tipo y estado */}
           <View className="flex-row justify-between">
             <Pressable 
-              onPress={() => setFilterType(filterType === 'todos' ? 'Apartamento' : filterType === 'Apartamento' ? 'Casa' : filterType === 'Casa' ? 'Estudio' : 'todos')}
+              onPress={cycleFilterType}
               className={`flex-1 px-4 py-2 rounded-lg border ${
                 filterType === 'Apartamento' ? 'bg-blue-100 border-blue-300' : 
                 filterType === 'Casa' ? 'bg-green-100 border-green-300' :
@@ -314,7 +234,7 @@ export const PropertiesTable: React.FC = () => {
             </Pressable>
             
             <Pressable 
-              onPress={() => setFilterStatus(filterStatus === 'todos' ? 'available' : filterStatus === 'available' ? 'occupied' : filterStatus === 'occupied' ? 'maintenance' : filterStatus === 'maintenance' ? 'pending' : 'todos')}
+              onPress={cycleFilterStatus}
               className={`flex-1 px-4 py-2 rounded-lg border ${
                 filterStatus === 'available' ? 'bg-green-100 border-green-300' : 
                 filterStatus === 'occupied' ? 'bg-blue-100 border-blue-300' :
@@ -340,11 +260,7 @@ export const PropertiesTable: React.FC = () => {
           {/* Botón para limpiar filtros */}
           {(filterType !== 'todos' || filterStatus !== 'todos' || searchTerm !== '') && (
             <Pressable 
-              onPress={() => {
-                setFilterType('todos');
-                setFilterStatus('todos');
-                setSearchTerm('');
-              }}
+              onPress={clearFilters}
               className="mt-3 bg-red-100 px-4 py-2 rounded-lg border border-red-300 items-center"
             >
               <Text className="text-red-800 text-sm font-medium">

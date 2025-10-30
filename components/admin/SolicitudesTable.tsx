@@ -1,14 +1,9 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { View, Text, ScrollView, Pressable, TextInput, Modal, Alert } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import React from 'react';
+import { Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { SolicitudDocumento, SolicitudPropietario } from '../../interfaces/SolicitudInterface';
+import { useSolicitudes } from '../../modules/admin/hooks';
 import { AdminStatsGrid } from './AdminStatsGrid';
-import { 
-  SolicitudPropietario, 
-  SolicitudFilters, 
-  SolicitudDocumento,
-  EstadisticasSolicitudes 
-} from '../../interfaces/SolicitudInterface';
-import { getAllApplications } from '../../libs/admin/api-service';
 
 
 
@@ -100,195 +95,25 @@ const DocumentosList: React.FC<DocumentosListProps> = ({ documentos }) => {
 };
 
 export const SolicitudesTable: React.FC = () => {
-  const [filters, setFilters] = useState<SolicitudFilters>({
-    search: '',
-    estado: 'todos',
-    fecha_desde: '',
-    fecha_hasta: '',
-    tipo_documento: 'todos',
-    sortBy: 'fecha_solicitud',
-    sortOrder: 'desc'
-  });
-
-  const [selectedSolicitud, setSelectedSolicitud] = useState<SolicitudPropietario | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  
-  // Estados para manejo de datos reales
-  const [solicitudes, setSolicitudes] = useState<SolicitudPropietario[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Función para cargar solicitudes desde el API
-  const loadSolicitudes = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      console.log('🔄 Cargando solicitudes desde el API...');
-      const response = await getAllApplications();
-      
-      if (response.success && response.data) {
-        console.log('✅ Solicitudes cargadas exitosamente:', response.data.length);
-        // Mapear los datos del API al formato esperado por el componente
-        const mappedSolicitudes: SolicitudPropietario[] = response.data.map((app: any) => ({
-          id: app.id,
-          user_id: app.renter?.id || '',
-          user_name: app.renter?.name || 'Usuario desconocido',
-          user_email: app.renter?.email || '',
-          user_phone: app.renter?.phone || '',
-          estado: app.status || 'pendiente',
-          fecha_solicitud: app.application_date || new Date().toISOString(),
-          documentos: [], // Los documentos se manejarían por separado si es necesario
-          informacion_adicional: {
-            experiencia_previa: false,
-            propiedades_a_publicar: 1,
-            motivo_solicitud: `Solicitud para propiedad: ${app.property?.title || 'Sin título'}`
-          }
-        }));
-        
-        setSolicitudes(mappedSolicitudes);
-      } else {
-        console.error('❌ Error en la respuesta del API:', response.message);
-        setError(response.message || 'Error al cargar las solicitudes');
-      }
-    } catch (err) {
-      console.error('❌ Error cargando solicitudes:', err);
-      setError('Error de conexión al cargar las solicitudes');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Cargar datos al montar el componente
-  useEffect(() => {
-    loadSolicitudes();
-  }, []);
-
-  // Estadísticas calculadas
-  const solicitudStats = useMemo(() => {
-    const total = solicitudes.length;
-    const pendientes = solicitudes.filter(s => s.estado === 'pendiente').length;
-    const en_revision = solicitudes.filter(s => s.estado === 'en_revision').length;
-    const aprobadas = solicitudes.filter(s => s.estado === 'aprobada').length;
-    const rechazadas = solicitudes.filter(s => s.estado === 'rechazada').length;
-    const incompletas = solicitudes.filter(s => s.estado === 'documentacion_incompleta').length;
-
-    const tasa_aprobacion = total > 0 ? Math.round((aprobadas / total) * 100) : 0;
-
-    return [
-      { 
-        title: 'Total Solicitudes', 
-        value: total.toString(), 
-        icon: 'file-text', 
-        color: '#3b82f6',
-        subtitle: 'Solicitudes recibidas'
-      },
-      { 
-        title: 'Pendientes', 
-        value: pendientes.toString(), 
-        icon: 'clock-o', 
-        color: '#f59e0b',
-        subtitle: 'Esperando revisión'
-      },
-      { 
-        title: 'En Revisión', 
-        value: en_revision.toString(), 
-        icon: 'eye', 
-        color: '#8b5cf6',
-        subtitle: 'Siendo evaluadas'
-      },
-      { 
-        title: 'Tasa Aprobación', 
-        value: `${tasa_aprobacion}%`, 
-        icon: 'check-circle', 
-        color: '#10b981',
-        subtitle: 'Solicitudes aprobadas'
-      }
-    ];
-  }, [solicitudes]);
-
-  // Filtrado de solicitudes
-  const filteredSolicitudes = useMemo(() => {
-    let filtered = solicitudes.filter(solicitud => {
-      const matchesSearch = solicitud.user_name.toLowerCase().includes(filters.search.toLowerCase()) ||
-                          solicitud.user_email.toLowerCase().includes(filters.search.toLowerCase());
-      
-      const matchesEstado = filters.estado === 'todos' || solicitud.estado === filters.estado;
-
-      return matchesSearch && matchesEstado;
-    });
-
-    // Ordenamiento
-    filtered.sort((a, b) => {
-      const aVal = a[filters.sortBy];
-      const bVal = b[filters.sortBy];
-      
-      if (filters.sortBy === 'fecha_solicitud') {
-        const aDate = new Date(aVal as string).getTime();
-        const bDate = new Date(bVal as string).getTime();
-        return filters.sortOrder === 'asc' ? aDate - bDate : bDate - aDate;
-      }
-      
-      const aStr = String(aVal).toLowerCase();
-      const bStr = String(bVal).toLowerCase();
-      
-      if (filters.sortOrder === 'asc') {
-        return aStr.localeCompare(bStr);
-      } else {
-        return bStr.localeCompare(aStr);
-      }
-    });
-
-    return filtered;
-  }, [filters]);
-
-  const handleAprobar = (solicitudId: string) => {
-    Alert.alert(
-      "Aprobar Solicitud",
-      "¿Estás seguro de que quieres aprobar esta solicitud?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        { 
-          text: "Aprobar", 
-          style: "default",
-          onPress: () => {
-            // Aquí iría la lógica para aprobar la solicitud
-            Alert.alert("Éxito", "Solicitud aprobada correctamente");
-            setModalVisible(false);
-          }
-        }
-      ]
-    );
-  };
-
-  const handleRechazar = (solicitudId: string) => {
-    Alert.alert(
-      "Rechazar Solicitud",
-      "¿Estás seguro de que quieres rechazar esta solicitud?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        { 
-          text: "Rechazar", 
-          style: "destructive",
-          onPress: () => {
-            // Aquí iría la lógica para rechazar la solicitud
-            Alert.alert("Rechazada", "Solicitud rechazada");
-            setModalVisible(false);
-          }
-        }
-      ]
-    );
-  };
-
-  const formatFecha = (fecha: string) => {
-    return new Date(fecha).toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  const {
+    solicitudes,
+    filteredSolicitudes,
+    loading,
+    error,
+    filters,
+    selectedSolicitud,
+    modalVisible,
+    solicitudStats,
+    loadSolicitudes,
+    handleOpenDetail,
+    handleCloseDetail,
+    handleAprobar,
+    handleRechazar,
+    updateFilters,
+    resetFilters,
+    formatFecha,
+    setModalVisible,
+  } = useSolicitudes();
 
   return (
     <ScrollView className="flex-1 bg-gray-50">
@@ -308,7 +133,7 @@ export const SolicitudesTable: React.FC = () => {
           <Text className="text-lg font-semibold text-gray-800 mb-4">
             Estadísticas de Solicitudes
           </Text>
-          <AdminStatsGrid variant="custom" customStats={solicitudStats} />
+          <AdminStatsGrid variant="custom" customStats={solicitudStats.stats} />
         </View>
 
         {/* Filtros */}
@@ -323,7 +148,7 @@ export const SolicitudesTable: React.FC = () => {
               className="bg-gray-50 border border-gray-200 rounded-lg px-10 py-3 text-gray-800"
               placeholder="Buscar por nombre o email..."
               value={filters.search}
-              onChangeText={(text) => setFilters(prev => ({ ...prev, search: text }))}
+              onChangeText={(text) => updateFilters({ search: text })}
             />
             <FontAwesome 
               name="search" 
@@ -337,33 +162,25 @@ export const SolicitudesTable: React.FC = () => {
           <View className="flex-row flex-wrap gap-2">
             <Pressable 
               className="bg-yellow-100 px-3 py-1 rounded-full"
-              onPress={() => setFilters(prev => ({ ...prev, estado: 'pendiente' }))}
+              onPress={() => updateFilters({ estado: 'pendiente' })}
             >
               <Text className="text-yellow-800 text-sm font-medium">Solo Pendientes</Text>
             </Pressable>
             <Pressable 
               className="bg-blue-100 px-3 py-1 rounded-full"
-              onPress={() => setFilters(prev => ({ ...prev, estado: 'en_revision' }))}
+              onPress={() => updateFilters({ estado: 'en_revision' })}
             >
               <Text className="text-blue-800 text-sm font-medium">En Revisión</Text>
             </Pressable>
             <Pressable 
               className="bg-green-100 px-3 py-1 rounded-full"
-              onPress={() => setFilters(prev => ({ ...prev, estado: 'aprobada' }))}
+              onPress={() => updateFilters({ estado: 'aprobada' })}
             >
               <Text className="text-green-800 text-sm font-medium">Aprobadas</Text>
             </Pressable>
             <Pressable 
               className="bg-gray-100 px-3 py-1 rounded-full"
-              onPress={() => setFilters({
-                search: '',
-                estado: 'todos',
-                fecha_desde: '',
-                fecha_hasta: '',
-                tipo_documento: 'todos',
-                sortBy: 'fecha_solicitud',
-                sortOrder: 'desc'
-              })}
+              onPress={resetFilters}
             >
               <Text className="text-gray-800 text-sm font-medium">Limpiar Filtros</Text>
             </Pressable>
@@ -414,10 +231,7 @@ export const SolicitudesTable: React.FC = () => {
               <Pressable
                 key={solicitud.id}
                 className="border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50"
-                onPress={() => {
-                  setSelectedSolicitud(solicitud);
-                  setModalVisible(true);
-                }}
+                onPress={() => handleOpenDetail(solicitud)}
               >
                 <View className="flex-row justify-between items-start mb-3">
                   <View className="flex-1 mr-4">
@@ -476,7 +290,7 @@ export const SolicitudesTable: React.FC = () => {
           animationType="slide"
           transparent={true}
           visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
+          onRequestClose={handleCloseDetail}
         >
           <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
             <View className="bg-white rounded-lg p-6 m-4 max-w-md w-full">
@@ -486,7 +300,7 @@ export const SolicitudesTable: React.FC = () => {
                     <Text className="text-xl font-bold text-gray-800">
                       Detalles de Solicitud
                     </Text>
-                    <Pressable onPress={() => setModalVisible(false)}>
+                    <Pressable onPress={handleCloseDetail}>
                       <FontAwesome name="times" size={20} color="#6b7280" />
                     </Pressable>
                   </View>

@@ -1,37 +1,17 @@
-import {useState, useEffect, useMemo} from 'react'
-import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  TextInput,
-  FlatList,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import React from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import { useUsers, type User } from '../../modules/admin/hooks';
 import { AdminStatsGrid } from './';
-import { getAllUsers } from '../../libs/admin/api-service';
-
-// Tipos para los usuarios - actualizado para coincidir con la respuesta del backend
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  role: string;
-  status: string;
-  verificationCode: string | null;
-  creation_date: Date;
-  // Campos adicionales para la UI (se pueden calcular o agregar desde el backend)
-  properties?: number;
-  totalPaid?: number;
-  solicitudPropietario?: {
-    id: string;
-    estado: 'pendiente' | 'en_revision' | 'aprobada' | 'rechazada' | 'documentacion_incompleta';
-    fecha_solicitud: string;
-  };
-}
 
 
 // Componente Badge para React Native
@@ -118,109 +98,22 @@ const SolicitudBadge: React.FC<{
 
 // Componente principal de la tabla de usuarios
 export const UsersTable: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState<string>('all');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  
-  // Estados para la gestión de datos de la API
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Función para obtener usuarios de la API
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      console.log('🔄 Obteniendo usuarios desde la API...');
-      const response = await getAllUsers();
-      
-      if (response.success && response.data) {
-        console.log('✅ Usuarios obtenidos exitosamente:', response.data.length);
-        
-        // Mapear los datos del backend a la estructura esperada por la UI
-        const mappedUsers: User[] = response.data.map((user) => ({
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-          role: user.role,
-          status: user.status || 'Activo',
-          verificationCode: user.verificationCode || null,
-          creation_date: user.creation_date,
-          // Valores por defecto para campos que no vienen del backend
-          properties: 0, // Se puede calcular desde otra API si es necesario
-          totalPaid: 0,  // Se puede calcular desde otra API si es necesario
-        }));
-        
-        setUsers(mappedUsers);
-      } else {
-        console.error('❌ Error al obtener usuarios:', response.message);
-        setError(response.message || 'Error al cargar usuarios');
-      }
-    } catch (err) {
-      console.error('❌ Error en fetchUsers:', err);
-      setError('Error de conexión al cargar usuarios');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Cargar usuarios al montar el componente
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-    // Estadísticas calculadas
-    const userStats = useMemo(() => {
-      const total = users.length;
-      const owners = users.filter(p => p.status === 'Propietarios').length;
-      const activeUsers = users.filter(p => p.status === 'Usuarios Activos').length;
-      const tenants = users.filter(p => p.status === 'Inquilinos').length;
-    
-      return [
-        {
-          title: 'Total Usuarios',
-          value: total.toLocaleString(),
-          icon: 'users',
-          color: '#3b82f6',
-          bgColor: '#dbeafe'
-        },
-        {
-          title: 'Usuarios Activos',
-          value: activeUsers.toLocaleString(),
-          icon: 'check-circle',
-          color: '#10b981',
-          bgColor: '#d1fae5'
-        },
-        {
-          title: 'Propietarios',
-          value: owners.toLocaleString(),
-          icon: 'home',
-          color: '#f59e0b',
-          bgColor: '#fef3c7'
-        },
-        {
-          title: 'Inquilinos',
-          value: tenants.toLocaleString(),
-          icon: 'user',
-          color: '#8b5cf6',
-          bgColor: '#ede9fe'
-        }
-      ];
-    }, [users]);
-
-  // Filtrado de usuarios
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = filterType === 'all' || user.role === filterType;
-    const matchesStatus = filterStatus === 'all' || user.status === filterStatus;
-
-    return matchesSearch && matchesType && matchesStatus;
-  });
+  const {
+    searchTerm,
+    filterType,
+    filterStatus,
+    users,
+    loading,
+    error,
+    userStats,
+    filteredUsers,
+    setSearchTerm,
+    setFilterType,
+    setFilterStatus,
+    fetchUsers,
+    handleUserAction,
+    clearFilters,
+  } = useUsers();
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -240,17 +133,6 @@ export const UsersTable: React.FC = () => {
       <Badge text="Propietario" variant="primary" />
     ) : (
       <Badge text="Inquilino" variant="outline" />
-    );
-  };
-
-  const handleUserAction = (action: string, user: User) => {
-    Alert.alert(
-      action,
-      `¿Deseas ${action.toLowerCase()} a ${user.name}?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Confirmar', onPress: () => console.log(`${action} user:`, user.id) }
-      ]
     );
   };
 
@@ -410,11 +292,7 @@ export const UsersTable: React.FC = () => {
           {/* Botón para limpiar filtros */}
           {(filterType !== 'all' || filterStatus !== 'all' || searchTerm !== '') && (
             <Pressable 
-              onPress={() => {
-                setFilterType('all');
-                setFilterStatus('all');
-                setSearchTerm('');
-              }}
+              onPress={clearFilters}
               className="mt-3 bg-red-100 px-4 py-2 rounded-lg border border-red-300 items-center"
             >
               <Text className="text-red-800 text-sm font-medium">
