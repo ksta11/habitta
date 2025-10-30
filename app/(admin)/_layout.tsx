@@ -115,6 +115,18 @@ export default function AdminDrawerLayout() {
         }}
       />
 
+      {/* Pantalla Documentos de Identidad Pendientes */}
+      <Drawer.Screen
+        name="identity-documents"
+        options={{
+          title: " Documentos de Identidad",
+          headerTitle: "Documentos de Identidad Pendientes",
+          drawerIcon: ({ color, size }) => (
+            <FontAwesome name="file-text" size={size} color={color} />
+          ),
+        }}
+      />
+
       {/* Pantalla Solicitudes */}
       <Drawer.Screen
         name="solicitudes"

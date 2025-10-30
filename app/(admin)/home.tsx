@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { AdminStatsGrid, PropTechCharts } from '../../components/admin';
+import React from 'react';
+import { ScrollView, Text, View } from 'react-native';
+import { AdminStatsGrid, PendingIdentityDocumentsComponent, PropTechCharts } from '../../components/admin';
 
 export default function AdminDashboard() {
 
@@ -26,6 +26,11 @@ export default function AdminDashboard() {
           <AdminStatsGrid 
             variant="full"
           />
+        </View>
+
+        {/* Documentos de Identidad Pendientes */}
+        <View className="mb-6">
+          <PendingIdentityDocumentsComponent />
         </View>
 
         {/* Actividad Reciente */}
