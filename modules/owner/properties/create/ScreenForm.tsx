@@ -70,7 +70,8 @@ export default function ScreenForm() {
       const isValid = await form.trigger();
       if (isValid) {
         const data = form.getValues();
-        await submitForm(data);
+        const result = await submitForm(data);
+        return result;
       } else {
         console.log('❌ Formulario completo tiene errores:', form.formState.errors);
       }
@@ -101,12 +102,15 @@ export default function ScreenForm() {
         form.reset();
         // Redirigir de vuelta a la lista de propiedades
         router.back();
+        return result;
       } else {
         // Mostrar error
         console.log('❌ Error al crear propiedad:', result.message);
+        return result;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log('💥 Error inesperado:', error);
+      return { success: false, message: error?.message || 'Error inesperado' };
     }
   };
   

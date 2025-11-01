@@ -4,7 +4,7 @@ import { CreatePropertyDTO } from './PropertyInterface';
 export interface FormStepProps extends UseFormReturn<CreatePropertyDTO> {
   nextStep: () => void;
   prevStep: () => void;
-  onSubmit: () => void;
+  onSubmit: () => Promise<any>;
   isFirstStep: boolean;
   isLastStep: boolean;
 }

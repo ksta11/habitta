@@ -8,6 +8,7 @@ export interface CreatePropertyDTO {
   address: string;
   city: string;
   price: number;
+  id_plan?: number;
   type: 'house' | 'apartament' | 'store' | 'office' | 'werehouse';
   rooms: number;
   bathrooms: number;
@@ -123,6 +124,21 @@ export interface UpdatePropertyResponse {
 
 export interface DeletePropertyResponse {
   success: boolean;
+  message?: string;
+  statusCode?: number;
+}
+
+export interface Plan{
+  id: number;
+  name: string;
+  price: number;
+  duration_days: number;
+  features: string;
+}
+
+export type GetPlansResponse = {
+  success: boolean;
+  data: Plan[];
   message?: string;
   statusCode?: number;
 }
