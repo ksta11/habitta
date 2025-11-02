@@ -2,15 +2,13 @@
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
 import { Controller } from 'react-hook-form';
-import { Alert, Image, Pressable, ScrollView, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import ButtonAtom from '../../../../components/atoms/ButtonAtom';
 import ImageUploader from '../../../../components/atoms/ImageUploader';
-import Input from '../../../../components/atoms/Input';
+import NumericField from '../../../../components/atoms/NumericField';
 import ProgressBar from '../../../../components/atoms/ProgressBar';
 import PlanSelector from '../../../../components/molecules/PlanSelector';
-import { Plan } from '../../../../interfaces/property/PropertyInterface';
 import { FormStepProps } from '../../../../interfaces/property/types';
-import { getPlans } from '../../../../libs/owner/property/api-service';
 
 export default function ScreenStep3({
   control,
@@ -21,63 +19,22 @@ export default function ScreenStep3({
   isFirstStep,
   isLastStep,
   onSubmit,
+  // optional props injected from create hook via parent
+  plans = [],
+  loadingPlans = false,
+  loadPlans,
+  isSubmitting = false,
 }: FormStepProps) {
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [loadingPlans, setLoadingPlans] = useState(false);
   const { errors } = formState;
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmitPress = async () => {
-    try {
-      setIsSubmitting(true);
-      // Ejecutar onSubmit y esperar si devuelve una promesa
-      const maybe = onSubmit();
-      const res: any = await Promise.resolve(maybe);
+  // Price input uses the reusable NumericField component (float mode)
 
-      // Si onSubmit devuelve un objeto { success: boolean, message?: string }
-      if (res && typeof res === 'object') {
-        if ('success' in res && res.success === false) {
-          Alert.alert('Hubo un problema', res.message || 'Error al crear la propiedad. Intenta de nuevo.');
-          return;
-        }
-        // Si existe message con success true, podríamos mostrar un toast informativo (opcional)
-      }
-    } catch (err: any) {
-      console.error('Error en onSubmit:', err);
-      // Mostrar un mensaje amigable al usuario y permanecer en el formulario
-      Alert.alert('Error', err?.message || 'Error al crear la propiedad. Intenta de nuevo.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
+  // Si el padre pasa planes, establecer el plan por defecto al primero
   useEffect(() => {
-    let mounted = true;
-    const load = async () => {
-      try {
-        setLoadingPlans(true);
-        const res = await getPlans();
-        if (!mounted) return;
-        if (res && res.success) {
-          setPlans(res.data || []);
-          // set default id_plan to first plan if available
-          if (res.data && res.data.length > 0) {
-            setValue('id_plan' as any, res.data[0].id as any);
-          }
-        } else {
-          console.warn('getPlans failed', res?.message);
-        }
-      } catch (err) {
-        console.error('Error loading plans', err);
-      } finally {
-        if (mounted) setLoadingPlans(false);
-      }
-    };
-    load();
-    return () => {
-      mounted = false;
-    };
-  }, [setValue]);
+    if (plans && plans.length > 0) {
+      setValue('id_plan' as any, plans[0].id as any);
+    }
+  }, [plans, setValue]);
 
   return (
     <View className="flex-1 bg-white-traffic mt-10">
@@ -99,13 +56,13 @@ export default function ScreenStep3({
         name="price"
         control={control}
         render={({ field: { onChange, value } }) => (
-          <Input
+          <NumericField
             label="Precio de renta"
             placeholder="Precio de renta"
-            value={value?.toString() || ''}
-            onChangeText={text => onChange(Number(text) || 0)}
+            value={value}
+            onChange={onChange}
             error={errors.price?.message}
-            keyboardType="numeric"
+            integer={false}
             borderColor="#A346E6"
             backgroundColor="#F6F6F6"
             labelColor="#A346E6"
@@ -214,7 +171,7 @@ export default function ScreenStep3({
           <View className="flex-1 ml-2">
             <ButtonAtom
               title={isLastStep ? 'Guardar' : 'Siguiente'}
-              onPress={handleSubmitPress}
+              onPress={onSubmit}
               loading={isSubmitting}
               disabled={isSubmitting}
               variant={isLastStep ? 'success' : 'primary'}

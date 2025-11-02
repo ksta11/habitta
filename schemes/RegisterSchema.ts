@@ -1,16 +1,13 @@
 import { z } from 'zod';
+import { textField } from '../utils/validation';
 
 export const RegisterSchema = z.object({
-  name: z
-    .string()
-    .min(1, 'El nombre es requerido')
-    .min(2, 'El nombre debe tener al menos 2 caracteres')
-    .max(50, 'El nombre no puede exceder 50 caracteres')
-    .trim(),
+  name: textField(2, 50, 'El nombre contiene caracteres no permitidos'),
   phone: z
     .string()
     .min(1, 'El teléfono es requerido')
     .min(10, 'El teléfono debe tener al menos 10 dígitos')
+    .regex(/^[0-9+\-\s()]+$/, 'El teléfono debe contener solo números y caracteres válidos')
     .trim(),
   email: z
     .string()

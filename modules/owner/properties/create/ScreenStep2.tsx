@@ -3,6 +3,7 @@ import { Controller } from 'react-hook-form';
 import { Text, View } from 'react-native';
 import ButtonAtom from '../../../../components/atoms/ButtonAtom';
 import Input from '../../../../components/atoms/Input';
+import NumericField from '../../../../components/atoms/NumericField';
 import PickerAtom from '../../../../components/atoms/Picker';
 import ProgressBar from '../../../../components/atoms/ProgressBar';
 import { FormStepProps } from '../../../../interfaces/property/types';
@@ -56,13 +57,13 @@ export default function ScreenStep2({
         name="area"
         control={control}
         render={({ field: { onChange, value } }) => (
-          <Input
+          <NumericField
             label="Área"
             placeholder="Área (m²)"
-            value={value?.toString() || ''}
-            onChangeText={text => onChange(Number(text) || 0)}
+            value={value}
+            onChange={onChange}
             error={errors.area?.message}
-            keyboardType="numeric"
+            integer={false}
             borderColor="#A346E6"
             backgroundColor="#F6F6F6"
             labelColor="#A346E6"
@@ -74,13 +75,13 @@ export default function ScreenStep2({
         name="rooms"
         control={control}
         render={({ field: { onChange, value } }) => (
-          <Input
+          <NumericField
             label="Habitaciones"
             placeholder="Habitaciones"
-            value={value?.toString() || ''}
-            onChangeText={text => onChange(Number(text) || 0)}
+            value={value}
+            onChange={onChange}
             error={errors.rooms?.message}
-            keyboardType="numeric"
+            integer={true}
             borderColor="#A346E6"
             backgroundColor="#F6F6F6"
             labelColor="#A346E6"
@@ -92,13 +93,13 @@ export default function ScreenStep2({
         name="bathrooms"
         control={control}
         render={({ field: { onChange, value } }) => (
-          <Input
+          <NumericField
             label="Baños"
             placeholder="Baños"
-            value={value?.toString() || ''}
-            onChangeText={text => onChange(Number(text) || 0)}
+            value={value}
+            onChange={onChange}
             error={errors.bathrooms?.message}
-            keyboardType="numeric"
+            integer={true}
             borderColor="#A346E6"
             backgroundColor="#F6F6F6"
             labelColor="#A346E6"

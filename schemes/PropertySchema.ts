@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { textField } from '../utils/validation';
 
 // Schema para PropertyImage
 const PropertyImageSchema = z.object({
@@ -6,10 +7,10 @@ const PropertyImageSchema = z.object({
 });
 
 export const PropertySchema = z.object({
-  title: z.string().min(3, 'El título es requerido'),
-  description: z.string().min(5, 'La descripción es requerida'),
-  address: z.string().min(5, 'La dirección es requerida'),
-  city: z.string().min(2, 'La ciudad es requerida'),
+  title: textField(3, 120, 'El título contiene caracteres no permitidos'),
+  description: textField(5, 2000, 'La descripción contiene caracteres no permitidos'),
+  address: textField(5, 200, 'La dirección contiene caracteres no permitidos'),
+  city: textField(2, 100, 'La ciudad contiene caracteres no permitidos'),
   price: z.number().min(1, 'El precio es requerido'),
   type: z.enum(['house', 'apartament', 'store', 'office', 'werehouse'], {
     message: 'Selecciona un tipo válido'
@@ -17,7 +18,7 @@ export const PropertySchema = z.object({
   rooms: z.number().min(0, 'Las habitaciones son requeridas'),
   bathrooms: z.number().min(0, 'Los baños son requeridos'),
   area: z.number().min(1, 'El área es requerida'),
-  services: z.string().min(2, 'Los servicios son requeridos'),
+  services: textField(2, 2000, 'Los servicios contienen caracteres no permitidos'),
   images: z.array(PropertyImageSchema).min(1, 'Agrega al menos una imagen'),
 });
 

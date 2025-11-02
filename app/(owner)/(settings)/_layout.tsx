@@ -31,10 +31,10 @@ export default function SettingsLayout() {
         }} 
       />
       <Stack.Screen 
-        name="edit/[id]" 
+        name="editProfile/editProfile" 
         options={{ 
-          headerShown: false,
-          title: 'Editar Propiedad'
+          headerShown: true,
+          title: 'Editar Perfil'
         }} 
       />
     </Stack>

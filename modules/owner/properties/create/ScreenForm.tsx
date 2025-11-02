@@ -2,10 +2,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { View } from 'react-native';
+import { Alert, View } from 'react-native';
 import { useAuth } from '../../../../contexts/AuthContext';
-import { createProperty } from '../../../../libs/owner/property/api-service';
 import { CreatePropertyFormType, CreatePropertySchema } from '../../../../schemes/PropertySchema';
+import useOwnerCreateProperties from '../../hooks/useOwnerCreateProperties';
 import ScreenStep1 from './ScreenStep1';
 import ScreenStep2 from './ScreenStep2';
 import ScreenStep3 from './ScreenStep3';
@@ -37,8 +37,8 @@ export default function ScreenForm() {
   const { user } = useAuth();
   const form = useForm<CreatePropertyFormType>({
     resolver: zodResolver(CreatePropertySchema),
-    mode: 'onSubmit', // Solo valida al hacer submit
-    reValidateMode: 'onBlur', // Revalida en blur después del primer submit
+    mode: 'onChange', // Solo valida al hacer submit
+    reValidateMode: 'onChange', // Revalida en blur después del primer submit
     defaultValues: {
       title: '',
       description: '',
@@ -91,27 +91,22 @@ export default function ScreenForm() {
     }
   };
 
+  // Hook compartido para creación (planes + submit)
+  const createHooks = useOwnerCreateProperties();
+
   // Lógica para enviar el formulario completo
   const submitForm = async (data: CreatePropertyFormType) => {
-    try {
-      const propertyData = { ...data, id_owner: user?.id };
-      const result = await createProperty(propertyData);
-      if (result.success) {
-        console.log('✅ Propiedad creada exitosamente:', result.data);
-        // Limpiar formulario
-        form.reset();
-        // Redirigir de vuelta a la lista de propiedades
-        router.back();
-        return result;
-      } else {
-        // Mostrar error
-        console.log('❌ Error al crear propiedad:', result.message);
-        return result;
-      }
-    } catch (error: any) {
-      console.log('💥 Error inesperado:', error);
-      return { success: false, message: error?.message || 'Error inesperado' };
+    const propertyData = { ...data, id_owner: user?.id };
+    const result = await createHooks.submitProperty(propertyData as any);
+    if (result && result.success) {
+      // Si todo ok, limpiar y navegar
+      form.reset();
+      router.back();
+    } else {
+      console.log('❌ Error al crear propiedad:', result?.message);
+      Alert.alert('Error', result?.message || 'No se pudo crear la propiedad');
     }
+    return result;
   };
   
   const prevStep = () => {
@@ -134,6 +129,11 @@ export default function ScreenForm() {
         onSubmit={handleStepSubmit}
         isLastStep={currentStep === steps.length - 1}
         isFirstStep={currentStep === 0}
+        // Props from create hook
+        plans={createHooks.plans}
+        loadingPlans={createHooks.loadingPlans}
+        loadPlans={createHooks.loadPlans}
+        isSubmitting={createHooks.isSubmitting}
       />
     </View>
   );
