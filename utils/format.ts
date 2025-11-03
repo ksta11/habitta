@@ -11,3 +11,12 @@ export function formatPlanPrice(price?: number | null): string {
 }
 
 export default formatPlanPrice;
+
+export function formatCurrency(amount: number, currency = 'COP', locale = 'es-CO') {
+  try {
+    return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(amount);
+  } catch (e) {
+    // Fallback
+    return `${currency} ${amount}`;
+  }
+}
