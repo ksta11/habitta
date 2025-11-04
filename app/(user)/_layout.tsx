@@ -1,29 +1,35 @@
-import { Tabs } from "expo-router";
+import React from 'react';
 import { FontAwesome } from "@expo/vector-icons";
+import { Tabs } from 'expo-router';
 import { AuthGuard } from '../../middleware/AuthGuard';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function UserTabsLayout() {
+  const insets = useSafeAreaInsets();
+  const TAB_BAR_BASE_HEIGHT = 70; // base height used previously
+
   return (
     <AuthGuard requiredRole="user">
-      <Tabs
-        screenOptions={{
-          headerShown: false,
-          tabBarActiveTintColor: "#320964", // blue-600
-          tabBarInactiveTintColor: "#BD93EF", // gray-500
-          tabBarStyle: {
-            backgroundColor: "#ffffff",
-            borderTopWidth: 1,
-            borderTopColor: "#e5e7eb", // gray-200
-            height: 70,
-            paddingBottom: 10,
-            paddingTop: 10,
-          },
-          tabBarLabelStyle: {
-            fontSize: 12,
-            fontWeight: "500",
-          },
-        }}
-      >
+            <Tabs
+            screenOptions={{
+              headerShown: false,
+              tabBarActiveTintColor: "#320964", // deep-violet
+              tabBarInactiveTintColor: "#BD93EF", // lavender-bright
+              tabBarStyle: {
+                backgroundColor: "#ffffff",
+                borderTopWidth: 1,
+                borderTopColor: "#e5e7eb", // gray-200
+                // respect bottom safe area so buttons overlay looks integrated
+                height: TAB_BAR_BASE_HEIGHT + insets.bottom,
+                paddingBottom: insets.bottom + 10,
+                paddingTop: 10,
+              },
+              tabBarLabelStyle: {
+                fontSize: 12,
+                fontWeight: "500",
+              },
+            }}
+          >
         {/* Tab Home */}
         <Tabs.Screen
           name="home"
