@@ -5,6 +5,7 @@ import ButtonAtom from '../../components/atoms/ButtonAtom';
 import PaymentModal from '../../components/atoms/PaymentModal';
 import { formatCurrency } from '../../utils/format';
 import { Payment as payment} from '../../interfaces/PaymentInterface';
+import { useRouter } from 'expo-router';
 
 interface Props {
   payment: payment;
@@ -92,9 +93,11 @@ function getStatusColorHex(key?: string) {
 
 export default function PaymentCard({ payment }: Props) {
   const { concept, amount, currency, created_at, status, counterparty_name, my_role } = payment;
+  const router = useRouter();
 
   const onPay = () => {
     Alert.alert('Pagar', `Simulando pago de ${formatCurrency(amount, currency)} a ${counterparty_name || 'destinatario'}`);
+    router.push(`./make/${payment.id_pay}`);
   };
 
   const onCancel = () => {

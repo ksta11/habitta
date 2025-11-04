@@ -19,9 +19,22 @@ export interface Payment {
   my_role?: 'payer' | 'receiver' | string;
 }
 
+export interface PaymentIntentResponse {
+  client_secret: string;
+  // El objeto `payment` contiene la representación completa del pago en tu modelo interno.
+  payment: Payment | null;
+}
+
 export interface GetPaymentsResponse {
   success: boolean;
   data: Payment[];
+  message?: string;
+  statusCode?: number;
+}
+
+export interface CreatePaymentIntentResponse {
+  success: boolean;
+  data: PaymentIntentResponse;
   message?: string;
   statusCode?: number;
 }
