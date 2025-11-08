@@ -3,13 +3,13 @@ import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   Switch,
   Text,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ReviewCommentInput from '../../../components/molecules/ReviewCommentInput';
 import ReviewSubmitButton from '../../../components/molecules/ReviewSubmitButton';
 import UserInfoCard from '../../../components/molecules/UserInfoCard';
@@ -165,20 +165,21 @@ export default function ReviewForm() {
   };
 
   const isFormValid = comment.trim().length > 0;
+  const insets = useSafeAreaInsets();
 
   if (loading || (review && !receiverUser)) {
     return (
-      <SafeAreaView className="flex-1 bg-white">
+      <View style={{ flex: 1, backgroundColor: '#ffffff', paddingTop: insets.top }}>
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#3B82F6" />
           <Text className="text-gray-600 mt-4">Cargando información...</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View style={{ flex: 1, backgroundColor: '#ffffff', paddingTop: insets.top }}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       
       {/* Header */}
@@ -218,6 +219,6 @@ export default function ReviewForm() {
         isValid={isFormValid}
         isSubmitting={submitting}
       />
-    </SafeAreaView>
+    </View>
   );
 }

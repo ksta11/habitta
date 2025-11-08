@@ -9,9 +9,9 @@
     "scheme": "habitta",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/lotties/Habitta.json",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/icon.png",
+      "backgroundColor": "#ffffff",
+      "resizeMode": "contain"
     },
     "ios": {
       "supportsTablet": true,
@@ -36,6 +36,9 @@
       [
         "expo-splash-screen",
         {
+          "image": "./assets/icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
           "backgroundColor": "#360f67"
         }
       ],

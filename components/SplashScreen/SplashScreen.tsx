@@ -1,10 +1,13 @@
 import LottieView from "lottie-react-native";
-import { SafeAreaView } from "react-native";
+import { View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import habitta from '../../assets/lotties/Habitta.json';
 
 export default function SplashScreen() {
+  const insets = useSafeAreaInsets();
+  
   return (
-    <SafeAreaView className="flex-1 justify-center items-center">
+    <View style={{ flex: 1, paddingTop: insets.top, paddingBottom: insets.bottom }} className="justify-center items-center">
         <LottieView 
           source={habitta} 
           autoPlay 
@@ -12,6 +15,6 @@ export default function SplashScreen() {
           loop={false}
           style={{ flex: 1, width: '100%'}}
         />
-    </SafeAreaView>
+    </View>
   );
 }
