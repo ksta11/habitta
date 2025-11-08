@@ -4,7 +4,7 @@ import * as Clipboard from 'expo-clipboard';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ButtonAtom from '../../components/atoms/ButtonAtom';
 import { formatCurrency } from '../../utils/format';
 import useMakePayment from './hooks/useMakePayment';
@@ -20,6 +20,7 @@ export default function MakePayment({ idPay }: MakePaymentProps) {
   // El hook utiliza el id interno (id_pay). Si no está presente no hará la petición.
   const { clientSecret, payment, loading, error } = useMakePayment(idPay ?? null);
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const insets = useSafeAreaInsets();
   const [sheetReady, setSheetReady] = useState(false);
   const [payLoading, setPayLoading] = useState(false);
 
@@ -109,7 +110,7 @@ export default function MakePayment({ idPay }: MakePaymentProps) {
       merchantIdentifier="merchant.identifier" // required for Apple Pay
       urlScheme="habitta" // required for 3D Secure and bank redirects
     >
-      <SafeAreaView className="flex-1 bg-gray-50" edges={['top']}>
+      <View style={{ flex: 1, backgroundColor: '#f9fafb', paddingTop: insets.top }}>
         {loading && (
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" color="#6D28D9" />
@@ -310,7 +311,7 @@ export default function MakePayment({ idPay }: MakePaymentProps) {
             </Text>
           </View>
         )}
-      </SafeAreaView>
+      </View>
     </StripeProvider>
   );
 }

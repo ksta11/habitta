@@ -1,7 +1,7 @@
 import { useFocusEffect } from "expo-router";
 import React from "react";
 import { FlatList, RefreshControl, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Label from "../../../components/atoms/Label";
 import PropertyCard from "../../../components/molecules/PropertyCard";
 import { PropertySearchFilters } from "../../../libs/user/property-search-service";
@@ -23,6 +23,12 @@ const categories = [
 ];
 
 export const UserHome = () => {
+  console.log('🏠 [UserHome] Iniciando renderizado del componente UserHome');
+
+  // Obtener safe area insets manualmente
+  const insets = useSafeAreaInsets();
+  console.log('🏠 [UserHome] SafeAreaInsets obtenidos:', insets);
+
   // === HOOKS DE PROPIEDADES ===
   const {
     properties,loading,refreshing,searchPropertiesWithFilters,refresh,formatPrice,getPropertyImage,} = useProperties();
@@ -109,12 +115,13 @@ export const UserHome = () => {
       refresh();
     }, [])
   );
+
   return (
     <View className="flex-1 bg-white">
-      <SafeAreaView>
-        {/* Header */}
+      <View style={{ paddingTop: insets.top }}>
         <HomeHeader onNavigateToReviews={navigateToReviewList} />
-      </SafeAreaView>
+      </View>
+
       {/* Búsqueda y Filtros */}
       <View className="px-4 pt-4">
         <SearchFilter

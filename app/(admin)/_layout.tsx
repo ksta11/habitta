@@ -2,12 +2,15 @@ import React from 'react';
 import { View, Text, Pressable, Alert } from 'react-native';
 import { Drawer } from 'expo-router/drawer';
 import { FontAwesome } from "@expo/vector-icons";
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
 import { DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 
 function CustomDrawerContent(props: any) {
   const { logout } = useAuth();
+  const insets = useSafeAreaInsets();
+  
+  console.log('🎨 [CustomDrawerContent] Renderizando con insets:', insets);
 
   const handleLogout = () => {
     Alert.alert(
@@ -28,7 +31,7 @@ function CustomDrawerContent(props: any) {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View style={{ flex: 1, backgroundColor: 'white', paddingTop: insets.top }}>
       <DrawerContentScrollView {...props} contentContainerStyle={{ paddingTop: 0 }}>
         {/* Header del drawer */}
         <View className="bg-black px-6 py-8 mb-4">
@@ -64,7 +67,7 @@ function CustomDrawerContent(props: any) {
           />
         </View>
       </DrawerContentScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

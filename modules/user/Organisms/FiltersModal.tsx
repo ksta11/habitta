@@ -1,6 +1,7 @@
-import React from 'react';
-import { View, Modal, ScrollView, Pressable, Text, TextInput, SafeAreaView } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import React from 'react';
+import { Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface PropertyFilters {
   searchTerm: string;
@@ -39,6 +40,8 @@ export default function FiltersModal({
   onResetFilters,
   onApplyFilters
 }: FiltersModalProps) {
+  const insets = useSafeAreaInsets();
+  
   return (
     <Modal
       visible={visible}
@@ -46,7 +49,7 @@ export default function FiltersModal({
       presentationStyle="pageSheet"
       onRequestClose={onClose}
     >
-      <SafeAreaView className="flex-1 bg-white">
+      <View style={{ flex: 1, backgroundColor: '#ffffff', paddingTop: insets.top }}>
         {/* Header del Modal */}
         <View className="flex-row items-center justify-between px-6 py-4 border-b border-gray-200">
           <Text className="text-xl font-bold text-gray-800">Filtros</Text>
@@ -247,7 +250,7 @@ export default function FiltersModal({
             </Pressable>
           </View>
         </View>
-      </SafeAreaView>
+      </View>
     </Modal>
   );
 }

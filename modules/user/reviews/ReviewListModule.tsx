@@ -1,11 +1,11 @@
 import React from 'react';
 import {
   ActivityIndicator,
-  SafeAreaView,
   ScrollView,
   Text,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import EmptyReviews from '../../../components/molecules/EmptyReviews';
 import ReviewCard from '../../../components/molecules/ReviewCard';
 import { useReviewNavigation, useReviews } from '../hooks';
@@ -33,21 +33,23 @@ export default function ReviewListModule() {
     navigateBack 
   } = useReviewNavigation();
 
+  const insets = useSafeAreaInsets();
+
   // Estado de carga
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-white">
+      <View style={{ flex: 1, backgroundColor: '#ffffff', paddingTop: insets.top }}>
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#531A99" />
           <Text className="text-gray-600 mt-4">Cargando reviews pendientes...</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   // UI Principal
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View style={{ flex: 1, backgroundColor: '#ffffff', paddingTop: insets.top }}>
       {/* Header */}
       <ReviewHeader 
         title="Reviews Pendientes" 
@@ -83,6 +85,6 @@ export default function ReviewListModule() {
           </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
