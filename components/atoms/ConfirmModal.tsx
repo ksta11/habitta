@@ -1,13 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import {
-    Modal,
-    Platform,
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Modal,
+  Pressable,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 interface ConfirmModalProps {
@@ -48,29 +46,29 @@ export default function ConfirmModal({
       onRequestClose={onCancel}
       statusBarTranslucent={true}
     >
-  <View style={styles.backdrop} accessibilityLabel={title}>
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Text style={styles.title}>{title}</Text>
+      <View className="flex-1 bg-black/50 justify-center items-center p-4" accessibilityLabel={title}>
+        <View className="w-full max-w-[420px] bg-white rounded-xl p-5 shadow-lg">
+          <View className="flex-row items-center justify-between">
+            <Text className="text-lg font-bold text-gray-900">{title}</Text>
 
-            <Pressable onPress={onCancel} accessibilityLabel="Close" style={styles.closeButton}>
-              <Text style={styles.closeText} accessibilityRole="button">
+            <Pressable onPress={onCancel} accessibilityLabel="Close" className="p-1.5 rounded-full">
+              <Text className="text-[22px] text-gray-500" accessibilityRole="button">
                 ×
               </Text>
             </Pressable>
           </View>
 
-          {message ? <Text style={styles.message}>{message}</Text> : null}
+          {message ? <Text className="mt-3 text-gray-700 leading-5">{message}</Text> : null}
 
           {needsInput ? (
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>
+            <View className="mt-3">
+              <Text className="text-[13px] text-gray-700 mb-1.5">
                 Escribe "{requireConfirmInput}" para completar esta acción.
               </Text>
               <TextInput
                 value={input}
                 onChangeText={setInput}
-                style={styles.input}
+                className="border border-gray-300 rounded-lg px-2.5 py-2 text-sm text-gray-900"
                 placeholder="Confirm"
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -79,21 +77,19 @@ export default function ConfirmModal({
             </View>
           ) : null}
 
-          <View style={styles.footer}>
-            <TouchableOpacity onPress={onCancel} style={[styles.button, styles.cancelButton]}>
-              <Text style={styles.cancelText}>{cancelText}</Text>
+          <View className="mt-4.5 flex-row justify-end gap-2">
+            <TouchableOpacity onPress={onCancel} className="px-3.5 py-2.5 rounded-lg min-w-[80px] items-center bg-gray-100">
+              <Text className="text-gray-700 font-semibold">{cancelText}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={onConfirm}
-              style={[
-                styles.button,
-                styles.confirmButton,
-                !confirmEnabled && styles.confirmButtonDisabled,
-              ]}
+              className={`px-3.5 py-2.5 rounded-lg min-w-[80px] items-center ml-2 ${
+                confirmEnabled ? 'bg-blue-600' : 'bg-blue-300'
+              }`}
               disabled={!confirmEnabled}
             >
-              <Text style={[styles.confirmText, !confirmEnabled && styles.confirmTextDisabled]}>
+              <Text className={`font-semibold ${confirmEnabled ? 'text-white' : 'text-blue-50'}`}>
                 {confirmText}
               </Text>
             </TouchableOpacity>
@@ -103,98 +99,3 @@ export default function ConfirmModal({
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
-  },
-  container: {
-    width: '100%',
-    maxWidth: 420,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
-    ...Platform.select({
-      android: { elevation: 8 },
-      ios: { shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } },
-    }),
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  closeButton: {
-    padding: 6,
-    borderRadius: 20,
-  },
-  closeText: {
-    fontSize: 22,
-    color: '#6b7280',
-  },
-  message: {
-    marginTop: 12,
-    color: '#374151',
-    lineHeight: 20,
-  },
-  inputGroup: {
-    marginTop: 12,
-  },
-  inputLabel: {
-    fontSize: 13,
-    color: '#374151',
-    marginBottom: 6,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    fontSize: 14,
-    color: '#111827',
-  },
-  footer: {
-    marginTop: 18,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 8,
-  },
-  button: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 8,
-    minWidth: 80,
-    alignItems: 'center',
-  },
-  cancelButton: {
-    backgroundColor: '#f3f4f6',
-  },
-  cancelText: {
-    color: '#374151',
-    fontWeight: '600',
-  },
-  confirmButton: {
-    backgroundColor: '#2563eb',
-    marginLeft: 8,
-  },
-  confirmButtonDisabled: {
-    backgroundColor: '#93c5fd',
-  },
-  confirmText: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-  confirmTextDisabled: {
-    color: '#e6f0ff',
-  },
-});
