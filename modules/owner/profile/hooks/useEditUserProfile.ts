@@ -3,6 +3,7 @@ import { Alert } from 'react-native';
 import { useAuth } from '../../../../contexts/AuthContext';
 import { getCurrentUserProfile, updateCurrentUserProfile } from '../../../../libs/userServices/api-service';
 import { EditUserProfileDTO } from '../../../../schemes/EditUserProfileSchema';
+import { hapticFeedback } from '../../../../utils/haptics';
 
 interface UseEditUserProfileReturn {
   isLoading: boolean;
@@ -26,6 +27,7 @@ export const useEditUserProfile = (): UseEditUserProfileReturn => {
         return response.user;
       } else {
         const msg = response?.message || 'No se pudo cargar el perfil';
+        hapticFeedback.error();
         setSubmitError(msg);
         Alert.alert('Error', msg);
         return null;
@@ -33,6 +35,7 @@ export const useEditUserProfile = (): UseEditUserProfileReturn => {
     } catch (err: any) {
       console.error('Error cargando perfil:', err);
       const msg = err?.message || 'Error al cargar el perfil';
+      hapticFeedback.error();
       setSubmitError(msg);
       Alert.alert('Error', msg);
       return null;
@@ -51,6 +54,7 @@ export const useEditUserProfile = (): UseEditUserProfileReturn => {
 
       if (result && typeof result === 'object') {
         if (result.user && result.user.id) {
+          hapticFeedback.success();
           setSubmitSuccess('Perfil actualizado exitosamente');
           // Update auth context
           try {
@@ -68,14 +72,17 @@ export const useEditUserProfile = (): UseEditUserProfileReturn => {
           }
           return result;
         } else if (result.message) {
+          hapticFeedback.error();
           setSubmitError(result.message);
           return result;
         }
       }
+      hapticFeedback.error();
       setSubmitError('Respuesta inválida del servidor');
       return { success: false, message: 'Respuesta inválida del servidor' };
     } catch (err: any) {
       console.error('Error en submitProfile:', err);
+      hapticFeedback.error();
       setSubmitError(err?.message || 'Error inesperado');
       return { success: false, message: err?.message || 'Error inesperado' };
     } finally {

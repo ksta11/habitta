@@ -11,6 +11,7 @@ import { EditUserProfileDTO, editUserProfileSchema } from "../../../schemes/Edit
 import useEditUserProfile from "./hooks/useEditUserProfile";
 
 import { useAuth } from "../../../contexts/AuthContext";
+import { hapticFeedback } from "../../../utils/haptics";
 
 // Atomic Design Components
 import ModernButton from "../../../components/atoms/ModernButton";
@@ -234,7 +235,10 @@ export default function FormEditUserProfile() {
                   onChangeText={onChange}
                   error={errors.password?.message}
                   showPassword={showPassword}
-                  onTogglePassword={() => setShowPassword(!showPassword)}
+                  onTogglePassword={() => {
+                    hapticFeedback.selection();
+                    setShowPassword(!showPassword);
+                  }}
                 />
               )}
             />

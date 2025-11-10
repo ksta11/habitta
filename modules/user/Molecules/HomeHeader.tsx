@@ -1,7 +1,8 @@
-import { FontAwesome } from '@expo/vector-icons';
-import React from 'react';
-import { Pressable, Text, View } from 'react-native';
-import Label from '../../../components/atoms/Label';
+import { FontAwesome } from "@expo/vector-icons";
+import React from "react";
+import { Pressable, Text, View } from "react-native";
+import Label from "../../../components/atoms/Label";
+import { hapticFeedback } from "../../../utils/haptics";
 
 interface HomeHeaderProps {
   onNavigateToReviews: () => void;
@@ -24,12 +25,31 @@ export default function HomeHeader({ onNavigateToReviews }: HomeHeaderProps) {
         </View>
       </View>
       <View className="flex-row items-center gap-2">
-        <Pressable 
+        <Pressable
           onPress={() => {
-            console.log('🚀 [HomeHeader] Botón de inbox presionado, navegando a reviews...');
-            console.log('🚀 [HomeHeader] Ejecutando callback de navegación...');
+            console.log(
+              "🚀 [HomeHeader] Botón de inbox presionado, navegando a reviews..."
+            );
+            console.log("🚀 [HomeHeader] Ejecutando callback de navegación...");
+            // Feedback háptico al navegar a reseñas
+            hapticFeedback.buttonPressLight();
             onNavigateToReviews();
-            console.log('🚀 [HomeHeader] Callback ejecutado');
+            console.log("🚀 [HomeHeader] Callback ejecutado");
+          }}
+          className="w-10 h-10 bg-violet rounded-full flex items-center justify-center shadow-sm"
+        >
+          <FontAwesome name="inbox" size={16} color="white" />
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            console.log(
+              "  Desplegando menu de usuario..."
+            );
+            console.log("🚀 [HomeHeader] Ejecutando callback de navegación...");
+            // Feedback háptico al navegar a reseñas
+            hapticFeedback.buttonPressLight();
+            onNavigateToReviews();
+            console.log("🚀 [HomeHeader] Callback ejecutado");
           }}
           className="w-10 h-10 bg-violet rounded-full flex items-center justify-center shadow-sm"
         >

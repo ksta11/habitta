@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../components/at
 import { Badge } from '../../../components/atoms/Badge';
 import { Avatar, AvatarFallback } from '../../../components/atoms/Avatar';
 import { router } from 'expo-router';
+import { hapticFeedback } from '../../../utils/haptics';
 
 interface RecentApplication {
   id: string;
@@ -66,7 +67,10 @@ export function RecentApplications({ applications }: RecentApplicationsProps) {
           <CardTitle className="text-lg font-semibold">Últimas Solicitudes</CardTitle>
           <Pressable 
             className="flex-row items-center"
-            onPress={() => router.push('/(owner)/(applications)')}
+            onPress={() => {
+              hapticFeedback.buttonPressLight();
+              router.push('/(owner)/(applications)');
+            }}
           >
             <Text className="text-violet text-sm font-medium mr-1">Ver todas</Text>
             <Ionicons name="chevron-forward" size={16} color="#7C3AED" />

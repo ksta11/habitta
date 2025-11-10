@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginDTO } from '../../../interfaces/LoginInterface';
 import { loginSchema } from '../../../schemes/LoginSchema';
 import { useAuth } from '../../../contexts/AuthContext';
+import { hapticFeedback } from '../../../utils/haptics';
 
 /**
  * Hook para manejar la lógica del formulario de login
@@ -43,16 +44,22 @@ export const useLogin = () => {
 
       if (result.success) {
         console.log('✅ [useLogin] Login exitoso');
+        // Feedback háptico de éxito
+        hapticFeedback.success();
         // La navegación se maneja automáticamente en AuthContext
         reset(); // Limpiar formulario
         return { success: true };
       } else {
         console.log('❌ [useLogin] Login fallido:', result.message);
+        // Feedback háptico de error
+        hapticFeedback.error();
         setSubmitError(result.message || 'Error desconocido');
         return { success: false, message: result.message };
       }
     } catch (error) {
       console.error('💥 [useLogin] Error crítico:', error);
+      // Feedback háptico de error
+      hapticFeedback.error();
       const errorMessage = 'Error inesperado. Intenta de nuevo.';
       setSubmitError(errorMessage);
       return { success: false, message: errorMessage };
@@ -63,6 +70,8 @@ export const useLogin = () => {
    * Alterna la visibilidad de la contraseña
    */
   const togglePasswordVisibility = () => {
+    // Feedback háptico sutil al cambiar visibilidad
+    hapticFeedback.selection();
     setShowPassword((prev) => !prev);
   };
 

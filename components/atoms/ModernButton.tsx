@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, Text } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { FONTS } from '../../utils/fonts';
 
 interface ModernButtonProps {
@@ -8,6 +9,8 @@ interface ModernButtonProps {
   disabled?: boolean;
   loading?: boolean;
   variant?: 'primary' | 'secondary';
+  enableHaptics?: boolean; // Nueva prop para habilitar/deshabilitar haptics
+  hapticStyle?: 'light' | 'medium' | 'heavy'; // Tipo de haptic feedback
 }
 
 export default function ModernButton({
@@ -15,8 +18,37 @@ export default function ModernButton({
   onPress,
   disabled = false,
   loading = false,
-  variant = 'primary'
+  variant = 'primary',
+  enableHaptics = true,
+  hapticStyle = 'medium'
 }: ModernButtonProps) {
+  
+  // Función para manejar el press con haptics
+  const handlePress = async () => {
+    if (disabled || loading) return;
+    
+    // Ejecutar haptic feedback antes de la acción
+    if (enableHaptics) {
+      try {
+        switch (hapticStyle) {
+          case 'light':
+            await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            break;
+          case 'medium':
+            await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            break;
+          case 'heavy':
+            await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+            break;
+        }
+      } catch (error) {
+        console.log('Haptics not available:', error);
+      }
+    }
+    
+    // Ejecutar la acción del botón
+    onPress();
+  };
   const getButtonStyle = () => {
     const baseStyle = {
       borderRadius: 16,
@@ -63,10 +95,19 @@ export default function ModernButton({
     };
   };
 
+  // Función para manejar el feedback visual al presionar
+  const handlePressIn = () => {
+    if (enableHaptics && !disabled && !loading) {
+      // Haptic muy sutil al tocar (opcional)
+      Haptics.selectionAsync().catch(() => {});
+    }
+  };
+
   return (
     <Pressable
       style={getButtonStyle()}
-      onPress={onPress}
+      onPress={handlePress}
+      onPressIn={handlePressIn}
       disabled={disabled || loading}
     >
       <Text style={getTextStyle()}>

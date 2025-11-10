@@ -9,6 +9,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { hapticFeedback } from '../../utils/haptics';
 
 interface ConfirmModalProps {
   visible: boolean;
@@ -40,6 +41,18 @@ export default function ConfirmModal({
     return input === requireConfirmInput;
   }, [needsInput, input, requireConfirmInput]);
 
+  const handleCancel = () => {
+    hapticFeedback.buttonPressLight();
+    onCancel();
+  };
+
+  const handleConfirm = () => {
+    if (confirmEnabled) {
+      hapticFeedback.buttonPress();
+      onConfirm();
+    }
+  };
+
   return (
     <Modal
       visible={visible}
@@ -53,7 +66,7 @@ export default function ConfirmModal({
           <View style={styles.header}>
             <Text style={styles.title}>{title}</Text>
 
-            <Pressable onPress={onCancel} accessibilityLabel="Close" style={styles.closeButton}>
+            <Pressable onPress={handleCancel} accessibilityLabel="Close" style={styles.closeButton}>
               <Text style={styles.closeText} accessibilityRole="button">
                 ×
               </Text>
@@ -80,12 +93,12 @@ export default function ConfirmModal({
           ) : null}
 
           <View style={styles.footer}>
-            <TouchableOpacity onPress={onCancel} style={[styles.button, styles.cancelButton]}>
+            <TouchableOpacity onPress={handleCancel} style={[styles.button, styles.cancelButton]}>
               <Text style={styles.cancelText}>{cancelText}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={onConfirm}
+              onPress={handleConfirm}
               style={[
                 styles.button,
                 styles.confirmButton,

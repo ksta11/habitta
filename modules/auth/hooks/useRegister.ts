@@ -5,6 +5,7 @@ import { Alert } from "react-native";
 import { RegisterSchema } from "../../../schemes/RegisterSchema";
 import { RegisterFormDTO } from "../../../interfaces/RegisterInterface";
 import { useAuth } from "../../../contexts/AuthContext";
+import { hapticFeedback } from "../../../utils/haptics";
 
 interface UseRegisterReturn {
   // React Hook Form
@@ -107,6 +108,8 @@ export const useRegister = (): UseRegisterReturn => {
 
       if (result.success) {
         console.log("✅ Registro exitoso");
+        // Feedback háptico de éxito
+        hapticFeedback.success();
         Alert.alert(
           "Registro exitoso",
           result.message || "Tu cuenta ha sido creada correctamente"
@@ -114,10 +117,14 @@ export const useRegister = (): UseRegisterReturn => {
         // La navegación se maneja automáticamente en el AuthContext
       } else {
         console.log("❌ Registro fallido:", result.message);
+        // Feedback háptico de error
+        hapticFeedback.error();
         setSubmitError(result.message || "Error al crear la cuenta");
       }
     } catch (error) {
       console.error("💥 Error inesperado en registro:", error);
+      // Feedback háptico de error
+      hapticFeedback.error();
       setSubmitError("Error inesperado. Intenta de nuevo.");
     }
   };
@@ -134,6 +141,8 @@ export const useRegister = (): UseRegisterReturn => {
    * Alterna la visibilidad de la contraseña
    */
   const togglePasswordVisibility = () => {
+    // Feedback háptico sutil al cambiar visibilidad
+    hapticFeedback.selection();
     setShowPassword((prev) => !prev);
   };
 
@@ -141,6 +150,8 @@ export const useRegister = (): UseRegisterReturn => {
    * Alterna la visibilidad de la contraseña de confirmación
    */
   const toggleRepeatPasswordVisibility = () => {
+    // Feedback háptico sutil al cambiar visibilidad
+    hapticFeedback.selection();
     setShowRepeatPassword((prev) => !prev);
   };
 

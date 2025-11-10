@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Pressable, Image, Text } from 'react-native';
 import Label from '../atoms/Label';
 import { Property } from '../../interfaces/property/PropertyInterface';
+import { hapticFeedback } from '../../utils/haptics';
 
 // Iconos simulados con emojis
 const HeartIcon = ({ filled }: { filled: boolean }) => (
@@ -26,9 +27,16 @@ export default function PropertyCard({
   formatPrice,
   getPropertyImage
 }: PropertyCardProps) {
+  
+  // Maneja el press con haptic feedback
+  const handlePress = () => {
+    hapticFeedback.buttonPress();
+    onPress();
+  };
+  
   return (
     <Pressable
-      onPress={onPress}
+      onPress={handlePress}
       className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mt-4"
     >
       <View className="relative">

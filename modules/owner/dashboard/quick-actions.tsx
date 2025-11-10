@@ -3,6 +3,7 @@ import { View, Text, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/atoms/Card';
 import { router } from 'expo-router';
+import { hapticFeedback } from '../../../utils/haptics';
 
 const actions = [
   {
@@ -47,6 +48,7 @@ export function QuickActions() {
             key={index} 
             className={`w-full justify-start h-auto p-4 mb-1 ${action.color} rounded-xl border-0`}
             onPress={() => {
+              hapticFeedback.buttonPress();
               console.log('🚀 [QuickActions] Navegando a:', action.link);
               router.push(action.link as any);
             }}

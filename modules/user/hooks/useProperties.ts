@@ -7,6 +7,7 @@ import {
   PropertySearchFilters,
 } from '../../../libs/user/property-search-service';
 import { Property } from '../../../interfaces/property/PropertyInterface';
+import { hapticFeedback } from '../../../utils/haptics';
 
 /**
  * Hook para manejar la lógica de propiedades
@@ -96,6 +97,8 @@ export const useProperties = () => {
   const refresh = async () => {
     setRefreshing(true);
     await loadProperties();
+    // Feedback háptico al completar el refresh
+    hapticFeedback.refresh();
   };
 
   /**

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Alert, Modal, Text, TextInput, View } from 'react-native';
 import ButtonAtom from '../../../components/atoms/ButtonAtom';
 import { createApplication } from '../../../libs/application/api-service';
+import { hapticFeedback } from '../../../utils/haptics';
 
 interface ContactHostModalProps {
   visible: boolean;
@@ -23,15 +24,19 @@ export default function ContactHostModal({
 
   const handleSend = async () => {
     if (!message.trim()) {
+      hapticFeedback.error();
       Alert.alert("Error", "Por favor ingresa un mensaje");
       return;
     }
 
     if (message.trim().length < 10) {
+      hapticFeedback.error();
       Alert.alert("Error", "El mensaje debe tener al menos 10 caracteres");
       return;
     }
 
+    // Haptic al presionar enviar
+    hapticFeedback.buttonPress();
     setIsLoading(true);
     
     try {
@@ -41,6 +46,7 @@ export default function ContactHostModal({
       });
 
       if (result.success) {
+        hapticFeedback.success();
         setMessage(''); // Limpiar el mensaje
         onClose(); // Cerrar el modal
         Alert.alert("¡Éxito!", "Tu solicitud ha sido enviada al anfitrión.");
@@ -50,9 +56,11 @@ export default function ContactHostModal({
           onSuccess();
         }
       } else {
+        hapticFeedback.error();
         Alert.alert("Error", result.message || "No se pudo enviar la solicitud");
       }
     } catch (error) {
+      hapticFeedback.error();
       console.error('Error al crear application:', error);
       Alert.alert("Error", "Ocurrió un error inesperado. Inténtalo de nuevo.");
     } finally {
@@ -61,6 +69,7 @@ export default function ContactHostModal({
   };
 
   const handleClose = () => {
+    hapticFeedback.buttonPressLight();
     setMessage(''); // Limpiar el mensaje al cerrar
     onClose();
   };

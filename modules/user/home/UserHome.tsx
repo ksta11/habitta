@@ -10,6 +10,7 @@ import CategorySelector from "../Molecules/CategorySelector";
 import HomeHeader from "../Molecules/HomeHeader";
 import SearchFilter from "../Molecules/SearchFilter";
 import FiltersModal from "../Organisms/FiltersModal";
+import { hapticFeedback } from "../../../utils/haptics";
 
 /**
  * Categorías disponibles para propiedades
@@ -87,6 +88,8 @@ export const UserHome = () => {
    * Maneja el cambio de categoría
    */
   const handleCategoryChange = (category: string) => {
+    // Feedback háptico al cambiar categoría
+    hapticFeedback.selection();
     applyFiltersWithCategory(category);
   };
 
@@ -128,7 +131,11 @@ export const UserHome = () => {
           searchTerm={filters.searchTerm}
           onSearchChange={(value: string) => updateFilter("searchTerm", value)}
           onSubmit={() => console.log("Submit search")}
-          onShowFilters={toggleFiltersModal}
+          onShowFilters={() => {
+            // Feedback háptico al abrir modal de filtros
+            hapticFeedback.selection();
+            toggleFiltersModal();
+          }}
         />
       </View>
 
@@ -206,7 +213,11 @@ export const UserHome = () => {
         }}
         availableCities={availableCities}
         propertiesCount={properties.length}
-        onClose={toggleFiltersModal}
+        onClose={() => {
+          // Feedback háptico al cerrar modal
+          hapticFeedback.selection();
+          toggleFiltersModal();
+        }}
         onUpdateFilter={(key: string, value: any) => {
           if (key === "priceRange" || key === "areaRange") {
             updateFilter(key as any, {
@@ -219,8 +230,14 @@ export const UserHome = () => {
             updateFilter(key as any, value);
           }
         }}
-        onResetFilters={resetFilters}
+        onResetFilters={() => {
+          // Feedback háptico al resetear filtros
+          hapticFeedback.refresh();
+          resetFilters();
+        }}
         onApplyFilters={() => {
+          // Feedback háptico al aplicar filtros
+          hapticFeedback.buttonPress();
           applyFiltersImmediately();
           toggleFiltersModal();
         }}
