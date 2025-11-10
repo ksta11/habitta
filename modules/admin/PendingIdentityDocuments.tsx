@@ -1,10 +1,11 @@
 import { FontAwesome } from '@expo/vector-icons';
 import React from 'react';
 import { Modal, ScrollView, Text, TextInput, View } from 'react-native';
+import Button from '../../components/atoms/Button';
+import FileViewer from '../../components/atoms/FileViewer';
+import IconButton from '../../components/atoms/IconButton';
 import { usePendingIdentityDocuments } from '../../modules/admin/hooks';
-import Button from '../atoms/Button';
-import FileViewer from '../atoms/FileViewer';
-import IconButton from '../atoms/IconButton';
+import { DocumentCard } from './Organisms';
 
 
 
@@ -75,67 +76,19 @@ export const PendingIdentityDocumentsComponent: React.FC = () => {
 
       <ScrollView className="max-h-96">
         {documents.map((doc) => (
-          <View key={doc.id} className="border border-gray-200 rounded-lg p-4 mb-3 bg-gray-50">
-            {/* Header del documento */}
-            <View className="flex-row items-center justify-between mb-3">
-              <View className="flex-1">
-                <Text className="font-semibold text-gray-800 text-base">
-                  {doc.description || 'Documento de Identidad'}
-                </Text>
-                <Text className="text-sm text-gray-500 mt-1">
-                  Subido: {formatDate(doc.upload_date)}
-                </Text>
-              </View>
-              <View className="bg-yellow-100 px-2 py-1 rounded-full">
-                <Text className="text-xs font-medium text-yellow-800">
-                  Pendiente
-                </Text>
-              </View>
-            </View>
-
-            {/* Información adicional */}
-            {doc.notes && (
-              <View className="mb-3">
-                <Text className="text-sm text-gray-600">
-                  <Text className="font-medium">Notas:</Text> {doc.notes}
-                </Text>
-              </View>
-            )}
-
-            {/* Botones de acción */}
-            <View className="flex-row items-center justify-between">
-              <View className="flex-row space-x-2">
-                <Button
-                  title="Aprobar"
-                  onPress={() => handleApprove(doc.id)}
-                  disabled={processing === doc.id}
-                  variant="primary"
-                  size="sm"
-                />
-                <Button
-                  title="Rechazar"
-                  onPress={() => handleReject(doc.id)}
-                  disabled={processing === doc.id}
-                  variant="secondary"
-                  size="sm"
-                />
-              </View>
-              
-              <IconButton
-                iconName="eye"
-                size={20}
-                color="#6B7280"
-                onPress={() => handleViewDocument(doc.url_document)}
-              />
-            </View>
-
-            {processing === doc.id && (
-              <View className="mt-2 flex-row items-center">
-                <FontAwesome name="spinner" size={12} color="#6B7280" />
-                <Text className="text-xs text-gray-500 ml-2">Procesando...</Text>
-              </View>
-            )}
-          </View>
+          <DocumentCard
+            key={doc.id}
+            id={doc.id}
+            description={doc.description || undefined}
+            uploadDate={doc.upload_date}
+            notes={doc.notes || undefined}
+            url={doc.url_document}
+            processing={processing === doc.id}
+            onApprove={handleApprove}
+            onReject={handleReject}
+            onView={handleViewDocument}
+            formatDate={formatDate}
+          />
         ))}
       </ScrollView>
 

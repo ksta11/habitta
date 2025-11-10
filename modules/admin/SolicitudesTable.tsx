@@ -1,98 +1,11 @@
 import { FontAwesome } from '@expo/vector-icons';
 import React from 'react';
-import { Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
-import { SolicitudDocumento, SolicitudPropietario } from '../../interfaces/SolicitudInterface';
+import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSolicitudes } from '../../modules/admin/hooks';
 import { AdminStatsGrid } from './AdminStatsGrid';
-
-
-
-// Componente Badge para estado de solicitud
-interface EstadoBadgeProps {
-  estado: SolicitudPropietario['estado'];
-}
-
-const EstadoBadge: React.FC<EstadoBadgeProps> = ({ estado }) => {
-  const getEstadoConfig = (estado: SolicitudPropietario['estado']) => {
-    switch (estado) {
-      case 'pendiente':
-        return { text: 'Pendiente', className: 'bg-yellow-100 text-yellow-800', icon: 'clock-o' };
-      case 'en_revision':
-        return { text: 'En Revisión', className: 'bg-blue-100 text-blue-800', icon: 'eye' };
-      case 'aprobada':
-        return { text: 'Aprobada', className: 'bg-green-100 text-green-800', icon: 'check-circle' };
-      case 'rechazada':
-        return { text: 'Rechazada', className: 'bg-red-100 text-red-800', icon: 'times-circle' };
-      case 'documentacion_incompleta':
-        return { text: 'Doc. Incompleta', className: 'bg-orange-100 text-orange-800', icon: 'file-text' };
-      default:
-        return { text: estado, className: 'bg-gray-100 text-gray-800', icon: 'question' };
-    }
-  };
-
-  const config = getEstadoConfig(estado);
-  
-  return (
-    <View className={`flex-row items-center px-2 py-1 rounded-full ${config.className}`}>
-      <FontAwesome name={config.icon as any} size={10} color={config.className.includes('yellow') ? '#d97706' : 
-                                                                config.className.includes('blue') ? '#2563eb' :
-                                                                config.className.includes('green') ? '#059669' :
-                                                                config.className.includes('red') ? '#dc2626' :
-                                                                config.className.includes('orange') ? '#ea580c' : '#6b7280'} />
-      <Text className={`text-xs font-medium ml-1 ${config.className.split(' ')[1]}`}>
-        {config.text}
-      </Text>
-    </View>
-  );
-};
-
-// Componente para mostrar documentos
-interface DocumentosListProps {
-  documentos: SolicitudDocumento[];
-}
-
-const DocumentosList: React.FC<DocumentosListProps> = ({ documentos }) => {
-  const getTipoDocumento = (tipo: SolicitudDocumento['tipo']) => {
-    const tipos = {
-      'dni': 'DNI/NIE',
-      'pasaporte': 'Pasaporte',
-      'certificado_ingresos': 'Cert. Ingresos',
-      'declaracion_renta': 'Decl. Renta',
-      'certificado_bancario': 'Cert. Bancario',
-      'otros': 'Otros'
-    };
-    return tipos[tipo] || tipo;
-  };
-
-  return (
-    <View className="mt-2">
-      <Text className="text-sm font-medium text-gray-700 mb-2">
-        Documentos ({documentos.length})
-      </Text>
-      <View className="flex-row flex-wrap gap-1">
-        {documentos.map((doc) => (
-          <View 
-            key={doc.id} 
-            className={`flex-row items-center px-2 py-1 rounded text-xs ${
-              doc.verificado ? 'bg-green-100' : 'bg-gray-100'
-            }`}
-          >
-            <FontAwesome 
-              name={doc.verificado ? 'check' : 'file-o'} 
-              size={10} 
-              color={doc.verificado ? '#059669' : '#6b7280'} 
-            />
-            <Text className={`text-xs ml-1 ${
-              doc.verificado ? 'text-green-800' : 'text-gray-600'
-            }`}>
-              {getTipoDocumento(doc.tipo)}
-            </Text>
-          </View>
-        ))}
-      </View>
-    </View>
-  );
-};
+import { StatusBadge } from './Atoms';
+import { DocumentList } from './Molecules';
+import { FilterPanel, SolicitudCard } from './Organisms';
 
 export const SolicitudesTable: React.FC = () => {
   const {
@@ -142,49 +55,33 @@ export const SolicitudesTable: React.FC = () => {
             Filtros y Búsqueda
           </Text>
           
-          {/* Barra de búsqueda */}
-          <View className="relative mb-4">
-            <TextInput
-              className="bg-gray-50 border border-gray-200 rounded-lg px-10 py-3 text-gray-800"
-              placeholder="Buscar por nombre o email..."
-              value={filters.search}
-              onChangeText={(text) => updateFilters({ search: text })}
-            />
-            <FontAwesome 
-              name="search" 
-              size={16} 
-              color="#6b7280" 
-              style={{ position: 'absolute', left: 12, top: 12 }}
-            />
-          </View>
-
-          {/* Filtros por estado */}
-          <View className="flex-row flex-wrap gap-2">
-            <Pressable 
-              className="bg-yellow-100 px-3 py-1 rounded-full"
-              onPress={() => updateFilters({ estado: 'pendiente' })}
-            >
-              <Text className="text-yellow-800 text-sm font-medium">Solo Pendientes</Text>
-            </Pressable>
-            <Pressable 
-              className="bg-blue-100 px-3 py-1 rounded-full"
-              onPress={() => updateFilters({ estado: 'en_revision' })}
-            >
-              <Text className="text-blue-800 text-sm font-medium">En Revisión</Text>
-            </Pressable>
-            <Pressable 
-              className="bg-green-100 px-3 py-1 rounded-full"
-              onPress={() => updateFilters({ estado: 'aprobada' })}
-            >
-              <Text className="text-green-800 text-sm font-medium">Aprobadas</Text>
-            </Pressable>
-            <Pressable 
-              className="bg-gray-100 px-3 py-1 rounded-full"
-              onPress={resetFilters}
-            >
-              <Text className="text-gray-800 text-sm font-medium">Limpiar Filtros</Text>
-            </Pressable>
-          </View>
+          <FilterPanel
+            searchPlaceholder="Buscar por nombre o email..."
+            searchValue={filters.search}
+            onSearchChange={(text) => updateFilters({ search: text })}
+            filters={[
+              {
+                label: 'Solo Pendientes',
+                value: 'pendiente',
+                active: filters.estado === 'pendiente',
+                onPress: () => updateFilters({ estado: 'pendiente' }),
+              },
+              {
+                label: 'En Revisión',
+                value: 'en_revision',
+                active: filters.estado === 'en_revision',
+                onPress: () => updateFilters({ estado: 'en_revision' }),
+              },
+              {
+                label: 'Aprobadas',
+                value: 'aprobada',
+                active: filters.estado === 'aprobada',
+                onPress: () => updateFilters({ estado: 'aprobada' }),
+              },
+            ]}
+            onClearFilters={resetFilters}
+            showClearButton={filters.estado !== '' || filters.search !== ''}
+          />
         </View>
 
         {/* Lista de solicitudes */}
@@ -228,46 +125,12 @@ export const SolicitudesTable: React.FC = () => {
               </View>
             ) : (
               filteredSolicitudes.map((solicitud) => (
-              <Pressable
-                key={solicitud.id}
-                className="border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50"
-                onPress={() => handleOpenDetail(solicitud)}
-              >
-                <View className="flex-row justify-between items-start mb-3">
-                  <View className="flex-1 mr-4">
-                    <Text className="text-lg font-semibold text-gray-800 mb-1">
-                      {solicitud.user_name}
-                    </Text>
-                    <Text className="text-gray-600 text-sm mb-2">
-                      {solicitud.user_email}
-                    </Text>
-                    <View className="flex-row items-center mb-2">
-                      <FontAwesome name="calendar" size={12} color="#6b7280" />
-                      <Text className="text-gray-500 text-sm ml-1">
-                        Solicitado: {formatFecha(solicitud.fecha_solicitud)}
-                      </Text>
-                    </View>
-                  </View>
-                  <EstadoBadge estado={solicitud.estado} />
-                </View>
-
-                <DocumentosList documentos={solicitud.documentos} />
-
-                <View className="mt-3 pt-3 border-t border-gray-200">
-                  <Text className="text-sm text-gray-600">
-                    <Text className="font-medium">Propiedades a publicar:</Text> {solicitud.informacion_adicional.propiedades_a_publicar}
-                  </Text>
-                  <Text className="text-sm text-gray-600 mt-1">
-                    <Text className="font-medium">Experiencia previa:</Text> {solicitud.informacion_adicional.experiencia_previa ? 'Sí' : 'No'}
-                  </Text>
-                </View>
-
-                <View className="flex-row justify-end mt-3">
-                  <Pressable className="bg-blue-100 px-3 py-1 rounded">
-                    <Text className="text-blue-800 text-sm font-medium">Ver Detalles</Text>
-                  </Pressable>
-                </View>
-              </Pressable>
+                <SolicitudCard
+                  key={solicitud.id}
+                  solicitud={solicitud}
+                  onView={handleOpenDetail}
+                  formatFecha={formatFecha}
+                />
               ))
             )}
 
@@ -313,7 +176,7 @@ export const SolicitudesTable: React.FC = () => {
                       {selectedSolicitud.user_email}
                     </Text>
 
-                    <EstadoBadge estado={selectedSolicitud.estado} />
+                    <StatusBadge status={selectedSolicitud.estado} variant="solicitud" />
 
                     <View className="mt-4">
                       <Text className="font-medium text-gray-800 mb-2">Motivo de la solicitud:</Text>
@@ -331,7 +194,14 @@ export const SolicitudesTable: React.FC = () => {
                       </View>
                     )}
 
-                    <DocumentosList documentos={selectedSolicitud.documentos} />
+                    <DocumentList 
+                      documentos={selectedSolicitud.documentos.map(doc => ({
+                        id: doc.id,
+                        tipo: doc.tipo,
+                        verificado: doc.verificado,
+                      }))}
+                      title="Documentos"
+                    />
 
                     {selectedSolicitud.comentarios_admin && (
                       <View className="mt-4 p-3 bg-gray-50 rounded-lg">
