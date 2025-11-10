@@ -5,6 +5,7 @@ import { useForm, UseFormReturn } from "react-hook-form";
 import { useAuth } from "../../../../contexts/AuthContext";
 import { beAnOwner, getCurrentUserProfile, updateCurrentUserProfile } from "../../../../libs/userServices/api-service";
 import { EditUserProfileDTO, editUserProfileSchema } from "../../../../schemes/EditUserProfileSchema";
+import { hapticFeedback } from "../../../../utils/haptics";
 
 interface UseEditUserProfileReturn {
   // React Hook Form
@@ -147,6 +148,7 @@ export const useEditUserProfile = (): UseEditUserProfileReturn => {
       if (result && typeof result === "object") {
         if (result.user && result.user.id) {
           console.log("✅ Perfil actualizado exitosamente");
+          hapticFeedback.success();
           setSubmitSuccess("Perfil actualizado exitosamente");
 
           // Actualizar los datos del usuario en el contexto
@@ -172,6 +174,7 @@ export const useEditUserProfile = (): UseEditUserProfileReturn => {
           setValue("password", "");
         } else if (result.message) {
           console.log("❌ Error del servidor:", result.message);
+          hapticFeedback.error();
 
           // Verificar si es un error de autenticación
           if (
@@ -188,14 +191,17 @@ export const useEditUserProfile = (): UseEditUserProfileReturn => {
           setSubmitError(result.message);
         } else {
           console.log("❌ Respuesta inesperada del servidor");
+          hapticFeedback.error();
           setSubmitError("Respuesta inesperada del servidor");
         }
       } else {
         console.log("❌ Respuesta inválida del servidor");
+        hapticFeedback.error();
         setSubmitError("Respuesta inválida del servidor");
       }
     } catch (error) {
       console.error("💥 Error inesperado en actualización:", error);
+      hapticFeedback.error();
       setSubmitError("Error inesperado. Intenta de nuevo.");
     }
   };
@@ -226,6 +232,7 @@ export const useEditUserProfile = (): UseEditUserProfileReturn => {
 
       if (result.success) {
         console.log("✅ Usuario convertido a propietario exitosamente");
+        hapticFeedback.success();
         setSubmitSuccess(result.message || "Ahora eres un propietario");
 
         // Si la respuesta incluye un nuevo token y datos de usuario, actualizarlos
@@ -254,10 +261,12 @@ export const useEditUserProfile = (): UseEditUserProfileReturn => {
         }, 1500);
       } else {
         console.log("❌ Error al convertir usuario:", result.message);
+        hapticFeedback.error();
         setSubmitError(result.message || "Error al convertir a propietario");
       }
     } catch (error) {
       console.error("💥 Error en handleBecomeOwner:", error);
+      hapticFeedback.error();
       setSubmitError("Error inesperado. Intenta de nuevo.");
     } finally {
       setBecomeOwnerLoading(false);
@@ -268,6 +277,7 @@ export const useEditUserProfile = (): UseEditUserProfileReturn => {
    * Alterna la visibilidad de la contraseña
    */
   const togglePasswordVisibility = () => {
+    hapticFeedback.selection();
     setShowPassword((prev) => !prev);
   };
 

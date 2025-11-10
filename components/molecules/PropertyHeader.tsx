@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Pressable, Text } from 'react-native';
+import { hapticFeedback } from '../../utils/haptics';
 
 // Iconos simulados con emojis
 const ArrowLeftIcon = () => <Text>←</Text>;
@@ -16,18 +17,28 @@ export default function PropertyHeader({
   onToggleFavorite,
   isFavorite
 }: PropertyHeaderProps) {
+  const handleGoBack = () => {
+    hapticFeedback.buttonPressLight();
+    onGoBack();
+  };
+
+  const handleToggleFavorite = () => {
+    hapticFeedback.selection();
+    onToggleFavorite();
+  };
+
   return (
     <View className="absolute top-12 left-0 right-0 z-10 flex-row items-center justify-between px-6 py-4">
       <Pressable
         className="bg-white/80 backdrop-blur-sm rounded-full p-3"
-        onPress={onGoBack}
+        onPress={handleGoBack}
       >
         <ArrowLeftIcon />
       </Pressable>
       <View className="flex-row gap-2">
         <Pressable 
           className="bg-white/80 backdrop-blur-sm rounded-full p-3"
-          onPress={onToggleFavorite}
+          onPress={handleToggleFavorite}
         >
           <HeartIcon filled={isFavorite} />
         </Pressable>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getOwnerStats } from "../../../libs/owner/api-service";
 import { OwnerDashboard } from "../../../interfaces/OwnerDashboardInterface";
+import { hapticFeedback } from "../../../utils/haptics";
 
 interface UseOwnerDashboardReturn {
   // Estado de datos
@@ -72,15 +73,18 @@ export const useOwnerDashboard = (): UseOwnerDashboardReturn => {
       const response = await getOwnerStats();
 
       if (response.success) {
+        hapticFeedback.success();
         setStatsData(response);
         console.log("✅ Estadísticas cargadas exitosamente:", response.data);
       } else {
+        hapticFeedback.error();
         setError(response.message);
         console.error("❌ Error al cargar estadísticas:", response.message);
       }
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Error desconocido";
+      hapticFeedback.error();
       setError(errorMessage);
       console.error("💥 Error crítico:", errorMessage);
     } finally {
@@ -93,6 +97,7 @@ export const useOwnerDashboard = (): UseOwnerDashboardReturn => {
    * Alias de loadOwnerStats para mayor claridad semántica
    */
   const refreshStats = async () => {
+    hapticFeedback.refresh();
     await loadOwnerStats();
   };
 

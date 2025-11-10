@@ -6,6 +6,7 @@ import { RecentApplications } from "./dashboard/recent-applications";
 import { RevenueChart } from "./dashboard/revenue-chart";
 import { StatsGrid } from "./dashboard/stats-grid";
 import { useOwnerDashboard } from './hooks';
+import { hapticFeedback } from '../../utils/haptics';
 
 export default function Dashboard() {
   // === HOOK DE DASHBOARD DEL PROPIETARIO ===
@@ -44,7 +45,10 @@ export default function Dashboard() {
         </Text>
         <Text 
           className="text-blue-600 text-center underline"
-          onPress={loadOwnerStats}
+          onPress={() => {
+            hapticFeedback.buttonPress();
+            loadOwnerStats();
+          }}
         >
           Reintentar
         </Text>

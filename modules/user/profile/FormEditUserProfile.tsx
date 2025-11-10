@@ -10,6 +10,7 @@ import PasswordInput from "../../../components/molecules/PasswordInput";
 import ModernButton from "../../../components/atoms/ModernButton";
 import ConfirmModal from "../../../components/atoms/ConfirmModal";
 import { useEditUserProfile } from "../hooks";
+import { hapticFeedback } from "../../../utils/haptics";
 
 export default function FormEditUserProfile() {
   const router = useRouter();
@@ -118,6 +119,7 @@ export default function FormEditUserProfile() {
             left: 16,
           }}
           onPress={() => {
+            hapticFeedback.buttonPressLight();
             if (router.canGoBack()) {
               router.back();
             } else {

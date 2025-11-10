@@ -3,6 +3,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Tabs } from 'expo-router';
 import { AuthGuard } from '../../middleware/AuthGuard';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { hapticFeedback } from '../../utils/haptics';
 
 export default function UserTabsLayout() {
   const insets = useSafeAreaInsets();
@@ -27,6 +28,12 @@ export default function UserTabsLayout() {
               tabBarLabelStyle: {
                 fontSize: 12,
                 fontWeight: "500",
+              },
+            }}
+            screenListeners={{
+              tabPress: () => {
+                // Feedback háptico al cambiar de tab
+                hapticFeedback.tabChange();
               },
             }}
           >

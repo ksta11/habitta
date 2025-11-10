@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { hapticFeedback } from '../../../utils/haptics';
 
 const FAVORITES_STORAGE_KEY = '@habitta_favorites';
 
@@ -81,6 +82,9 @@ export const useFavorites = () => {
    * Alterna el estado de favorito de una propiedad
    */
   const toggleFavorite = async (propertyId: string) => {
+    // Feedback háptico al toggle de favorito
+    hapticFeedback.selection();
+    
     if (isFavorite(propertyId)) {
       await removeFromFavorites(propertyId);
     } else {
