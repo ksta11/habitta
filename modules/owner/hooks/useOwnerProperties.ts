@@ -1,12 +1,12 @@
-import { useState, useEffect, useCallback } from "react";
-import { Alert } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import { Alert } from "react-native";
 import { Property } from "../../../interfaces/property/PropertyInterface";
-import {
-  getOwnerProperties,
-  deleteProperty,
-} from "../../../libs/owner/property/api-service";
 import { getOwnerStatus } from "../../../libs/owner/api-service";
+import {
+  deleteProperty,
+  getOwnerProperties,
+} from "../../../libs/owner/property/api-service";
 
 interface FormattedPropertyData {
   price: string;
@@ -32,10 +32,10 @@ interface UseOwnerPropertiesReturn {
   loadProperties: () => Promise<void>;
   handleRefresh: () => Promise<void>;
   handleDeleteProperty: (propertyId: string, propertyTitle: string) => Promise<void>;
-  showDeleteConfirmation: (propertyId: string, propertyTitle: string) => void;
+  showDeleteConfirmation: (propertyId: string, propertyTitle: string, publicationStatus?: string) => void;
   handleCreatePropertyPress: () => Promise<void>;
   formatPropertyData: (property: Property) => FormattedPropertyData;
-  handleEditProperty: (propertyId: string, propertyTitle: string) => void;
+  handleEditProperty: (propertyId: string, propertyTitle: string, publicationStatus?: string) => void;
   handleViewProperty: (propertyId: string, propertyTitle: string) => void;
 }
 
@@ -129,7 +129,7 @@ export const useOwnerProperties = (): UseOwnerPropertiesReturn => {
    */
   const handleDeleteProperty = async (
     propertyId: string,
-    propertyTitle: string
+    propertyTitle: string,
   ) => {
     try {
       console.log("🗑️ Iniciando eliminación de propiedad:", propertyId);
@@ -166,8 +166,17 @@ export const useOwnerProperties = (): UseOwnerPropertiesReturn => {
    */
   const showDeleteConfirmation = (
     propertyId: string,
-    propertyTitle: string
+    propertyTitle: string,
+    publicationStatus?: string
   ) => {
+    if (publicationStatus === 'rented') {
+      Alert.alert(
+        "Propiedad rentada",
+        "No se puede eliminar una propiedad que está actualmente rentada.",
+        [{ text: "Entendido" }]
+      );
+      return;
+    }
     Alert.alert(
       "Confirmar eliminación",
       `¿Estás seguro de que quieres eliminar la propiedad "${propertyTitle}"?\n\nEsta acción no se puede deshacer.`,
@@ -246,8 +255,18 @@ export const useOwnerProperties = (): UseOwnerPropertiesReturn => {
 
   /**
    * Navega a la pantalla de edición de propiedad
+   * Verifica si la propiedad está rentada antes de permitir la edición
    */
-  const handleEditProperty = (propertyId: string, propertyTitle: string) => {
+  const handleEditProperty = (propertyId: string, propertyTitle: string, publicationStatus?: string) => {
+    if (publicationStatus === 'rented') {
+      Alert.alert(
+        "Propiedad rentada",
+        "No se puede editar una propiedad que está actualmente rentada.",
+        [{ text: "Entendido" }]
+      );
+      return;
+    }
+    
     console.log(`Editando propiedad ${propertyId}:`, propertyTitle);
     router.push(`./edit/${propertyId}`);
   };

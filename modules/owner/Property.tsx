@@ -77,7 +77,7 @@ export default function PropertyScreen() {
                   <View className="flex-1 mr-2">
                     <ButtonAtom
                       title="Editar"
-                      onPress={() => handleEditProperty(item.id, item.title)}
+                      onPress={() => handleEditProperty(item.id, item.title, item.publication_status)}
                       variant="habitta-secondary"
                       size="medium"
                       icon="create-outline"
@@ -89,7 +89,7 @@ export default function PropertyScreen() {
                   <View className="flex-1">
                     <ButtonAtom
                       title="Eliminar"
-                      onPress={() => showDeleteConfirmation(item.id, item.title)}
+                      onPress={() => showDeleteConfirmation(item.id, item.title, item.publication_status)}
                       variant="danger"
                       size="medium"
                       icon="trash-outline"
