@@ -1,20 +1,10 @@
 import React from 'react';
-import { View, Text } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
-
-// Tipos para las estadísticas
-interface StatCard {
-  title: string;
-  value: string | number;
-  icon: string;
-  color: string;
-  bgColor?: string;
-  subtitle?: string;
-}
+import { type StatCardType } from './Atoms';
+import { StatsGrid } from './Molecules';
 
 interface AdminStatsGridProps {
   variant?: 'home' | 'users' | 'full' | 'custom';
-  customStats?: StatCard[];
+  customStats?: StatCardType[];
 }
 
 // Mock data - en una app real esto vendría de tu API
@@ -33,7 +23,7 @@ const mockStats = {
 
 export const AdminStatsGrid: React.FC<AdminStatsGridProps> = ({ variant = 'full', customStats }) => {
   
-  const getStatsForVariant = (variant: string): StatCard[] => {
+  const getStatsForVariant = (variant: string): StatCardType[] => {
     if (variant === 'custom' && customStats) {
       return customStats;
     }
@@ -180,40 +170,5 @@ export const AdminStatsGrid: React.FC<AdminStatsGridProps> = ({ variant = 'full'
 
   const stats = getStatsForVariant(variant);
 
-  const renderStatCard = (stat: StatCard, index: number) => {
-    // Generar bgColor automáticamente si no se proporciona
-    const bgColor = stat.bgColor || `${stat.color}20`; // Agregar transparencia al color
-    
-    return (
-      <View key={index} className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 w-[48%] mb-3">
-        <View className="flex-row items-center justify-between">
-          <View className="flex-1">
-            <Text className="text-gray-600 text-sm font-medium mb-1">{stat.title}</Text>
-            <Text className="text-2xl font-bold text-gray-800 mb-1">{stat.value}</Text>
-            {stat.subtitle && (
-              <Text className="text-xs text-gray-500">{stat.subtitle}</Text>
-            )}
-          </View>
-          <View 
-            className="p-3 rounded-full ml-3"
-            style={{ backgroundColor: bgColor }}
-          >
-            <FontAwesome 
-              name={stat.icon as any} 
-              size={20} 
-              color={stat.color} 
-            />
-          </View>
-        </View>
-      </View>
-    );
-  };
-
-  return (
-    <View className="mb-6">
-      <View className="flex-row flex-wrap justify-between">
-        {stats.map((stat, index) => renderStatCard(stat, index))}
-      </View>
-    </View>
-  );
+  return <StatsGrid stats={stats} />;
 };
