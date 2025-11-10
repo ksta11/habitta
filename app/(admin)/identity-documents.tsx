@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { PendingIdentityDocumentsComponent } from '../../components/admin';
+import { PendingIdentityDocumentsComponent } from '../../modules/admin';
 
 export default function IdentityDocumentsScreen() {
   return (

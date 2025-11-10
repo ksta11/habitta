@@ -1,7 +1,8 @@
-import React from 'react';
-import { View, Text, ScrollView, Dimensions } from 'react-native';
-import { LineChart, BarChart, PieChart } from 'react-native-gifted-charts';
 import { FontAwesome } from '@expo/vector-icons';
+import React from 'react';
+import { Dimensions, ScrollView, Text, View } from 'react-native';
+import { BarChart, LineChart, PieChart } from 'react-native-gifted-charts';
+import { ChartContainer } from './Molecules';
 
 const { width } = Dimensions.get('window');
 const chartWidth = width - 40; // Padding de 20 a cada lado
@@ -61,18 +62,6 @@ interface PropTechChartsProps {
 }
 
 export const PropTechCharts: React.FC<PropTechChartsProps> = ({ variant = 'dashboard' }) => {
-  
-  const ChartContainer: React.FC<{ title: string; subtitle?: string; children: React.ReactNode }> = 
-    ({ title, subtitle, children }) => (
-    <View className="bg-white rounded-lg p-4 mb-6 shadow-sm border border-gray-200">
-      <View className="mb-4">
-        <Text className="text-lg font-semibold text-gray-800 mb-1">{title}</Text>
-        {subtitle && <Text className="text-sm text-gray-600">{subtitle}</Text>}
-      </View>
-      {children}
-    </View>
-  );
-
   return (
     <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
       <View className="p-4">
@@ -87,8 +76,8 @@ export const PropTechCharts: React.FC<PropTechChartsProps> = ({ variant = 'dashb
         </View>
 
         {/* Gráfico 1: Tasa de Ocupación */}
-        <ChartContainer 
-          title="Tasa de Ocupación" 
+        <ChartContainer
+          title="Tasa de Ocupación"
           subtitle="Porcentaje de propiedades ocupadas por mes"
         >
           <View className="items-center">
