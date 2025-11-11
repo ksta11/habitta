@@ -1,53 +1,27 @@
 import { Stack } from 'expo-router';
+import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function AuthLayout() {
+  const insets = useSafeAreaInsets();
+  
   return (
-    <Stack 
-      screenOptions={{ 
-        headerShown: true,
-        headerTransparent: true, // Hace el header transparente
-        headerTitle: '', // Sin título
-      }}
-    >
-      <Stack.Screen 
-        name="login" 
-        options={{
-          title: '', // Sin título para que no se vea texto
-          headerStyle: {
-            backgroundColor: '#7C3AED',
-          },
-          headerTintColor: '#FFFFFF',
-          headerShadowVisible: false,
-          headerTransparent: false, // Asegurar que no sea transparente para el color
-          headerBackVisible: false, // Ocultar el botón de back nativo
-        }}
-      />
-      <Stack.Screen 
-        name="register" 
-        options={{
-          title: '', // Sin título para que no se vea texto
-          headerStyle: {
-            backgroundColor: '#7C3AED',
-          },
-          headerTintColor: '#FFFFFF',
-          headerShadowVisible: false,
-          headerTransparent: false, // Asegurar que no sea transparente para el color
-          headerBackVisible: false, // Ocultar el botón de back nativo
-        }}
-      />
-      <Stack.Screen 
-        name="verify" 
-        options={{
-          title: '', // Sin título para que no se vea texto
-          headerStyle: {
-            backgroundColor: '#7C3AED',
-          },
-          headerTintColor: '#FFFFFF',
-          headerShadowVisible: false,
-          headerTransparent: false, // Asegurar que no sea transparente para el color
-          headerBackVisible: false, // Ocultar el botón de back nativo
-        }}
-      />
-    </Stack>
+    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+      <View style={{ flex: 1, paddingTop: insets.top, backgroundColor: '#7C3AED' }}>
+        <Stack 
+          screenOptions={{ 
+            headerShown: false,
+            contentStyle: { 
+              backgroundColor: 'white',
+              paddingBottom: insets.bottom
+            }
+          }}
+        >
+          <Stack.Screen name="login" />
+          <Stack.Screen name="register" />
+          <Stack.Screen name="verify" />
+        </Stack>
+      </View>
+    </View>
   );
 }
