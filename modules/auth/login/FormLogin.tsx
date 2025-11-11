@@ -83,29 +83,6 @@ export default function FormLogin() {
           }}
         />
 
-        {/* Back button */}
-        <Pressable
-          className="absolute w-10 h-10 rounded-full items-center justify-center"
-          style={({ pressed }) => [
-            {
-              backgroundColor: pressed 
-                ? "rgba(255, 255, 255, 0.3)" 
-                : "rgba(255, 255, 255, 0.2)",
-              top: Platform.OS === "ios" ? insets.top + 20 : 20,
-              left: 16,
-            }
-          ]}
-          onPress={() => {
-            if (router.canGoBack()) {
-              router.back();
-            } else {
-              router.replace("/auth/login");
-            }
-          }}
-        >
-          <Ionicons name="chevron-back" size={20} color="white" />
-        </Pressable>
-
         {/* Header text */}
         <View className="absolute left-6 right-6" style={{ bottom: 24 }}>
           <Text className="text-white text-xl font-bold mb-1 leading-tight">
