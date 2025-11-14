@@ -1,9 +1,10 @@
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import React from "react";
 import { FlatList, RefreshControl, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Label from "../../../components/atoms/Label";
 import PropertyCard from "../../../components/molecules/PropertyCard";
+import { useAuth } from "../../../contexts/AuthContext";
 import { PropertySearchFilters } from "../../../libs/user/property-search-service";
 import { PropertyFilters as IPropertyFilters,useFavorites,useProperties,usePropertyFilters,usePropertyNavigation,useReviewNavigation,} from "../hooks";
 import CategorySelector from "../Molecules/CategorySelector";
@@ -25,6 +26,12 @@ const categories = [
 
 export const UserHome = () => {
   console.log('🏠 [UserHome] Iniciando renderizado del componente UserHome');
+
+  // Router para navegación
+  const router = useRouter();
+
+  // Contexto de autenticación
+  const { user, logout } = useAuth();
 
   // Obtener safe area insets manualmente
   const insets = useSafeAreaInsets();
@@ -122,7 +129,25 @@ export const UserHome = () => {
   return (
     <View className="flex-1 bg-white">
       <View style={{ paddingTop: insets.top }}>
-        <HomeHeader onNavigateToReviews={navigateToReviewList} />
+        <HomeHeader 
+          onNavigateToReviews={navigateToReviewList}
+          userName={user?.name || user?.email || "Usuario"}
+          userEmail={user?.email}
+          userPhoto={undefined} // El tipo User no tiene photoUrl aún
+          onNavigateToProfile={() => {
+            hapticFeedback.buttonPressLight();
+            router.push("/(user)/profile");
+          }}
+          onNavigateToSettings={() => {
+            hapticFeedback.buttonPressLight();
+            router.push("/(user)/settings");
+          }}
+          onLogout={async () => {
+            hapticFeedback.buttonPress();
+            await logout();
+            router.replace("/auth/login");
+          }}
+        />
       </View>
 
       {/* Búsqueda y Filtros */}

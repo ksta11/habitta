@@ -133,17 +133,6 @@ export const hapticFeedback = {
   cancel: () => triggerImpact('light'),
 };
 
-/**
- * Hook personalizado para usar haptics en componentes
- * Ejemplo de uso:
- * 
- * const haptics = useHaptics();
- * 
- * <Button onPress={() => {
- *   haptics.buttonPress();
- *   // tu lógica aquí
- * }} />
- */
 export const useHaptics = () => {
   return hapticFeedback;
 };
