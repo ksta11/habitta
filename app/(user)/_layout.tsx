@@ -51,11 +51,8 @@ export default function UserTabsLayout() {
         {/* Tab Perfil */}
         <Tabs.Screen
           name="profile"
-          options={{
-            title: "Perfil",
-            tabBarIcon: ({ color, size }) => (
-              <FontAwesome name="user" size={size} color={color} />
-            ),
+         options={{
+            href: null, 
           }}
         />
 
@@ -69,15 +66,24 @@ export default function UserTabsLayout() {
             ),
           }}
         />
+
+         {/* Tab arrendamientos */}
+        <Tabs.Screen
+          name="(leases)"
+          options={{
+            title: 'leases',
+            tabBarIcon: ({ color, size }) => (
+              <FontAwesome name="envelope" size={size} color={color} />
+            ),
+          }}
+        />
+        
         
         {/* Tab Configuración */}
         <Tabs.Screen
           name="settings"
           options={{
-            title: "Settings",
-            tabBarIcon: ({ color, size }) => (
-              <FontAwesome name="cog" size={size} color={color} />
-            ),
+            href: null, 
           }}
         />
 
