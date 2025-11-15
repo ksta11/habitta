@@ -1,9 +1,10 @@
-import React from 'react';
-import { View, Text, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../components/atoms/Card';
 import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { Pressable, Text, View } from 'react-native';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/atoms/Card';
 import { hapticFeedback } from '../../../utils/haptics';
+import { pressedPrimaryButton, pressedSecondaryButton, standarDeepVioletButton, standarLavenderButton, standarPrimaryButton } from '../../../utils/TokensDesing';
 
 const actions = [
   {
@@ -11,32 +12,38 @@ const actions = [
     description: "Agregar nueva propiedad",
     icon: "add" as const,
     link: "/(owner)/(properties)/create/Form",
-    color: "bg-violet", // violet principal
+    token: standarPrimaryButton,
+    pressedToken: pressedPrimaryButton,
   },
   {
     title: "Ver Reviews",
     description: "Gestionar reseñas",
     icon: "chatbubbles" as const,
     link: "/(owner)/(review)",
-    color: "bg-violet", // violet para mantener consistencia
+    token: standarPrimaryButton,
+    pressedToken: pressedPrimaryButton,
   },
   {
     title: "Ver Estadísticas",
     description: "Reportes completos",
     icon: "bar-chart" as const,
     link: "/(owner)/home",
-    color: "bg-lavender-indigo", // lavender-indigo
+    token: standarLavenderButton,
+    pressedToken: pressedSecondaryButton,
   },
   {
     title: "Ajustar Plan",
     description: "Cambiar suscripción",
     icon: "settings" as const,
     link: "/(owner)/home",
-    color: "bg-deep-violet", // deep-violet
+    token: standarDeepVioletButton,
+    pressedToken: pressedPrimaryButton,
   },
 ];
 
 export function QuickActions() {
+  const [pressedIndex, setPressedIndex] = useState<number | null>(null);
+
   return (
     <Card className="border-0 shadow-sm">
       <CardHeader className="pb-4">
@@ -46,7 +53,9 @@ export function QuickActions() {
         {actions.map((action, index) => (
           <Pressable 
             key={index} 
-            className={`w-full justify-start h-auto p-4 mb-1 ${action.color} rounded-xl border-0`}
+            className={`w-full justify-start h-auto p-4 mb-1 rounded-xl ${pressedIndex === index ? action.pressedToken : action.token}`}
+            onPressIn={() => setPressedIndex(index)}
+            onPressOut={() => setPressedIndex(null)}
             onPress={() => {
               hapticFeedback.buttonPress();
               console.log('🚀 [QuickActions] Navegando a:', action.link);
