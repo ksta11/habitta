@@ -21,6 +21,10 @@ export { usePropertyNavigation } from './usePropertyNavigation';
 export { useEditUserProfile } from '../profile/hooks/useEditUserProfile';
 export { useProfile } from '../profile/hooks/useProfile';
 
+// Hooks de Leases
+export { useActiveLease } from './useActiveLease';
+export { useMaintenanceRequests } from './useMaintenanceRequests';
+
 // Agregar aquí nuevos hooks cuando se creen:
 // export { useApplications } from './useApplications';
 // export { useUserSettings } from './useUserSettings';
