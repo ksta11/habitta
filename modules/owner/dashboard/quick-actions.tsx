@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/atoms/Card';
 import { hapticFeedback } from '../../../utils/haptics';
-import { pressedDeepVioletButton, pressedPrimaryButton, pressedSecondaryButton, standarDeepVioletButton, standarLavenderButton, standarPrimaryButton } from '../../../utils/TokensDesing';
+import { pressedPrimaryButton, pressedSecondaryButton, standarLavenderButton, standarPrimaryButton } from '../../../utils/TokensDesing';
 
 const actions = [
   {
@@ -24,20 +24,12 @@ const actions = [
     pressedToken: pressedPrimaryButton,
   },
   {
-    title: "Ver Estadísticas",
-    description: "Reportes completos",
-    icon: "bar-chart" as const,
-    link: "/(owner)/home",
+    title: "Ver Solicitudes",
+    description: "Miras las solicitudes de tus propiedades",
+    icon: "mail" as const,
+    link: "/(owner)/(applications)",
     token: standarLavenderButton,
     pressedToken: pressedSecondaryButton,
-  },
-  {
-    title: "Ajustar Plan",
-    description: "Cambiar suscripción",
-    icon: "settings" as const,
-    link: "/(owner)/home",
-    token: standarDeepVioletButton,
-    pressedToken: pressedDeepVioletButton,
   },
 ];
 
