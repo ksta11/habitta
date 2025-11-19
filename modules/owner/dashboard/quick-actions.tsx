@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/atoms/Card';
 import { hapticFeedback } from '../../../utils/haptics';
-import { pressedPrimaryButton, pressedSecondaryButton, standarDeepVioletButton, standarLavenderButton, standarPrimaryButton } from '../../../utils/TokensDesing';
+import { pressedDeepVioletButton, pressedPrimaryButton, pressedSecondaryButton, standarDeepVioletButton, standarLavenderButton, standarPrimaryButton } from '../../../utils/TokensDesing';
 
 const actions = [
   {
@@ -37,7 +37,7 @@ const actions = [
     icon: "settings" as const,
     link: "/(owner)/home",
     token: standarDeepVioletButton,
-    pressedToken: pressedPrimaryButton,
+    pressedToken: pressedDeepVioletButton,
   },
 ];
 

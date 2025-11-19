@@ -24,6 +24,7 @@ export const standarDangerOutlineButton = 'bg-transparent border-red-500 border-
 // Estados pressed (para usar con onPressIn/onPressOut en Pressable)
 export const pressedPrimaryButton = 'bg-transparent border-violet border-2 text-violet opacity-80'
 export const pressedSecondaryButton = 'bg-transparent border-lavender-indigo border-2 text-lavender-indigo opacity-80'
+export const pressedDeepVioletButton = 'bg-deep-violet/80 border-deep-violet border-2 text-white'
 export const pressedDangerButton = 'bg-transparent border-red-500 border-2 text-red-500 opacity-80'
 export const pressedGhostButton = 'bg-white/10 border-white border-2 text-white'
 
