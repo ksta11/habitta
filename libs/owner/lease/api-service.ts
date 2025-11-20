@@ -19,7 +19,7 @@ const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
  */
 export const getOwnerLeases = async (): Promise<GetOwnerLeasesResponse> => {
   try {
-    console.log('🏠 Obteniendo arrendamientos del owner...');
+    console.log('🏠 Obteniendo arrendamientos del owner...'); 
     
     // Obtener datos del usuario desde AsyncStorage
     const userDataString = await AsyncStorage.getItem(USER_KEY);

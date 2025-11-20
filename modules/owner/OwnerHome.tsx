@@ -1,3 +1,4 @@
+import { useFocusEffect, useRouter } from "expo-router";
 import React from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { DashboardHeader } from "./dashboard/dashboard-header";
@@ -7,6 +8,8 @@ import { RevenueChart } from "./dashboard/revenue-chart";
 import { StatsGrid } from "./dashboard/stats-grid";
 import { useOwnerDashboard } from './hooks';
 import { hapticFeedback } from '../../utils/haptics';
+import { useAuth } from "../../contexts/AuthContext";
+import { useReviewNavigation } from "../user/hooks";
 
 export default function Dashboard() {
   // === HOOK DE DASHBOARD DEL PROPIETARIO ===
@@ -22,6 +25,15 @@ export default function Dashboard() {
     occupiedVsTotal,
     loadOwnerStats,
   } = useOwnerDashboard();
+
+
+    // Router para navegación
+    const router = useRouter();
+  
+    // Contexto de autenticación
+    const { user, logout } = useAuth();
+    const { navigateToReviewList } = useReviewNavigation();
+    
 
   // Mostrar loading
   if (loading) {
@@ -60,7 +72,25 @@ export default function Dashboard() {
     <View className="flex-1 bg-gray-50">
         <ScrollView className="flex-1">
             <View className="px-4 py-6">
-                <DashboardHeader />
+                <DashboardHeader
+                        onNavigateToReviews={navigateToReviewList}
+                          userName={user?.name || user?.email || "Usuario"}
+                          userEmail={user?.email}
+                          userPhoto={undefined} // El tipo User no tiene photoUrl aún
+                          onNavigateToProfile={() => {
+                            hapticFeedback.buttonPressLight();
+                           //router.push("/(owner)/(settings)/editProfile");
+                          }}
+                          onNavigateToSettings={() => {
+                            hapticFeedback.buttonPressLight();
+                            router.push("/(owner)/(settings)");
+                          }}
+                          onLogout={async () => {
+                            hapticFeedback.buttonPress();
+                            await logout();
+                            router.replace("/auth/login");
+                          }}
+                        />
                 <View className="mt-6">
                     <StatsGrid 
                       totalProperties={totalProperties}
