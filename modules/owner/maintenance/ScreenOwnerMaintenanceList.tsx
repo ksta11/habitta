@@ -1,6 +1,8 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import AcceptMaintenanceModal from '../../../components/molecules/AcceptMaintenanceModal';
+import CompleteMaintenanceModal from '../../../components/molecules/CompleteMaintenanceModal';
 import OwnerMaintenanceRequestCard from '../../../components/molecules/OwnerMaintenanceRequestCard';
 import { OwnerMaintenanceFilter } from '../../../interfaces/owner/OwnerMaintenanceInterface';
 import { hapticFeedback } from '../../../utils/haptics';
@@ -17,11 +19,20 @@ export default function ScreenOwnerMaintenanceList() {
     inProgressCount,
     completedCount,
     refresh,
-    approveRequest,
+    acceptAndSchedule,
     rejectRequest,
+    completeWork,
   } = useOwnerMaintenanceRequests();
 
   const [activeFilter, setActiveFilter] = useState<OwnerMaintenanceFilter>('all');
+  const [acceptModalVisible, setAcceptModalVisible] = useState(false);
+  const [completeModalVisible, setCompleteModalVisible] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<{ 
+    id: string; 
+    title: string;
+    estimatedCost?: number;
+    scheduledDate?: string;
+  } | null>(null);
 
   // Filtrar solicitudes según el filtro activo
   const filteredRequests = requests.filter(request => {
@@ -47,8 +58,50 @@ export default function ScreenOwnerMaintenanceList() {
 
   const handleApprove = (requestId: string) => {
     hapticFeedback.buttonPress();
-    // TODO: Mostrar modal para agregar costo estimado y fecha programada
-    approveRequest(requestId);
+    const request = requests.find(r => r.id_maintenance === requestId);
+    if (request) {
+      setSelectedRequest({
+        id: request.id_maintenance,
+        title: request.title,
+        estimatedCost: request.cost_estimate ?? undefined,
+        scheduledDate: request.scheduled_date ?? undefined,
+      });
+      setAcceptModalVisible(true);
+    }
+  };
+
+  const handleAcceptMaintenance = async (scheduledDate: string, estimatedCost?: number) => {
+    if (!selectedRequest) return;
+    
+    const success = await acceptAndSchedule(selectedRequest.id, scheduledDate, estimatedCost);
+    if (success) {
+      setAcceptModalVisible(false);
+      setSelectedRequest(null);
+    }
+  };
+
+  const handleComplete = (requestId: string) => {
+    hapticFeedback.buttonPress();
+    const request = requests.find(r => r.id_maintenance === requestId);
+    if (request) {
+      setSelectedRequest({
+        id: request.id_maintenance,
+        title: request.title,
+        estimatedCost: request.cost_estimate ?? undefined,
+        scheduledDate: request.scheduled_date ?? undefined,
+      });
+      setCompleteModalVisible(true);
+    }
+  };
+
+  const handleCompleteWork = async (actualCost?: number) => {
+    if (!selectedRequest) return;
+    
+    const success = await completeWork(selectedRequest.id, actualCost);
+    if (success) {
+      setCompleteModalVisible(false);
+      setSelectedRequest(null);
+    }
   };
 
   const handleReject = (requestId: string) => {
@@ -167,16 +220,41 @@ export default function ScreenOwnerMaintenanceList() {
         ) : (
           filteredRequests.map((request) => (
             <OwnerMaintenanceRequestCard
-              key={request.id}
+              key={request.id_maintenance}
               request={request}
               onPress={handleRequestPress}
               onApprove={handleApprove}
               onReject={handleReject}
-              showActions={activeFilter === 'pending' || activeFilter === 'in_review' || activeFilter === 'all'}
+              onComplete={handleComplete}
+              showActions={true}
             />
           ))
         )}
       </ScrollView>
+
+      {/* Modal para aceptar y programar */}
+      <AcceptMaintenanceModal
+        visible={acceptModalVisible}
+        onClose={() => {
+          setAcceptModalVisible(false);
+          setSelectedRequest(null);
+        }}
+        onAccept={handleAcceptMaintenance}
+        maintenanceTitle={selectedRequest?.title || ''}
+      />
+
+      {/* Modal para completar trabajo */}
+      <CompleteMaintenanceModal
+        visible={completeModalVisible}
+        onClose={() => {
+          setCompleteModalVisible(false);
+          setSelectedRequest(null);
+        }}
+        onComplete={handleCompleteWork}
+        maintenanceTitle={selectedRequest?.title || ''}
+        estimatedCost={selectedRequest?.estimatedCost}
+        scheduledDate={selectedRequest?.scheduledDate}
+      />
     </View>
   );
 }

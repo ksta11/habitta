@@ -1,8 +1,9 @@
 import { FontAwesome } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator, Linking, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import Label from '../../../components/atoms/Label';
+import ConfirmMaintenanceModal from '../../../components/molecules/ConfirmMaintenanceModal';
 import LeaseCard from '../../../components/molecules/LeaseCard';
 import MaintenanceRequestCard from '../../../components/molecules/MaintenanceRequestCard';
 import { hapticFeedback } from '../../../utils/haptics';
@@ -10,6 +11,13 @@ import { useActiveLease, useMaintenanceRequests } from '../hooks';
 
 export default function ScreenLeases() {
   const router = useRouter();
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<{
+    id: string;
+    title: string;
+    scheduledDate: string;
+    estimatedCost?: number;
+  } | null>(null);
   
   // Hook del arrendamiento activo
   const {
@@ -28,7 +36,10 @@ export default function ScreenLeases() {
     requests: maintenanceRequests,
     loading: maintenanceLoading,
     pendingCount,
+    acceptedCount,
+    confirmedCount,
     inProgressCount,
+    confirmRequest,
     refresh: refreshMaintenance,
   } = useMaintenanceRequests(lease?.id);
 
@@ -65,6 +76,36 @@ export default function ScreenLeases() {
     hapticFeedback.buttonPressLight();
     // TODO: Implementar vista de detalles
     console.log('Ver detalles de solicitud:', requestId);
+  };
+
+  /**
+   * Confirmar fecha de mantenimiento
+   */
+  const handleConfirmMaintenance = (requestId: string) => {
+    hapticFeedback.buttonPress();
+    const request = maintenanceRequests.find(r => r.id_maintenance === requestId);
+    if (request && request.scheduled_date) {
+      setSelectedRequest({
+        id: request.id_maintenance,
+        title: request.title,
+        scheduledDate: request.scheduled_date,
+        estimatedCost: request.cost_estimate ?? undefined,
+      });
+      setConfirmModalVisible(true);
+    }
+  };
+
+  /**
+   * Ejecutar confirmación
+   */
+  const handleConfirmRequest = async () => {
+    if (!selectedRequest) return;
+    
+    const success = await confirmRequest(selectedRequest.id);
+    if (success) {
+      setConfirmModalVisible(false);
+      setSelectedRequest(null);
+    }
   };
 
   /**
@@ -165,15 +206,15 @@ export default function ScreenLeases() {
             <Text className="text-2xl font-bold text-erie-black mt-2">{pendingCount}</Text>
             <Text className="text-gray-600 text-sm">Pendientes</Text>
           </View>
+          <View className="flex-1 bg-purple-50 rounded-2xl p-4">
+            <FontAwesome name="calendar-check-o" size={24} color="#7c3aed" />
+            <Text className="text-2xl font-bold text-erie-black mt-2">{acceptedCount}</Text>
+            <Text className="text-gray-600 text-sm">Por Confirmar</Text>
+          </View>
           <View className="flex-1 bg-blue-50 rounded-2xl p-4">
             <FontAwesome name="wrench" size={24} color="#3b82f6" />
-            <Text className="text-2xl font-bold text-erie-black mt-2">{inProgressCount}</Text>
-            <Text className="text-gray-600 text-sm">En Progreso</Text>
-          </View>
-          <View className="flex-1 bg-green-50 rounded-2xl p-4">
-            <FontAwesome name="check-circle" size={24} color="#10b981" />
-            <Text className="text-2xl font-bold text-erie-black mt-2">{maintenanceRequests.filter(r => r.status === 'completed').length}</Text>
-            <Text className="text-gray-600 text-sm">Completadas</Text>
+            <Text className="text-2xl font-bold text-erie-black mt-2">{confirmedCount + inProgressCount}</Text>
+            <Text className="text-gray-600 text-sm">Activas</Text>
           </View>
         </View>
 
@@ -202,8 +243,9 @@ export default function ScreenLeases() {
 
             {recentRequests.map((request) => (
               <MaintenanceRequestCard
-                key={request.id}
+                key={request.id_maintenance}
                 request={request}
+                onConfirm={handleConfirmMaintenance}
                 onViewDetails={handleViewMaintenanceDetails}
               />
             ))}
@@ -243,6 +285,21 @@ export default function ScreenLeases() {
           </View>
         )}
       </View>
+
+      {/* Modal de Confirmación */}
+      {selectedRequest && (
+        <ConfirmMaintenanceModal
+          visible={confirmModalVisible}
+          onClose={() => {
+            setConfirmModalVisible(false);
+            setSelectedRequest(null);
+          }}
+          onConfirm={handleConfirmRequest}
+          maintenanceTitle={selectedRequest.title}
+          scheduledDate={selectedRequest.scheduledDate}
+          estimatedCost={selectedRequest.estimatedCost}
+        />
+      )}
     </ScrollView>
   );
 }

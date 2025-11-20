@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 import { OwnerMaintenanceRequest, OwnerMaintenanceStats } from '../../../interfaces/owner/OwnerMaintenanceInterface';
 import {
+  acceptAndScheduleMaintenanceRequest,
   approveMaintenanceRequest,
   completeMaintenanceWork,
   getOwnerMaintenanceRequests,
@@ -34,10 +35,11 @@ interface UseOwnerMaintenanceRequestsReturn {
   
   // Acciones del owner
   reviewRequest: (requestId: string, notes?: string) => Promise<boolean>;
+  acceptAndSchedule: (requestId: string, scheduledDate: string, estimatedCost?: number) => Promise<boolean>;
   approveRequest: (requestId: string, estimatedCost?: number, scheduledDate?: string, notes?: string) => Promise<boolean>;
   rejectRequest: (requestId: string, notes: string) => Promise<boolean>;
   scheduleWork: (requestId: string, scheduledDate: string, estimatedCost?: number, notes?: string) => Promise<boolean>;
-  completeWork: (requestId: string, actualCost: number, notes?: string) => Promise<boolean>;
+  completeWork: (requestId: string, actualCost?: number, notes?: string) => Promise<boolean>;
 }
 
 /**
@@ -61,9 +63,9 @@ export const useOwnerMaintenanceRequests = (): UseOwnerMaintenanceRequestsReturn
 
       if (response.success) {
         console.log('✅ [useOwnerMaintenanceRequests] Solicitudes cargadas:', response.data.length);
-        // Ordenar por fecha de solicitud (más recientes primero)
+        // Ordenar por fecha de creación (más recientes primero)
         const sortedRequests = response.data.sort((a, b) => 
-          new Date(b.request_date).getTime() - new Date(a.request_date).getTime()
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
         setRequests(sortedRequests);
         setError(null);
@@ -128,7 +130,43 @@ export const useOwnerMaintenanceRequests = (): UseOwnerMaintenanceRequestsReturn
   }, [loadRequests]);
 
   /**
-   * Aprobar solicitud
+   * Aceptar y programar solicitud (Paso 3)
+   */
+  const acceptAndSchedule = useCallback(async (
+    requestId: string,
+    scheduledDate: string,
+    estimatedCost?: number
+  ): Promise<boolean> => {
+    try {
+      setProcessing(true);
+      console.log('✅ [useOwnerMaintenanceRequests] Aceptando y programando solicitud:', requestId);
+      
+      const response = await acceptAndScheduleMaintenanceRequest(requestId, scheduledDate, estimatedCost);
+      
+      if (response.success) {
+        console.log('✅ Solicitud aceptada y programada');
+        hapticFeedback.success();
+        await loadRequests();
+        Alert.alert('Éxito', 'Solicitud aceptada y programada correctamente');
+        return true;
+      } else {
+        console.log('❌ Error:', response.message);
+        hapticFeedback.error();
+        Alert.alert('Error', response.message);
+        return false;
+      }
+    } catch (err) {
+      console.error('❌ Error crítico:', err);
+      hapticFeedback.error();
+      Alert.alert('Error', 'Error al aceptar y programar solicitud');
+      return false;
+    } finally {
+      setProcessing(false);
+    }
+  }, [loadRequests]);
+
+  /**
+   * Aprobar solicitud (legacy - ahora usa accepted)
    */
   const approveRequest = useCallback(async (
     requestId: string,
@@ -237,39 +275,64 @@ export const useOwnerMaintenanceRequests = (): UseOwnerMaintenanceRequestsReturn
   }, [loadRequests]);
 
   /**
-   * Completar trabajo
+   * Completar trabajo (Paso 5)
    */
   const completeWork = useCallback(async (
     requestId: string,
-    actualCost: number,
+    actualCost?: number,
     notes?: string
   ): Promise<boolean> => {
-    try {
-      setProcessing(true);
-      console.log('✅ [useOwnerMaintenanceRequests] Completando trabajo:', requestId);
-      
-      const response = await completeMaintenanceWork(requestId, actualCost, notes);
-      
-      if (response.success) {
-        console.log('✅ Trabajo completado');
-        hapticFeedback.success();
-        await loadRequests();
-        Alert.alert('Éxito', 'Trabajo completado correctamente');
-        return true;
-      } else {
-        console.log('❌ Error:', response.message);
-        hapticFeedback.error();
-        Alert.alert('Error', response.message);
-        return false;
-      }
-    } catch (err) {
-      console.error('❌ Error crítico:', err);
-      hapticFeedback.error();
-      Alert.alert('Error', 'Error al completar trabajo');
-      return false;
-    } finally {
-      setProcessing(false);
-    }
+    return new Promise((resolve) => {
+      Alert.alert(
+        'Completar Trabajo',
+        '¿Confirmas que el trabajo de mantenimiento ha sido completado?',
+        [
+          {
+            text: 'No',
+            style: 'cancel',
+            onPress: () => {
+              hapticFeedback.buttonPressLight();
+              resolve(false);
+            },
+          },
+          {
+            text: 'Sí, Completar',
+            onPress: async () => {
+              try {
+                setProcessing(true);
+                console.log('✅ [useOwnerMaintenanceRequests] Completando trabajo:', requestId);
+                
+                hapticFeedback.buttonPress();
+                
+                const response = await completeMaintenanceWork(requestId, actualCost, notes);
+                
+                if (response.success) {
+                  console.log('✅ Trabajo completado');
+                  hapticFeedback.success();
+                  await loadRequests();
+                  Alert.alert('Éxito', 'Trabajo completado correctamente', [
+                    { text: 'OK', onPress: () => hapticFeedback.buttonPressLight() }
+                  ]);
+                  resolve(true);
+                } else {
+                  console.log('❌ Error:', response.message);
+                  hapticFeedback.error();
+                  Alert.alert('Error', response.message);
+                  resolve(false);
+                }
+              } catch (err) {
+                console.error('❌ Error crítico:', err);
+                hapticFeedback.error();
+                Alert.alert('Error', 'Error al completar trabajo');
+                resolve(false);
+              } finally {
+                setProcessing(false);
+              }
+            },
+          },
+        ]
+      );
+    });
   }, [loadRequests]);
 
   /**
@@ -289,7 +352,7 @@ export const useOwnerMaintenanceRequests = (): UseOwnerMaintenanceRequestsReturn
 
   const pendingCount = requests.filter(r => r.status === 'pending').length;
   const inReviewCount = requests.filter(r => r.status === 'in_review').length;
-  const approvedCount = requests.filter(r => r.status === 'approved').length;
+  const approvedCount = requests.filter(r => r.status === 'approved' || r.status === 'accepted').length;
   const inProgressCount = requests.filter(r => r.status === 'in_progress').length;
   const completedCount = requests.filter(r => r.status === 'completed').length;
   const rejectedCount = requests.filter(r => r.status === 'rejected').length;
@@ -317,13 +380,13 @@ export const useOwnerMaintenanceRequests = (): UseOwnerMaintenanceRequestsReturn
    */
   const calculateAverageCost = (): number => {
     const completedWithCost = requests.filter(r => 
-      r.status === 'completed' && r.actual_cost
+      r.status === 'completed' && r.cost_estimate
     );
     
     if (completedWithCost.length === 0) return 0;
     
     const totalCost = completedWithCost.reduce((sum, request) => 
-      sum + (request.actual_cost || 0), 0
+      sum + (request.cost_estimate || 0), 0
     );
     
     return totalCost / completedWithCost.length;
@@ -364,6 +427,7 @@ export const useOwnerMaintenanceRequests = (): UseOwnerMaintenanceRequestsReturn
     
     // Acciones
     reviewRequest,
+    acceptAndSchedule,
     approveRequest,
     rejectRequest,
     scheduleWork,

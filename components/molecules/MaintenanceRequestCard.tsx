@@ -2,10 +2,10 @@ import { FontAwesome } from '@expo/vector-icons';
 import React from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import {
-  MAINTENANCE_CATEGORIES,
-  MAINTENANCE_PRIORITIES,
-  MAINTENANCE_STATUSES,
-  MaintenanceRequest
+    MAINTENANCE_CATEGORIES,
+    MAINTENANCE_PRIORITIES,
+    MAINTENANCE_STATUSES,
+    MaintenanceRequest
 } from '../../interfaces/MaintenanceInterface';
 import { hapticFeedback } from '../../utils/haptics';
 import { Badge } from '../atoms/Badge';
@@ -15,6 +15,7 @@ import Label from '../atoms/Label';
 interface MaintenanceRequestCardProps {
   request: MaintenanceRequest;
   onCancel?: (requestId: string) => void;
+  onConfirm?: (requestId: string) => void;
   onViewDetails?: (requestId: string) => void;
   showPropertyInfo?: boolean;
 }
@@ -22,6 +23,7 @@ interface MaintenanceRequestCardProps {
 export default function MaintenanceRequestCard({
   request,
   onCancel,
+  onConfirm,
   onViewDetails,
   showPropertyInfo = false,
 }: MaintenanceRequestCardProps) {
@@ -35,11 +37,11 @@ export default function MaintenanceRequestCard({
     });
   };
 
-  // Obtener datos de categoría
-  const categoryData = MAINTENANCE_CATEGORIES[request.category];
+  // Obtener datos de categoría (opcional - puede no existir en el backend)
+  const categoryData = request.category ? MAINTENANCE_CATEGORIES[request.category] : null;
 
-  // Obtener datos de prioridad
-  const priorityData = MAINTENANCE_PRIORITIES[request.priority];
+  // Obtener datos de prioridad (opcional - puede no existir en el backend)
+  const priorityData = request.priority ? MAINTENANCE_PRIORITIES[request.priority] : null;
 
   // Obtener datos de estado
   const statusData = MAINTENANCE_STATUSES[request.status];
@@ -52,6 +54,8 @@ export default function MaintenanceRequestCard({
       case 'in_progress':
         return 'info';
       case 'approved':
+      case 'accepted':
+      case 'confirmed':
         return 'success';
       case 'in_review':
         return 'info';
@@ -67,6 +71,7 @@ export default function MaintenanceRequestCard({
 
   // Obtener variante del badge de prioridad
   const getPriorityBadgeVariant = () => {
+    if (!request.priority) return 'default';
     switch (request.priority) {
       case 'urgent':
       case 'high':
@@ -87,21 +92,25 @@ export default function MaintenanceRequestCard({
         <Badge variant={getStatusBadgeVariant()}>
           {statusData.label}
         </Badge>
-        <Badge variant={getPriorityBadgeVariant()}>
-          Prioridad: {priorityData.label}
-        </Badge>
+        {priorityData && (
+          <Badge variant={getPriorityBadgeVariant()}>
+            Prioridad: {priorityData.label}
+          </Badge>
+        )}
       </View>
 
       {/* Título y Categoría */}
       <View className="mb-3">
-        <View className="flex-row items-center mb-2">
-          <FontAwesome 
-            name={categoryData.icon as any} 
-            size={18} 
-            color="#531A99" 
-          />
-          <Text className="text-gray-600 ml-2 capitalize">{categoryData.label}</Text>
-        </View>
+        {categoryData && (
+          <View className="flex-row items-center mb-2">
+            <FontAwesome 
+              name={categoryData.icon as any} 
+              size={18} 
+              color="#531A99" 
+            />
+            <Text className="text-gray-600 ml-2 capitalize">{categoryData.label}</Text>
+          </View>
+        )}
         <Label text={request.title} size="lg" weight="bold" />
       </View>
 
@@ -113,14 +122,14 @@ export default function MaintenanceRequestCard({
       </View>
 
       {/* Información de la Propiedad (opcional) */}
-      {showPropertyInfo && request.property_title && (
+      {showPropertyInfo && request.property && (
         <View className="border-t border-gray-200 pt-3 mb-3">
           <Text className="text-gray-600 text-sm mb-1">Propiedad:</Text>
-          <Text className="text-erie-black font-semibold">{request.property_title}</Text>
-          {request.property_address && (
+          <Text className="text-erie-black font-semibold">{request.property.title}</Text>
+          {request.property.address && (
             <View className="flex-row items-center mt-1">
               <FontAwesome name="map-marker" size={12} color="#6b7280" />
-              <Text className="text-gray-600 text-xs ml-1">{request.property_address}</Text>
+              <Text className="text-gray-600 text-xs ml-1">{request.property.address}</Text>
             </View>
           )}
         </View>
@@ -149,7 +158,7 @@ export default function MaintenanceRequestCard({
         <View className="flex-row justify-between mb-2">
           <Text className="text-gray-600 text-sm">Solicitado:</Text>
           <Text className="text-erie-black text-sm font-medium">
-            {formatDate(request.request_date)}
+            {formatDate(request.created_at)}
           </Text>
         </View>
         
@@ -162,11 +171,11 @@ export default function MaintenanceRequestCard({
           </View>
         )}
         
-        {request.completion_date && (
+        {request.completed_date && (
           <View className="flex-row justify-between">
             <Text className="text-gray-600 text-sm">Completado:</Text>
             <Text className="text-green-600 text-sm font-medium">
-              {formatDate(request.completion_date)}
+              {formatDate(request.completed_date)}
             </Text>
           </View>
         )}
@@ -183,13 +192,13 @@ export default function MaintenanceRequestCard({
       )}
 
       {/* Costos (si existen) */}
-      {(request.estimated_cost || request.actual_cost) && (
+      {(request.cost_estimate || request.actual_cost) && (
         <View className="bg-gray-50 rounded-2xl p-3 mb-3">
-          {request.estimated_cost && (
+          {request.cost_estimate && (
             <View className="flex-row justify-between mb-1">
               <Text className="text-gray-600 text-sm">Costo Estimado:</Text>
               <Text className="text-erie-black text-sm font-semibold">
-                ${request.estimated_cost.toLocaleString()}
+                ${request.cost_estimate.toLocaleString()}
               </Text>
             </View>
           )}
@@ -204,15 +213,67 @@ export default function MaintenanceRequestCard({
         </View>
       )}
 
+      {/* Alerta para confirmación requerida */}
+      {request.status === 'accepted' && onConfirm && (
+        <View className="bg-purple-50 border-2 border-purple-500 rounded-xl p-4 mb-3">
+          <View className="flex-row items-center mb-2">
+            <FontAwesome name="calendar-check-o" size={20} color="#7c3aed" />
+            <Text className="text-purple-700 font-bold ml-2 text-base">
+              ¡Fecha Programada!
+            </Text>
+          </View>
+          <Text className="text-purple-600 text-sm mb-3">
+            El propietario ha aceptado tu solicitud y programó el mantenimiento. 
+            Por favor, confirma que la fecha te funciona.
+          </Text>
+          {request.scheduled_date && (
+            <View className="bg-white rounded-lg p-3 mb-3">
+              <Text className="text-gray-600 text-xs mb-1">Fecha programada:</Text>
+              <Text className="text-purple-700 font-bold text-lg">
+                {new Date(request.scheduled_date).toLocaleDateString('es-ES', {
+                  weekday: 'long',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </Text>
+            </View>
+          )}
+          {request.cost_estimate && (
+            <View className="bg-white rounded-lg p-3 mb-3">
+              <Text className="text-gray-600 text-xs mb-1">Costo estimado:</Text>
+              <Text className="text-gray-900 font-bold text-lg">
+                ${request.cost_estimate.toLocaleString()}
+              </Text>
+            </View>
+          )}
+        </View>
+      )}
+
       {/* Botones de Acción */}
       <View className="flex-row gap-2">
+        {/* Botón de Confirmar (para status accepted) */}
+        {onConfirm && request.status === 'accepted' && (
+          <Pressable
+            onPress={() => {
+              hapticFeedback.buttonPress();
+              onConfirm(request.id_maintenance);
+            }}
+            className="flex-1 flex-row items-center justify-center bg-purple-600 rounded-xl py-3"
+          >
+            <FontAwesome name="check-circle" size={16} color="white" />
+            <Text className="text-white font-semibold ml-2">Confirmar Fecha</Text>
+          </Pressable>
+        )}
+
         {onViewDetails && (
           <Pressable
             onPress={() => {
               hapticFeedback.buttonPressLight();
-              onViewDetails(request.id);
+              onViewDetails(request.id_maintenance);
             }}
-            className="flex-1 flex-row items-center justify-center bg-violet rounded-xl py-3"
+            className={`${onConfirm && request.status === 'accepted' ? 'flex-1' : 'flex-1'} flex-row items-center justify-center bg-violet rounded-xl py-3`}
           >
             <FontAwesome name="eye" size={16} color="white" />
             <Text className="text-white font-semibold ml-2">Ver Detalles</Text>
@@ -223,7 +284,7 @@ export default function MaintenanceRequestCard({
           <Pressable
             onPress={() => {
               hapticFeedback.buttonPress();
-              onCancel(request.id);
+              onCancel(request.id_maintenance);
             }}
             className="flex-1 flex-row items-center justify-center bg-red-100 rounded-xl py-3"
           >

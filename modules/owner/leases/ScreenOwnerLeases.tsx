@@ -97,6 +97,22 @@ export default function ScreenOwnerLeases() {
           />
         }
       >
+        {/* Botón para ver Solicitudes de Mantenimiento */}
+        <View 
+          className="bg-violet rounded-xl p-4 mb-4 flex-row items-center justify-between active:opacity-80"
+          onTouchEnd={handleViewMaintenance}
+        >
+          <View className="flex-1">
+            <Text className="text-white font-bold text-lg mb-1">
+              Solicitudes de Mantenimiento
+            </Text>
+            <Text className="text-white/80 text-sm">
+              Ver todas las solicitudes de tus inquilinos
+            </Text>
+          </View>
+          <Text className="text-white text-2xl ml-3">→</Text>
+        </View>
+
         {leases.length === 0 ? (
           <View className="flex-1 justify-center items-center py-20">
             <Text className="text-gray-500 text-center mb-2">

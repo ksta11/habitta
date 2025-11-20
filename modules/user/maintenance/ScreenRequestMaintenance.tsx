@@ -12,26 +12,22 @@ import {
   View
 } from 'react-native';
 import Label from '../../../components/atoms/Label';
+import { useAuth } from '../../../contexts/AuthContext';
 import {
-  CreateMaintenanceRequestDTO,
-  MAINTENANCE_CATEGORIES,
-  MAINTENANCE_PRIORITIES,
-  MaintenanceCategory,
-  MaintenancePriority
+  CreateMaintenanceRequestDTO
 } from '../../../interfaces/MaintenanceInterface';
 import { hapticFeedback } from '../../../utils/haptics';
 import { useActiveLease, useMaintenanceRequests } from '../hooks';
 
 export default function ScreenRequestMaintenance() {
   const router = useRouter();
+  const { user } = useAuth();
   const { lease, loading: leaseLoading } = useActiveLease();
   const { createRequest, creating } = useMaintenanceRequests();
 
   // Estado del formulario
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState<MaintenanceCategory>('other');
-  const [priority, setPriority] = useState<MaintenancePriority>('medium');
 
   // Errores de validación
   const [errors, setErrors] = useState<{
@@ -70,6 +66,33 @@ export default function ScreenRequestMaintenance() {
       return;
     }
 
+    if (!user) {
+      console.log('❌ No hay usuario autenticado');
+      return;
+    }
+
+    // Validar que tenemos todos los IDs necesarios
+    if (!lease.id_property) {
+      console.error('❌ Falta id_property en el lease');
+      return;
+    }
+
+    // Obtener id_owner del lease o del owner anidado
+    const ownerId = lease.id_owner || lease.owner?.id;
+    if (!ownerId) {
+      console.error('❌ No se pudo obtener id_owner del lease');
+      console.log('📋 Lease data:', { 
+        id_owner: lease.id_owner, 
+        owner: lease.owner 
+      });
+      return;
+    }
+
+    if (!user.id) {
+      console.error('❌ Falta id en el usuario');
+      return;
+    }
+
     if (!validateForm()) {
       hapticFeedback.error();
       return;
@@ -77,14 +100,18 @@ export default function ScreenRequestMaintenance() {
 
     hapticFeedback.buttonPress();
 
+    // Enviar todos los campos requeridos por el backend
     const requestData: CreateMaintenanceRequestDTO = {
-      id_lease: lease.id,
       id_property: lease.id_property,
+      id_owner: ownerId,
+      id_user: user.id,
       title: title.trim(),
       description: description.trim(),
-      category,
-      priority,
+      created_by: 'user',
+      responsibility: 'owner',
     };
+
+    console.log('📤 Enviando solicitud de mantenimiento:', requestData);
 
     const success = await createRequest(requestData);
 
@@ -92,8 +119,6 @@ export default function ScreenRequestMaintenance() {
       // Limpiar formulario
       setTitle('');
       setDescription('');
-      setCategory('other');
-      setPriority('medium');
       setErrors({});
 
       // Volver a la pantalla anterior
@@ -184,33 +209,7 @@ export default function ScreenRequestMaintenance() {
             <Text className="text-gray-600 text-sm mb-3">
               Selecciona el tipo de mantenimiento
             </Text>
-            <View className="flex-row flex-wrap gap-2">
-              {Object.entries(MAINTENANCE_CATEGORIES).map(([key, data]) => (
-                <Pressable
-                  key={key}
-                  onPress={() => {
-                    hapticFeedback.selection();
-                    setCategory(key as MaintenanceCategory);
-                  }}
-                  className={`flex-row items-center px-4 py-2 rounded-xl ${
-                    category === key ? 'bg-violet' : 'bg-gray-100'
-                  }`}
-                >
-                  <FontAwesome
-                    name={data.icon as any}
-                    size={14}
-                    color={category === key ? 'white' : '#531A99'}
-                  />
-                  <Text
-                    className={`ml-2 text-sm font-medium ${
-                      category === key ? 'text-white' : 'text-erie-black'
-                    }`}
-                  >
-                    {data.label}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
+        
           </View>
 
           {/* Prioridad */}
@@ -219,28 +218,7 @@ export default function ScreenRequestMaintenance() {
             <Text className="text-gray-600 text-sm mb-3">
               ¿Qué tan urgente es?
             </Text>
-            <View className="flex-row gap-2">
-              {Object.entries(MAINTENANCE_PRIORITIES).map(([key, data]) => (
-                <Pressable
-                  key={key}
-                  onPress={() => {
-                    hapticFeedback.selection();
-                    setPriority(key as MaintenancePriority);
-                  }}
-                  className={`flex-1 py-3 rounded-xl ${
-                    priority === key ? 'bg-violet' : 'bg-gray-100'
-                  }`}
-                >
-                  <Text
-                    className={`text-center text-sm font-semibold ${
-                      priority === key ? 'text-white' : 'text-erie-black'
-                    }`}
-                  >
-                    {data.label}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
+  
           </View>
 
           {/* Descripción */}

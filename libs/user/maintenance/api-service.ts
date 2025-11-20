@@ -12,76 +12,55 @@ const TOKEN_KEY = '@habitta_token';
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
 
 /**
+ * Obtiene el token de autenticación del AsyncStorage
+ */
+const getAuthToken = async (): Promise<string | null> => {
+  try {
+    return await AsyncStorage.getItem(TOKEN_KEY);
+  } catch (error) {
+    console.error('❌ Error al obtener token:', error);
+    return null;
+  }
+};
+
+/**
  * Obtiene todas las solicitudes de mantenimiento del usuario autenticado
- * TODO: Implementar endpoint en backend - Por ahora retorna datos mockeados
  */
 export const getMaintenanceRequests = async (): Promise<GetMaintenanceRequestsResponse> => {
   try {
-    console.log('🔧 [MOCK] Obteniendo solicitudes de mantenimiento...');
+    console.log('🔧 Obteniendo solicitudes de mantenimiento del usuario...');
     
-    // Simular delay de red
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Datos mockeados con categorías válidas
-    const mockRequests = [
-      {
-        id: 'maint-1',
-        id_lease: 'lease-123',
-        id_property: 'prop-123',
-        id_renter: 'renter-123',
-        id_owner: 'owner-123',
-        title: 'Fuga en el baño principal',
-        category: 'plumbing' as const,
-        priority: 'high' as const,
-        status: 'in_progress' as const,
-        description: 'Hay una fuga de agua en el lavabo del baño principal que necesita atención urgente.',
-        request_date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-        scheduled_date: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
-        images: [],
-        owner_notes: 'El plomero visitará mañana a las 10:00 AM',
-      },
-      {
-        id: 'maint-2',
-        id_lease: 'lease-123',
-        id_property: 'prop-123',
-        id_renter: 'renter-123',
-        id_owner: 'owner-123',
-        title: 'Aire acondicionado no enfría',
-        category: 'heating' as const, // Corregido de 'hvac' a 'heating'
-        priority: 'medium' as const,
-        status: 'pending' as const,
-        description: 'El aire acondicionado de la sala no está enfriando adecuadamente.',
-        request_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-        images: [],
-      },
-      {
-        id: 'maint-3',
-        id_lease: 'lease-123',
-        id_property: 'prop-123',
-        id_renter: 'renter-123',
-        id_owner: 'owner-123',
-        title: 'Luz de la cocina parpadeando',
-        category: 'electrical' as const,
-        priority: 'low' as const,
-        status: 'completed' as const,
-        description: 'La luz del techo de la cocina parpadea constantemente.',
-        request_date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-        scheduled_date: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
-        completion_date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-        images: [],
-        owner_notes: 'Se reemplazó el balastro. Problema resuelto.',
-        estimated_cost: 1500,
-        actual_cost: 1200,
-      },
-    ];
-
-    console.log('✅ [MOCK] Solicitudes obtenidas:', mockRequests.length);
+    const token = await getAuthToken();
+    console.log('🔑 Token obtenido:', token ? `${token.substring(0, 20)}...` : 'null');
     
-    return {
-      success: true,
-      data: mockRequests as any,
-      message: 'Solicitudes obtenidas exitosamente'
-    };
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    // Intentar primero con /my (endpoint para usuarios)
+    const url = `${API_BASE_URL}/api/maintenances/my`;
+    console.log('🌐 URL completa (intentando /my):', url);
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    
+    console.log('📡 Status de respuesta:', response.status);
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      console.log('❌ Respuesta de error del backend:', JSON.stringify(data, null, 2));
+      throw new Error(data.message || 'Error al obtener solicitudes de mantenimiento');
+    }
+
+    console.log('✅ Solicitudes obtenidas:', data.data?.length || 0);
+    
+    return data;
   } catch (error) {
     console.error('❌ Error al obtener solicitudes de mantenimiento:', error);
     return {
@@ -114,34 +93,48 @@ export const getLeaseMaintenanceRequests = async (leaseId: string): Promise<GetM
 
 /**
  * Crea una nueva solicitud de mantenimiento
- * TODO: Implementar endpoint en backend - Por ahora retorna datos mockeados
  */
 export const createMaintenanceRequest = async (
   requestData: CreateMaintenanceRequestDTO
 ): Promise<CreateMaintenanceRequestResponse> => {
   try {
-    console.log('🔧 [MOCK] Creando solicitud de mantenimiento...');
+    console.log('🔧 Creando solicitud de mantenimiento...');
     console.log('📋 Datos:', requestData);
     
-    // Simular delay de red
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // Crear solicitud mock
-    const newRequest = {
-      id: `maint-${Date.now()}`,
-      ...requestData,
-      status: 'pending' as const,
-      request_date: new Date().toISOString(),
-      images: [],
-    };
-
-    console.log('✅ [MOCK] Solicitud de mantenimiento creada');
+    const token = await getAuthToken();
+    console.log('🔑 Token obtenido:', token ? `${token.substring(0, 20)}...` : 'null');
     
-    return {
-      success: true,
-      data: newRequest as any,
-      message: 'Solicitud creada exitosamente'
-    };
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    const url = `${API_BASE_URL}/api/maintenances`;
+    console.log('🌐 URL completa:', url);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(requestData),
+    });
+    
+    console.log('📡 Status de respuesta:', response.status);
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.log('❌ Respuesta de error del backend:', JSON.stringify(data, null, 2));
+      if (data.errors) {
+        console.log('📋 Errores de validación Zod:', JSON.stringify(data.errors, null, 2));
+      }
+      throw new Error(data.message || 'Error al crear solicitud de mantenimiento');
+    }
+
+    console.log('✅ Solicitud de mantenimiento creada:', data.data.id_maintenance);
+    
+    return data;
   } catch (error) {
     console.error('❌ Error al crear solicitud de mantenimiento:', error);
     return {
@@ -154,33 +147,45 @@ export const createMaintenanceRequest = async (
 
 /**
  * Actualiza una solicitud de mantenimiento existente
- * TODO: Implementar endpoint en backend - Por ahora retorna datos mockeados
  */
 export const updateMaintenanceRequest = async (
   requestId: string,
   updateData: UpdateMaintenanceRequestDTO
 ): Promise<UpdateMaintenanceRequestResponse> => {
   try {
-    console.log('🔧 [MOCK] Actualizando solicitud de mantenimiento:', requestId);
+    console.log('🔧 Actualizando solicitud de mantenimiento:', requestId);
     console.log('📋 Datos:', updateData);
     
-    // Simular delay de red
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Retornar solicitud actualizada mock
-    const updatedRequest = {
-      id: requestId,
-      ...updateData,
-      request_date: new Date().toISOString(),
-    };
-
-    console.log('✅ [MOCK] Solicitud actualizada');
+    const token = await getAuthToken();
+    console.log('🔑 Token obtenido:', token ? `${token.substring(0, 20)}...` : 'null');
     
-    return {
-      success: true,
-      data: updatedRequest as any,
-      message: 'Solicitud actualizada exitosamente'
-    };
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    const url = `${API_BASE_URL}/api/maintenances/${requestId}`;
+    console.log('🌐 URL completa:', url);
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(updateData),
+    });
+    
+    console.log('📡 Status de respuesta:', response.status);
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Error al actualizar solicitud de mantenimiento');
+    }
+
+    console.log('✅ Solicitud actualizada:', data.data.id_maintenance);
+    
+    return data;
   } catch (error) {
     console.error('❌ Error al actualizar solicitud de mantenimiento:', error);
     return {
@@ -189,6 +194,13 @@ export const updateMaintenanceRequest = async (
       message: error instanceof Error ? error.message : 'Error inesperado'
     };
   }
+};
+
+/**
+ * Confirma una solicitud de mantenimiento (Paso 4)
+ */
+export const confirmMaintenanceRequest = async (requestId: string): Promise<UpdateMaintenanceRequestResponse> => {
+  return updateMaintenanceRequest(requestId, { status: 'confirmed' });
 };
 
 /**

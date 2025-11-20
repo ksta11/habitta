@@ -72,12 +72,27 @@ export const getActiveLease = async (): Promise<GetActiveLeaseResponse> => {
     const endDate = new Date(startDate);
     endDate.setFullYear(endDate.getFullYear() + 1); // +1 año
 
+    // Obtener id_owner de la propiedad
+    const ownerId = signedApplication.property?.id_owner;
+    
+    if (!ownerId) {
+      console.error('❌ ERROR: No se encontró id_owner en la propiedad');
+      console.log('📋 Property data:', JSON.stringify(signedApplication.property, null, 2));
+      return {
+        success: false,
+        data: null,
+        message: 'No se pudo obtener el id del propietario'
+      };
+    }
+    
+    console.log('✅ Owner ID obtenido:', ownerId);
+
     // Transformar la application a formato Lease
     const lease: Lease = {
       id: signedApplication.id,
       id_renter: signedApplication.id_renter,
       id_property: signedApplication.id_property,
-      id_owner: signedApplication.property.id_owner,
+      id_owner: ownerId || '', // Usar el id del owner
       start_date: signedApplication.application_date, // Fecha de firma del contrato
       end_date: endDate.toISOString(), // 12 meses después
       monthly_rent: signedApplication.property.price,

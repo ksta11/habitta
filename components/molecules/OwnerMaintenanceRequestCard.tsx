@@ -17,6 +17,7 @@ interface OwnerMaintenanceRequestCardProps {
   onPress?: (requestId: string) => void;
   onApprove?: (requestId: string) => void;
   onReject?: (requestId: string) => void;
+  onComplete?: (requestId: string) => void;
   showActions?: boolean;
 }
 
@@ -25,6 +26,7 @@ export default function OwnerMaintenanceRequestCard({
   onPress,
   onApprove,
   onReject,
+  onComplete,
   showActions = true,
 }: OwnerMaintenanceRequestCardProps) {
   // Formatear fecha
@@ -47,9 +49,9 @@ export default function OwnerMaintenanceRequestCard({
     }).format(amount);
   };
 
-  // Obtener datos de categoría
-  const categoryData = MAINTENANCE_CATEGORIES[request.category];
-  const priorityData = MAINTENANCE_PRIORITIES[request.priority];
+  // Obtener datos de categoría (opcional - no viene del backend por ahora)
+  const categoryData = null;
+  const priorityData = null;
   const statusData = MAINTENANCE_STATUSES[request.status];
 
   // Obtener variante del badge de estado
@@ -59,6 +61,8 @@ export default function OwnerMaintenanceRequestCard({
         return 'success';
       case 'in_progress':
       case 'approved':
+      case 'accepted':
+      case 'confirmed':
         return 'info';
       case 'in_review':
         return 'warning';
@@ -74,102 +78,89 @@ export default function OwnerMaintenanceRequestCard({
 
   // Obtener variante del badge de prioridad
   const getPriorityBadgeVariant = () => {
-    switch (request.priority) {
-      case 'urgent':
-      case 'high':
-        return 'error';
-      case 'medium':
-        return 'warning';
-      case 'low':
-        return 'success';
-      default:
-        return 'default';
-    }
+    return 'default';
   };
 
   const handlePress = () => {
     if (onPress) {
       hapticFeedback.buttonPressLight();
-      onPress(request.id);
+      onPress(request.id_maintenance);
     }
   };
 
   const handleApprove = () => {
     if (onApprove) {
       hapticFeedback.buttonPress();
-      onApprove(request.id);
+      onApprove(request.id_maintenance);
     }
   };
 
   const handleReject = () => {
     if (onReject) {
       hapticFeedback.buttonPress();
-      onReject(request.id);
+      onReject(request.id_maintenance);
+    }
+  };
+
+  const handleComplete = () => {
+    if (onComplete) {
+      hapticFeedback.buttonPress();
+      onComplete(request.id_maintenance);
     }
   };
 
   // Mostrar acciones solo para estados que lo permitan
   const canApprove = request.status === 'pending' || request.status === 'in_review';
   const canReject = request.status === 'pending' || request.status === 'in_review';
+  const canComplete = request.status === 'confirmed' || request.status === 'in_progress';
 
   return (
     <Pressable onPress={handlePress}>
       <Card className="mb-4">
-        {/* Header con Estado y Prioridad */}
+        {/* Header con Estado */}
         <View className="flex-row justify-between items-center mb-3">
           <Badge variant={getStatusBadgeVariant()}>
             {statusData.label}
           </Badge>
-          <Badge variant={getPriorityBadgeVariant()}>
-            {priorityData.label}
-          </Badge>
+          <Text className="text-gray-500 text-sm">
+            {formatDate(request.created_at)}
+          </Text>
         </View>
 
         {/* Información de la Propiedad */}
-        <View className="bg-violet-50 rounded-xl p-3 mb-3">
-          <View className="flex-row items-center">
-            {request.property.images && request.property.images.length > 0 && (
-              <Image
-                source={{ uri: request.property.images[0].url_image }}
-                className="w-16 h-16 rounded-lg mr-3"
-                resizeMode="cover"
-              />
-            )}
-            <View className="flex-1">
-              <Text className="text-erie-black font-bold text-sm mb-1">
-                {request.property.title}
-              </Text>
-              <Text className="text-gray-600 text-xs" numberOfLines={1}>
-                {request.property.address}
-              </Text>
+        {request.property && (
+          <View className="bg-violet-50 rounded-xl p-3 mb-3">
+            <View className="flex-row items-center">
+              <View className="flex-1">
+                <Text className="text-erie-black font-bold text-sm mb-1">
+                  {request.property.title}
+                </Text>
+                <Text className="text-gray-600 text-xs" numberOfLines={1}>
+                  {request.property.address}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
+        )}
 
         {/* Información del Inquilino */}
-        <View className="mb-3">
-          <View className="flex-row items-center mb-1">
-            <FontAwesome name="user" size={14} color="#531A99" />
-            <Text className="text-gray-600 text-sm ml-2">Solicitado por:</Text>
+        {request.user && (
+          <View className="mb-3">
+            <View className="flex-row items-center mb-1">
+              <FontAwesome name="user" size={14} color="#531A99" />
+              <Text className="text-gray-600 text-sm ml-2">Solicitado por:</Text>
+            </View>
+            <Text className="text-erie-black font-semibold">
+              {request.user.name}
+            </Text>
+            <Text className="text-gray-600 text-sm">
+              {request.user.phone}
+            </Text>
           </View>
-          <Text className="text-erie-black font-semibold">
-            {request.renter.name}
-          </Text>
-          <Text className="text-gray-600 text-sm">
-            {request.renter.phone}
-          </Text>
-        </View>
+        )}
 
-        {/* Título y Categoría */}
+        {/* Título */}
         <View className="mb-3">
-          <View className="flex-row items-center mb-2">
-            <FontAwesome 
-              name={categoryData.icon as any} 
-              size={18} 
-              color="#531A99" 
-            />
-            <Text className="text-gray-600 ml-2 capitalize">{categoryData.label}</Text>
-          </View>
           <Label text={request.title} size="lg" weight="bold" />
         </View>
 
@@ -180,35 +171,12 @@ export default function OwnerMaintenanceRequestCard({
           </Text>
         </View>
 
-        {/* Imágenes si existen */}
-        {request.images && request.images.length > 0 && (
-          <View className="mb-3">
-            <Text className="text-gray-600 text-sm mb-2 font-semibold">
-              Imágenes ({request.images.length}):
-            </Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              className="flex-row"
-            >
-              {request.images.map((image, index) => (
-                <Image
-                  key={index}
-                  source={{ uri: image.url_image }}
-                  className="w-24 h-24 rounded-lg mr-2"
-                  resizeMode="cover"
-                />
-              ))}
-            </ScrollView>
-          </View>
-        )}
-
         {/* Fechas */}
         <View className="border-t border-gray-200 pt-3 mb-3">
           <View className="flex-row justify-between mb-2">
             <Text className="text-gray-600 text-sm">Solicitado:</Text>
             <Text className="text-erie-black text-sm font-semibold">
-              {formatDate(request.request_date)}
+              {formatDate(request.created_at)}
             </Text>
           </View>
           
@@ -221,75 +189,67 @@ export default function OwnerMaintenanceRequestCard({
             </View>
           )}
           
-          {request.completion_date && (
+          {request.completed_date && (
             <View className="flex-row justify-between">
               <Text className="text-gray-600 text-sm">Completado:</Text>
               <Text className="text-green-600 text-sm font-semibold">
-                {formatDate(request.completion_date)}
+                {formatDate(request.completed_date)}
               </Text>
             </View>
           )}
         </View>
 
-        {/* Notas del Owner */}
-        {request.owner_notes && (
-          <View className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-3">
-            <View className="flex-row items-center mb-1">
-              <FontAwesome name="sticky-note" size={14} color="#3b82f6" />
-              <Text className="text-blue-700 text-sm font-semibold ml-2">
-                Notas del Propietario:
-              </Text>
-            </View>
-            <Text className="text-blue-900 text-sm">{request.owner_notes}</Text>
-          </View>
-        )}
-
         {/* Costos */}
-        {(request.estimated_cost || request.actual_cost) && (
+        {request.cost_estimate && (
           <View className="border-t border-gray-200 pt-3 mb-3">
-            {request.estimated_cost && (
-              <View className="flex-row justify-between mb-2">
-                <Text className="text-gray-600 text-sm">Costo Estimado:</Text>
-                <Text className="text-orange-600 font-semibold">
-                  {formatCurrency(request.estimated_cost)}
-                </Text>
-              </View>
-            )}
-            {request.actual_cost && (
-              <View className="flex-row justify-between">
-                <Text className="text-gray-600 text-sm">Costo Real:</Text>
-                <Text className="text-green-600 font-bold">
-                  {formatCurrency(request.actual_cost)}
-                </Text>
-              </View>
-            )}
+            <View className="flex-row justify-between mb-2">
+              <Text className="text-gray-600 text-sm">Costo Estimado:</Text>
+              <Text className="text-orange-600 font-semibold">
+                {formatCurrency(request.cost_estimate)}
+              </Text>
+            </View>
           </View>
         )}
 
-        {/* Calificación del Inquilino */}
-        {request.status === 'completed' && request.renter_rating && (
-          <View className="bg-green-50 border border-green-200 rounded-xl p-3 mb-3">
-            <View className="flex-row items-center mb-1">
-              <FontAwesome name="star" size={14} color="#10b981" />
-              <Text className="text-green-700 text-sm font-semibold ml-2">
-                Calificación del Inquilino: {request.renter_rating}/5
+        {/* Alerta para trabajo confirmado - listo para realizar */}
+        {canComplete && onComplete && (
+          <View className="bg-green-50 border-2 border-green-500 rounded-xl p-4 mb-3">
+            <View className="flex-row items-center mb-2">
+              <FontAwesome name="check-circle" size={20} color="#10b981" />
+              <Text className="text-green-700 font-bold ml-2 text-base">
+                {request.status === 'confirmed' ? '¡Trabajo Confirmado!' : '¡Trabajo en Progreso!'}
               </Text>
             </View>
-            {request.renter_review && (
-              <Text className="text-green-900 text-sm mt-1">
-                "{request.renter_review}"
-              </Text>
+            <Text className="text-green-600 text-sm mb-3">
+              {request.status === 'confirmed' 
+                ? 'El inquilino ha confirmado la fecha. Puedes proceder con el mantenimiento.'
+                : 'El trabajo está en progreso. Marca como completado cuando termines.'
+              }
+            </Text>
+            {request.scheduled_date && (
+              <View className="bg-white rounded-lg p-3">
+                <Text className="text-gray-600 text-xs mb-1">Fecha programada:</Text>
+                <Text className="text-green-700 font-bold text-base">
+                  {new Date(request.scheduled_date).toLocaleDateString('es-ES', {
+                    weekday: 'long',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </Text>
+              </View>
             )}
           </View>
         )}
 
         {/* Botones de Acción */}
-        {showActions && (canApprove || canReject) && (
-          <View className="flex-row mt-3">
+        {showActions && (canApprove || canReject || canComplete) && (
+          <View className="flex-row mt-3 gap-2">
             {canApprove && onApprove && (
               <Pressable
                 onPress={handleApprove}
-                className="flex-1 bg-green-600 rounded-full py-3 mr-2 items-center"
+                className="flex-1 bg-green-600 rounded-full py-3 items-center"
               >
                 <Text className="text-white-traffic font-bold">Aprobar</Text>
               </Pressable>
@@ -300,6 +260,15 @@ export default function OwnerMaintenanceRequestCard({
                 className="flex-1 bg-red-600 rounded-full py-3 items-center"
               >
                 <Text className="text-white-traffic font-bold">Rechazar</Text>
+              </Pressable>
+            )}
+            {canComplete && onComplete && (
+              <Pressable
+                onPress={handleComplete}
+                className="flex-1 bg-green-600 rounded-xl py-3 items-center flex-row justify-center"
+              >
+                <FontAwesome name="check-circle" size={16} color="white" />
+                <Text className="text-white-traffic font-bold ml-2">Marcar Completado</Text>
               </Pressable>
             )}
           </View>

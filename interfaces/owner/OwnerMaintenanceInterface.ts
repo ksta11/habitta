@@ -1,65 +1,46 @@
 // Interfaces para el sistema de mantenimiento desde la perspectiva del Owner
 
 import { 
-  MaintenanceCategory, 
-  MaintenancePriority, 
   MaintenanceStatus,
-  MaintenanceImage 
+  MaintenanceUser,
+  MaintenanceProperty
 } from '../MaintenanceInterface';
 
-// Información del inquilino (renter) en la solicitud
-export interface MaintenanceRenter {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-}
-
-// Información de la propiedad en la solicitud
-export interface MaintenanceProperty {
-  id: string;
-  title: string;
-  address: string;
-  images: Array<{
-    url_image: string;
-  }>;
-}
-
-// Solicitud de mantenimiento desde la perspectiva del Owner
+// Solicitud de mantenimiento desde la perspectiva del Owner (basado en respuesta del backend)
 export interface OwnerMaintenanceRequest {
-  id: string;
-  id_lease: string;
-  id_renter: string;
+  id_maintenance: string;
   id_property: string;
   id_owner: string;
+  id_user: string;
   title: string;
   description: string;
-  category: MaintenanceCategory;
-  priority: MaintenancePriority;
   status: MaintenanceStatus;
-  request_date: string;
-  scheduled_date?: string;
-  completion_date?: string;
-  images: MaintenanceImage[];
-  owner_notes?: string;
-  renter_rating?: number;
-  renter_review?: string;
-  estimated_cost?: number;
-  actual_cost?: number;
+  responsibility: 'user' | 'owner';
+  cost_estimate: number | null;
+  scheduled_date: string | null;
+  confirmed_date: string | null;
+  completed_date: string | null;
+  attachments: string[] | null;
+  created_by: 'user' | 'owner';
+  id_payment: string | null;
+  created_at: string;
+  updated_at: string;
   
-  // Datos adicionales para el owner
-  renter: MaintenanceRenter;
-  property: MaintenanceProperty;
+  // Relaciones anidadas
+  property?: MaintenanceProperty;
+  user?: MaintenanceUser;
+  payment?: any | null;
 }
 
 // DTO para actualizar solicitud como owner
 export interface OwnerUpdateMaintenanceRequestDTO {
   status?: MaintenanceStatus;
   scheduled_date?: string;
-  completion_date?: string;
-  owner_notes?: string;
-  estimated_cost?: number;
-  actual_cost?: number;
+  confirmed_date?: string;
+  completed_date?: string;
+  cost_estimate?: number;
+  responsibility?: 'user' | 'owner';
+  attachments?: string[];
 }
 
 // Respuestas de la API

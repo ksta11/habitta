@@ -3,7 +3,9 @@
 export type MaintenanceStatus = 
   | 'pending'       // Pendiente de revisión
   | 'in_review'     // En revisión por el propietario
-  | 'approved'      // Aprobada
+  | 'accepted'      // Aceptada y programada por owner
+  | 'confirmed'     // Confirmada por user
+  | 'approved'      // Aprobada (legacy)
   | 'in_progress'   // En progreso
   | 'completed'     // Completada
   | 'rejected'      // Rechazada
@@ -23,59 +25,109 @@ export type MaintenanceCategory =
   | 'security'      // Seguridad
   | 'other';        // Otro
 
+export type CreatedBy = 'user' | 'owner';
+export type Responsibility = 'user' | 'owner';
+
 export interface MaintenanceImage {
   id?: string;
   url_image: string;
 }
 
-export interface MaintenanceRequest {
+// Datos de usuario/owner/property anidados en la respuesta
+export interface MaintenanceUser {
   id: string;
-  id_lease: string;
-  id_renter: string;
+  name: string;
+  email: string;
+  phone: string;
+  pushToken?: string;
+}
+
+export interface MaintenanceProperty {
+  id: string;
+  title: string;
+  address: string;
+}
+
+export interface MaintenancePayment {
+  id: string;
+  // Agregar campos de payment según tu backend
+}
+
+// Interfaz principal basada en la respuesta del backend
+export interface MaintenanceRequest {
+  // IDs principales
+  id_maintenance: string;
   id_property: string;
   id_owner: string;
+  id_user: string;
+  
+  // Campos obligatorios
   title: string;
   description: string;
-  category: MaintenanceCategory;
-  priority: MaintenancePriority;
   status: MaintenanceStatus;
-  request_date: string;
-  scheduled_date?: string;
-  completion_date?: string;
-  images: MaintenanceImage[];
+  responsibility: Responsibility;
+  created_by: CreatedBy;
+  created_at: string;
+  updated_at: string;
+  
+  // Campos de costos
+  cost_estimate: number | null;
+  actual_cost?: number | null;
+  estimated_cost?: number | null; // Alias para compatibilidad
+  
+  // Fechas
+  scheduled_date: string | null;
+  confirmed_date: string | null;
+  completed_date: string | null;
+  request_date?: string; // Alias para created_at
+  completion_date?: string; // Alias para completed_date
+  
+  // Campos opcionales que pueden no venir del backend
+  category?: MaintenanceCategory;
+  priority?: MaintenancePriority;
+  attachments: string[] | null;
+  images?: MaintenanceImage[];
   owner_notes?: string;
-  renter_rating?: number; // Calificación del inquilino sobre el servicio
-  renter_review?: string;
-  estimated_cost?: number;
-  actual_cost?: number;
-  property_title?: string;
-  property_address?: string;
+  id_payment: string | null;
+  
+  // Relaciones anidadas
+  property?: MaintenanceProperty;
+  property_title?: string; // Para compatibilidad
+  property_address?: string; // Para compatibilidad
+  owner?: MaintenanceUser;
+  user?: MaintenanceUser;
+  payment?: MaintenancePayment | null;
+  
+  // Campos legacy para compatibilidad
+  id?: string; // Alias para id_maintenance
 }
 
+// DTO para crear una solicitud de mantenimiento
 export interface CreateMaintenanceRequestDTO {
-  id_lease: string;
   id_property: string;
+  id_owner: string;
+  id_user: string;
   title: string;
   description: string;
-  category: MaintenanceCategory;
-  priority: MaintenancePriority;
-  images?: MaintenanceImage[];
+  created_by: CreatedBy;
+  responsibility: Responsibility;
+  cost_estimate?: number;
 }
 
+// DTO para actualizar una solicitud de mantenimiento
 export interface UpdateMaintenanceRequestDTO {
   title?: string;
   description?: string;
-  category?: MaintenanceCategory;
-  priority?: MaintenancePriority;
   status?: MaintenanceStatus;
   scheduled_date?: string;
-  owner_notes?: string;
-  estimated_cost?: number;
-  actual_cost?: number;
-  renter_rating?: number;
-  renter_review?: string;
+  confirmed_date?: string;
+  completed_date?: string;
+  cost_estimate?: number;
+  responsibility?: Responsibility;
+  attachments?: string[];
 }
 
+// Respuestas de la API
 export interface GetMaintenanceRequestsResponse {
   success: boolean;
   data: MaintenanceRequest[];
@@ -85,18 +137,18 @@ export interface GetMaintenanceRequestsResponse {
 export interface CreateMaintenanceRequestResponse {
   success: boolean;
   data: MaintenanceRequest;
-  message?: string;
+  message: string;
 }
 
 export interface UpdateMaintenanceRequestResponse {
   success: boolean;
   data: MaintenanceRequest;
-  message?: string;
+  message: string;
 }
 
 export interface DeleteMaintenanceRequestResponse {
   success: boolean;
-  message?: string;
+  message: string;
 }
 
 // Utilidades para categorías y prioridades
@@ -123,6 +175,8 @@ export const MAINTENANCE_PRIORITIES = {
 export const MAINTENANCE_STATUSES = {
   pending: { label: 'Pendiente', color: '#9ca3af' },
   in_review: { label: 'En Revisión', color: '#3b82f6' },
+  accepted: { label: 'Aceptada', color: '#8b5cf6' },
+  confirmed: { label: 'Confirmada', color: '#10b981' },
   approved: { label: 'Aprobada', color: '#8b5cf6' },
   in_progress: { label: 'En Progreso', color: '#f59e0b' },
   completed: { label: 'Completada', color: '#10b981' },

@@ -6,6 +6,7 @@ import {
 } from '../../../interfaces/MaintenanceInterface';
 import {
   cancelMaintenanceRequest,
+  confirmMaintenanceRequest,
   createMaintenanceRequest,
   getLeaseMaintenanceRequests,
   getMaintenanceRequests
@@ -22,12 +23,15 @@ interface UseMaintenanceRequestsReturn {
 
   // Estados derivados
   pendingCount: number;
+  acceptedCount: number;
+  confirmedCount: number;
   inProgressCount: number;
   completedCount: number;
 
   // Funciones
   loadRequests: (leaseId?: string) => Promise<void>;
   createRequest: (data: CreateMaintenanceRequestDTO) => Promise<boolean>;
+  confirmRequest: (requestId: string) => Promise<boolean>;
   cancelRequest: (requestId: string) => Promise<boolean>;
   refresh: () => Promise<void>;
 }
@@ -57,9 +61,9 @@ export const useMaintenanceRequests = (leaseId?: string): UseMaintenanceRequests
       if (response.success) {
         console.log(`✅ [useMaintenanceRequests] ${response.data.length} solicitudes cargadas`);
         
-        // Ordenar por fecha de solicitud (más reciente primero)
+        // Ordenar por fecha de creación (más reciente primero)
         const sortedRequests = [...response.data].sort((a, b) => 
-          new Date(b.request_date).getTime() - new Date(a.request_date).getTime()
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
         
         setRequests(sortedRequests);
@@ -98,7 +102,7 @@ export const useMaintenanceRequests = (leaseId?: string): UseMaintenanceRequests
       const response = await createMaintenanceRequest(data);
 
       if (response.success) {
-        console.log('✅ [useMaintenanceRequests] Solicitud creada:', response.data.id);
+        console.log('✅ [useMaintenanceRequests] Solicitud creada:', response.data.id_maintenance);
         
         // Agregar la nueva solicitud al inicio de la lista
         setRequests(prev => [response.data, ...prev]);
@@ -152,6 +156,86 @@ export const useMaintenanceRequests = (leaseId?: string): UseMaintenanceRequests
   }, []);
 
   /**
+   * Confirmar solicitud de mantenimiento (Paso 4)
+   */
+  const confirmRequest = useCallback(async (requestId: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+      Alert.alert(
+        'Confirmar Fecha',
+        '¿Confirmas la fecha programada para el mantenimiento?',
+        [
+          {
+            text: 'No',
+            style: 'cancel',
+            onPress: () => {
+              hapticFeedback.buttonPressLight();
+              resolve(false);
+            },
+          },
+          {
+            text: 'Sí, Confirmar',
+            onPress: async () => {
+              try {
+                console.log('✅ [useMaintenanceRequests] Confirmando solicitud:', requestId);
+                
+                hapticFeedback.buttonPress();
+                
+                const response = await confirmMaintenanceRequest(requestId);
+
+                if (response.success) {
+                  console.log('✅ [useMaintenanceRequests] Solicitud confirmada');
+                  
+                  // Actualizar estado de la solicitud en la lista
+                  setRequests(prev =>
+                    prev.map(req =>
+                      req.id_maintenance === requestId
+                        ? { ...req, status: 'confirmed', confirmed_date: new Date().toISOString() }
+                        : req
+                    )
+                  );
+                  
+                  setError(null);
+                  hapticFeedback.success();
+                  
+                  Alert.alert(
+                    'Fecha Confirmada',
+                    'Has confirmado la fecha del mantenimiento.',
+                    [{ text: 'OK', onPress: () => hapticFeedback.buttonPressLight() }]
+                  );
+                  
+                  resolve(true);
+                } else {
+                  console.log('❌ [useMaintenanceRequests] Error al confirmar:', response.message);
+                  hapticFeedback.error();
+                  
+                  Alert.alert(
+                    'Error',
+                    response.message || 'No se pudo confirmar la solicitud.',
+                    [{ text: 'OK', onPress: () => hapticFeedback.buttonPressLight() }]
+                  );
+                  
+                  resolve(false);
+                }
+              } catch (err) {
+                console.error('❌ [useMaintenanceRequests] Error al confirmar:', err);
+                hapticFeedback.error();
+                
+                Alert.alert(
+                  'Error',
+                  err instanceof Error ? err.message : 'Error inesperado',
+                  [{ text: 'OK', onPress: () => hapticFeedback.buttonPressLight() }]
+                );
+                
+                resolve(false);
+              }
+            },
+          },
+        ]
+      );
+    });
+  }, []);
+
+  /**
    * Cancelar solicitud de mantenimiento
    */
   const cancelRequest = useCallback(async (requestId: string): Promise<boolean> => {
@@ -186,7 +270,7 @@ export const useMaintenanceRequests = (leaseId?: string): UseMaintenanceRequests
                   // Actualizar estado de la solicitud en la lista
                   setRequests(prev =>
                     prev.map(req =>
-                      req.id === requestId
+                      req.id_maintenance === requestId
                         ? { ...req, status: 'cancelled' }
                         : req
                     )
@@ -276,6 +360,20 @@ export const useMaintenanceRequests = (leaseId?: string): UseMaintenanceRequests
   ).length;
 
   /**
+   * Contador de solicitudes aceptadas (esperando confirmación)
+   */
+  const acceptedCount = requests.filter(
+    req => req.status === 'accepted'
+  ).length;
+
+  /**
+   * Contador de solicitudes confirmadas
+   */
+  const confirmedCount = requests.filter(
+    req => req.status === 'confirmed'
+  ).length;
+
+  /**
    * Contador de solicitudes en progreso
    */
   const inProgressCount = requests.filter(
@@ -299,12 +397,15 @@ export const useMaintenanceRequests = (leaseId?: string): UseMaintenanceRequests
 
     // Estados derivados
     pendingCount,
+    acceptedCount,
+    confirmedCount,
     inProgressCount,
     completedCount,
 
     // Funciones
     loadRequests,
     createRequest,
+    confirmRequest,
     cancelRequest,
     refresh,
   };
