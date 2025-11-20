@@ -37,6 +37,20 @@ export default function SettingsLayout() {
           title: 'Editar Perfil'
         }} 
       />
+      <Stack.Screen
+        name="payment/viewPayments"
+        options={{
+          headerShown: true,
+          title: 'Gestion de Pagos',
+        }}
+      />
+      <Stack.Screen
+        name="payment/make/[id]"
+        options={{
+          headerShown: true,
+          title: 'Ventana de Pago',
+        }}
+      />
     </Stack>
   );
 }

@@ -2,10 +2,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { StripeProvider, useStripe } from '@stripe/stripe-react-native';
 import * as Clipboard from 'expo-clipboard';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AlertModal from '../../components/atoms/AlertModal';
 import ButtonAtom from '../../components/atoms/ButtonAtom';
+import ToastNotification from '../../components/atoms/ToastNotification';
 import { formatCurrency } from '../../utils/format';
 import useMakePayment from './hooks/useMakePayment';
 
@@ -23,7 +26,18 @@ export default function MakePayment({ idPay }: MakePaymentProps) {
   const insets = useSafeAreaInsets();
   const [sheetReady, setSheetReady] = useState(false);
   const [payLoading, setPayLoading] = useState(false);
-
+  const router = useRouter();
+  
+  // Estados para el AlertModal
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertType, setAlertType] = useState<'success' | 'error' | 'info' | 'warning'>('info');
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  
+  // Estados para el Toast
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'warning'>('success');
+  const [toastMessage, setToastMessage] = useState('');
   // Inicializar PaymentSheet cuando tengamos clientSecret
   useEffect(() => {
     let mounted = true;
@@ -53,23 +67,36 @@ export default function MakePayment({ idPay }: MakePaymentProps) {
     };
   }, [clientSecret, initPaymentSheet]);
 
+  const showAlert = (type: 'success' | 'error' | 'info' | 'warning', title: string, message: string) => {
+    setAlertType(type);
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setAlertVisible(true);
+  };
+
+  const showToast = (type: 'success' | 'error' | 'info' | 'warning', message: string) => {
+    setToastType(type);
+    setToastMessage(message);
+    setToastVisible(true);
+  };
+
   const handlePayPress = async () => {
     if (!sheetReady || !clientSecret || !payment || !idPay) return;
     setPayLoading(true);
     try {
       const { error: presentError } = await presentPaymentSheet();
       if (presentError) {
-        Alert.alert('Error', presentError.message || 'Error al procesar el pago');
         setPayLoading(false);
+        showAlert('error', 'Error en el pago', presentError.message || 'Error al procesar el pago');
         return;
       }
 
       // PaymentSheet reports success locally. Final confirmation will arrive
       // via webhook (server-side). Inform the user and trust the webhook
       // to update the payment status in your backend.
-      Alert.alert('Listo', 'Pago enviado. La confirmación final se registrará automáticamente (webhook).');
+      showAlert('success', '¡Pago exitoso!', 'Tu pago ha sido enviado. La confirmación final se registrará automáticamente.');
     } catch (e) {
-      Alert.alert('Error', 'Ocurrió un error al procesar el pago');
+      showAlert('error', 'Error', 'Ocurrió un error inesperado al procesar el pago. Por favor, intenta nuevamente.');
     } finally {
       setPayLoading(false);
     }
@@ -235,11 +262,11 @@ export default function MakePayment({ idPay }: MakePaymentProps) {
                             title="Copiar" 
                             onPress={async () => { 
                               if (!payment.reference_code) {
-                                Alert.alert('Error', 'No hay referencia para copiar');
+                                showToast('error', 'No hay referencia para copiar');
                                 return;
                               }
                               await Clipboard.setStringAsync(payment.reference_code);
-                              Alert.alert('✓ Copiado', 'Referencia copiada'); 
+                              showToast('success', 'Referencia copiada al portapapeles');
                             }} 
                             variant="habitta-outline" 
                             size="small" 
@@ -312,6 +339,30 @@ export default function MakePayment({ idPay }: MakePaymentProps) {
           </View>
         )}
       </View>
+
+      {/* Alert Modal */}
+      <AlertModal
+        visible={alertVisible}
+        type={alertType}
+        title={alertTitle}
+        message={alertMessage}
+        onClose={() => {
+          setAlertVisible(false);
+          // Si el alert fue de éxito después de pagar, regresar
+          if (alertType === 'success' && alertTitle === '¡Pago exitoso!') {
+            router.back();
+          }
+        }}
+        closeText="Entendido"
+      />
+
+      {/* Toast Notification */}
+      <ToastNotification
+        visible={toastVisible}
+        type={toastType}
+        message={toastMessage}
+        onHide={() => setToastVisible(false)}
+      />
     </StripeProvider>
   );
 }

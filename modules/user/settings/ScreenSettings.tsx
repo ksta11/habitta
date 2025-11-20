@@ -95,12 +95,13 @@ const ScreenSettings = () => {
             </Pressable>
           </Link>
           
-          <Pressable 
-            className="py-3 border-b border-gray-100"
-            // onPress={() => console.log('Pantalla de cambio de contraseña no implementada aún')}
-          >
-            <Label text="Cambiar Contraseña" size="md" />
-          </Pressable>
+          
+
+          <Link href="/(user)/settings/payment/viewPayments" asChild>
+            <Pressable className="py-3 border-b border-gray-100">
+              <Label text="Gestionar Pagos" size="md" />
+            </Pressable>
+          </Link>
           
           <Pressable 
             className="py-3 border-b border-gray-100"
