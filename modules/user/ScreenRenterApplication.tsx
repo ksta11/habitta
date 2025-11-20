@@ -1,4 +1,5 @@
 import { useFocusEffect } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { RenterApplication } from '../../interfaces/application/RenterApplicationInterface';
@@ -14,6 +15,7 @@ import {
 import ApplicationRenterCard from './Atoms/ApplicationRenterCard';
 
 export default function ScreenRenterApplication() {
+  const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [applications, setApplications] = useState<RenterApplication[]>([]);
@@ -87,9 +89,13 @@ export default function ScreenRenterApplication() {
   };
 
   const handleUploadDocuments = async (applicationId: string) => {
-    // Función placeholder - sin funcionalidad como solicitaste
     console.log('📄 Subir documentos para aplicación:', applicationId);
-    // Aquí iría la lógica para subir documentos en el futuro
+    router.push(`/(user)/(applications)/documents/${applicationId}` as any);
+  };
+
+  const handleViewDocuments = async (applicationId: string) => {
+    console.log('👁️ Ver documentos para aplicación:', applicationId);
+    router.push(`/(user)/(applications)/view-documents/${applicationId}` as any);
   };
 
   const handleTerminate = async (applicationId: string, propertyTitle: string) => {
@@ -222,6 +228,7 @@ export default function ScreenRenterApplication() {
               onAccept={handleAccept}
               onWithdraw={handleWithdraw}
               onUploadDocuments={handleUploadDocuments}
+              onViewDocuments={handleViewDocuments}
               onTerminate={handleTerminate}
             />
           ))

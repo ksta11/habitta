@@ -1,15 +1,15 @@
-import { Paths, File } from 'expo-file-system';
+import { File, Paths } from 'expo-file-system';
 import * as Sharing from "expo-sharing";
 import * as WebBrowser from "expo-web-browser";
 import React from "react";
 import {
-    ActivityIndicator,
-    Button,
-    Image,
-    StyleSheet,
-    Text,
-    View,
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
+import ButtonAtom from "./ButtonAtom";
 
 interface FileViewerProps {
   fileUrl: string | null;
@@ -69,11 +69,32 @@ const FileViewer: React.FC<FileViewerProps> = ({ fileUrl }) => {
           </Text>
 
           {isPdf ? (
-            <Button title="Ver PDF" onPress={openInBrowser} />
+            <ButtonAtom 
+              title="Ver PDF" 
+              onPress={openInBrowser}
+              variant="habitta-primary"
+              size="medium"
+              icon="document-text-outline"
+              iconPosition="left"
+            />
           ) : isOffice ? (
-            <Button title="Abrir con otra app" onPress={openInExternalApp} />
+            <ButtonAtom 
+              title="Abrir con otra app" 
+              onPress={openInExternalApp}
+              variant="habitta-primary"
+              size="medium"
+              icon="share-outline"
+              iconPosition="left"
+            />
           ) : (
-            <Button title="Abrir archivo" onPress={openInBrowser} />
+            <ButtonAtom 
+              title="Abrir archivo" 
+              onPress={openInBrowser}
+              variant="habitta-primary"
+              size="medium"
+              icon="open-outline"
+              iconPosition="left"
+            />
           )}
         </>
       )}

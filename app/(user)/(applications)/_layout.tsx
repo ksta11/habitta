@@ -1,5 +1,5 @@
 import { Stack } from 'expo-router';
-
+import HeaderBackButton from '../../../components/atoms/HeaderBackButton';
 export default function ApplicationsLayout() {
   return (
     <Stack
@@ -11,12 +11,25 @@ export default function ApplicationsLayout() {
         headerTitleStyle: {
           fontWeight: 'bold',
         },
+        headerLeft: () => <HeaderBackButton />,
       }}
     >
       <Stack.Screen
         name="index"
         options={{
           title: 'Solicitudes de Arriendo',
+        }}
+      />
+      <Stack.Screen
+        name="documents/[id]"
+        options={{
+          title: 'Documentos de la Solicitud',
+        }}
+      />
+      <Stack.Screen
+        name="view-documents/[id]"
+        options={{
+          title: 'Ver Documentos',
         }}
       />
     </Stack>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, Text, ActivityIndicator, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { hapticFeedback } from '../../utils/haptics';
 
 interface ButtonAtomProps {
   title: string;
@@ -185,7 +186,10 @@ export default function ButtonAtom({
         shadowRadius: 8,
         elevation: 6, // Para Android
       }}
-      onPress={onPress}
+      onPress={() => {
+        hapticFeedback.buttonPress();
+        onPress();
+      }}
       disabled={isDisabled}
     >
       {renderContent()}

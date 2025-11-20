@@ -1,10 +1,11 @@
+import { useFocusEffect } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Alert } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
 import { Application } from "../../../interfaces/application/ApplicationInterface";
 import {
-  getOwnerApplications,
-  updateApplicationStatus,
+    getOwnerApplications,
+    updateApplicationStatus,
 } from "../../../libs/application/api-service";
 
 interface UseOwnerApplicationsReturn {
@@ -25,6 +26,7 @@ interface UseOwnerApplicationsReturn {
   handleTerminate: (applicationId: string, applicantName: string) => Promise<void>;
   handleReject: (applicationId: string, applicantName: string) => void;
   handleCancel: (applicationId: string, applicantName: string) => void;
+  handleUploadDocuments: (applicationId: string) => void;
 }
 
 /**
@@ -63,6 +65,7 @@ interface UseOwnerApplicationsReturn {
  */
 export const useOwnerApplications = (): UseOwnerApplicationsReturn => {
   // === ESTADO LOCAL ===
+  const router = useRouter();
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -392,6 +395,14 @@ export const useOwnerApplications = (): UseOwnerApplicationsReturn => {
     );
   };
 
+  /**
+   * Navegar a la pantalla de documentos de la aplicación
+   */
+  const handleUploadDocuments = (applicationId: string) => {
+    console.log("📄 Navegando a documentos para aplicación:", applicationId);
+    router.push(`/(owner)/(applications)/documents/${applicationId}` as any);
+  };
+
   // === AUTO-REFRESH AL ENFOCAR ===
   /**
    * Cargar aplicaciones cada vez que la pantalla recibe foco
@@ -427,5 +438,6 @@ export const useOwnerApplications = (): UseOwnerApplicationsReturn => {
     handleTerminate,
     handleReject,
     handleCancel,
+    handleUploadDocuments,
   };
 };

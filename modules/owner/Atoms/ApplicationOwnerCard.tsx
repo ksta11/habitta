@@ -18,6 +18,7 @@ interface ApplicationOwnerCardProps {
   onCancel?: (applicationId: string, applicantName: string) => void;
   onSign?: (applicationId: string) => void;
   onTerminate?: (applicationId: string, applicantName: string) => void;
+  onUploadDocuments?: (applicationId: string) => void;
 }
 
 export default function ApplicationOwnerCard({
@@ -30,6 +31,7 @@ export default function ApplicationOwnerCard({
   onCancel,
   onSign,
   onTerminate,
+  onUploadDocuments,
 }: ApplicationOwnerCardProps) {
   const [showSigningModal, setShowSigningModal] = useState(false);
   
@@ -321,6 +323,20 @@ export default function ApplicationOwnerCard({
             "{application.description}"
           </Text>
         </View>
+      </View>
+
+      {/* Botón de Documentos */}
+      <View className="mb-4">
+        <ButtonAtom
+          title="Ver/Subir Documentos"
+          onPress={() => onUploadDocuments?.(application.id)}
+          variant="habitta-outline"
+          size="medium"
+          icon="documents-outline"
+          iconPosition="left"
+          fullWidth={true}
+          className={standarPrimaryOutlineButton}
+        />
       </View>
 
       {/* Botones de Acción */}

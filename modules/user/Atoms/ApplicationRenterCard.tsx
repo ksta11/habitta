@@ -13,6 +13,7 @@ interface ApplicationRenterCardProps {
   onAccept?: (applicationId: string) => void;
   onWithdraw?: (applicationId: string, propertyTitle: string) => void;
   onUploadDocuments?: (applicationId: string) => void;
+  onViewDocuments?: (applicationId: string) => void;
   onTerminate?: (applicationId: string, propertyTitle: string) => void;
 }
 
@@ -21,6 +22,7 @@ export default function ApplicationRenterCard({
   onAccept,
   onWithdraw,
   onUploadDocuments,
+  onViewDocuments,
   onTerminate,
 }: ApplicationRenterCardProps) {
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -101,18 +103,31 @@ export default function ApplicationRenterCard({
     switch (application.status) {
       case 'pending':
         return (
-          <View className="flex-row">
-            <View className="flex-1">
+          <View>
+            <View className="mb-3">
               <ButtonAtom
-                title="Cancelar Solicitud"
-                onPress={() => onWithdraw?.(application.id, application.property.title)}
-                variant="danger"
+                title="Ver Documentos"
+                onPress={() => onViewDocuments?.(application.id)}
+                variant="habitta-outline"
                 size="medium"
-                icon="close-outline"
+                icon="eye-outline"
                 iconPosition="left"
                 fullWidth={true}
-                className={standarDangerButton}
               />
+            </View>
+            <View className="flex-row">
+              <View className="flex-1">
+                <ButtonAtom
+                  title="Cancelar Solicitud"
+                  onPress={() => onWithdraw?.(application.id, application.property.title)}
+                  variant="danger"
+                  size="medium"
+                  icon="close-outline"
+                  iconPosition="left"
+                  fullWidth={true}
+                  className={standarDangerButton}
+                />
+              </View>
             </View>
           </View>
         );
@@ -150,67 +165,106 @@ export default function ApplicationRenterCard({
 
       case 'pre_approved':
         return (
-          <View className="flex-row">
-            <View className="flex-1 mr-3">
+          <View>
+            <View className="mb-3">
               <ButtonAtom
-                title="Aceptar"
-                onPress={handleAcceptClick}
-                variant="habitta-primary"
+                title="Ver Documentos"
+                onPress={() => onViewDocuments?.(application.id)}
+                variant="habitta-outline"
                 size="medium"
-                icon="checkmark-outline"
+                icon="eye-outline"
                 iconPosition="left"
                 fullWidth={true}
-                className={standarSuccessButton}
               />
             </View>
-            
-            <View className="flex-1">
-              <ButtonAtom
-                title="Rechazar"
-                onPress={() => onWithdraw?.(application.id, application.property.title)}
-                variant="danger"
-                size="medium"
-                icon="close-outline"
-                iconPosition="left"
-                fullWidth={true}
-                className={standarDangerButton}
-              />
+            <View className="flex-row">
+              <View className="flex-1 mr-3">
+                <ButtonAtom
+                  title="Aceptar"
+                  onPress={handleAcceptClick}
+                  variant="habitta-primary"
+                  size="medium"
+                  icon="checkmark-outline"
+                  iconPosition="left"
+                  fullWidth={true}
+                  className={standarSuccessButton}
+                />
+              </View>
+              
+              <View className="flex-1">
+                <ButtonAtom
+                  title="Rechazar"
+                  onPress={() => onWithdraw?.(application.id, application.property.title)}
+                  variant="danger"
+                  size="medium"
+                  icon="close-outline"
+                  iconPosition="left"
+                  fullWidth={true}
+                  className={standarDangerButton}
+                />
+              </View>
             </View>
           </View>
         );
 
       case 'approved':
         return (
-          <View className="flex-row">
-            <View className="flex-1">
+          <View>
+            <View className="mb-3">
               <ButtonAtom
-                title="Retirar Solicitud"
-                onPress={() => onWithdraw?.(application.id, application.property.title)}
-                variant="danger"
+                title="Ver Documentos"
+                onPress={() => onViewDocuments?.(application.id)}
+                variant="habitta-outline"
                 size="medium"
-                icon="close-outline"
+                icon="eye-outline"
                 iconPosition="left"
                 fullWidth={true}
-                className={standarDangerButton}
               />
+            </View>
+            <View className="flex-row">
+              <View className="flex-1">
+                <ButtonAtom
+                  title="Retirar Solicitud"
+                  onPress={() => onWithdraw?.(application.id, application.property.title)}
+                  variant="danger"
+                  size="medium"
+                  icon="close-outline"
+                  iconPosition="left"
+                  fullWidth={true}
+                  className={standarDangerButton}
+                />
+              </View>
             </View>
           </View>
         );
 
       case 'signed':
         return (
-          <View className="flex-row">
-            <View className="flex-1">
+          <View>
+            <View className="mb-3">
               <ButtonAtom
-                title="Terminar Contrato"
-                onPress={() => onTerminate?.(application.id, application.property.title)}
-                variant="danger"
+                title="Ver Documentos"
+                onPress={() => onViewDocuments?.(application.id)}
+                variant="habitta-outline"
                 size="medium"
-                icon="close-circle-outline"
+                icon="eye-outline"
                 iconPosition="left"
                 fullWidth={true}
-                className={standarDangerButton}
               />
+            </View>
+            <View className="flex-row">
+              <View className="flex-1">
+                <ButtonAtom
+                  title="Terminar Contrato"
+                  onPress={() => onTerminate?.(application.id, application.property.title)}
+                  variant="danger"
+                  size="medium"
+                  icon="close-circle-outline"
+                  iconPosition="left"
+                  fullWidth={true}
+                  className={standarDangerButton}
+                />
+              </View>
             </View>
           </View>
         );

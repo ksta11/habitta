@@ -1,4 +1,5 @@
 import { Stack } from 'expo-router';
+import HeaderBackButton from '../../../components/atoms/HeaderBackButton';
 
 export default function PropertiesLayout() {
   return (
@@ -11,6 +12,7 @@ export default function PropertiesLayout() {
         headerTitleStyle: {
           fontWeight: 'bold',
         },
+        headerLeft: () => <HeaderBackButton />,
       }}
     >
       <Stack.Screen

@@ -19,6 +19,7 @@ export default function ScreenApplication() {
     handleTerminate,
     handleReject,
     handleCancel,
+    handleUploadDocuments,
   } = useOwnerApplications();
 
   return (
@@ -68,6 +69,7 @@ export default function ScreenApplication() {
               onCancel={handleCancel}
               onSign={handleSign}
               onTerminate={handleTerminate}
+              onUploadDocuments={handleUploadDocuments}
             />
           ))
         )}

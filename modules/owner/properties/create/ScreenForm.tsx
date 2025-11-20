@@ -101,7 +101,7 @@ export default function ScreenForm() {
     if (result && result.success) {
       // Si todo ok, limpiar y navegar
       form.reset();
-      router.back();
+      router.push('/(owner)/(properties)/index');
     } else {
       console.log('❌ Error al crear propiedad:', result?.message);
       Alert.alert('Error', result?.message || 'No se pudo crear la propiedad');

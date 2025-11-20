@@ -19,6 +19,12 @@ export default function ApplicationsLayout() {
           title: 'Solicitudes de Arriendo',
         }}
       />
+      <Stack.Screen
+        name="documents/[id]"
+        options={{
+          title: 'Documentos de la Solicitud',
+        }}
+      />
     </Stack>
   );
 }
