@@ -1,6 +1,7 @@
-import React from 'react';
-import { View, TextInput, Pressable, Text } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { Pressable, Text, TextInput, View } from 'react-native';
+import { standarFilterButton, standarFilterButtonPressed } from '../../../utils/TokensDesing';
 
 interface SearchFilterProps {
   searchTerm: string;
@@ -15,6 +16,8 @@ export default function SearchFilter({
   onSubmit,
   onShowFilters
 }: SearchFilterProps) {
+  const [isPressed, setIsPressed] = useState(false);
+
   return (
     <View className="px-6 mb-6">
       <View className="flex-row gap-3">
@@ -33,7 +36,9 @@ export default function SearchFilter({
         </View>
         <Pressable 
           onPress={onShowFilters}
-          className="bg-violet px-4 py-3 rounded-lg flex-row items-center"
+          onPressIn={() => setIsPressed(true)}
+          onPressOut={() => setIsPressed(false)}
+          className={`px-4 py-3 ${isPressed ? standarFilterButtonPressed : standarFilterButton}`}
         >
           <FontAwesome name="filter" size={16} color="white" />
           <Text className="text-white ml-2 font-medium">Filtros</Text>

@@ -3,6 +3,7 @@ import React from 'react';
 import { ActivityIndicator, FlatList, Text, View } from 'react-native';
 import ButtonAtom from '../../components/atoms/ButtonAtom';
 import OptionModal from '../../components/atoms/OptionModal';
+import { standarDangerButton, standarPrimaryButton, standarSecondaryButton } from '../../utils/TokensDesing';
 import PropertyCard from './Atoms/PropertyCard';
 import { useOwnerProperties } from './hooks';
 
@@ -83,6 +84,7 @@ export default function PropertyScreen() {
                       icon="create-outline"
                       iconPosition="left"
                       fullWidth={true}
+                      className={standarSecondaryButton}
                     />
                   </View>
                   
@@ -95,6 +97,7 @@ export default function PropertyScreen() {
                       icon="trash-outline"
                       iconPosition="left"
                       fullWidth={true}
+                      className={standarDangerButton}
                     />
                   </View>
                 </View>
@@ -114,6 +117,7 @@ export default function PropertyScreen() {
           icon="add-circle-outline"
           iconPosition="left"
           fullWidth={true}
+          className={standarPrimaryButton}
         />
         
         <OptionModal

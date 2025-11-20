@@ -1,12 +1,13 @@
-import React from 'react';
-import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { hapticFeedback } from '../../utils/haptics';
+import { pressedPrimaryButton, standarPrimaryButton } from '../../utils/TokensDesing';
 import { DashboardHeader } from "./dashboard/dashboard-header";
 import { QuickActions } from "./dashboard/quick-actions";
 import { RecentApplications } from "./dashboard/recent-applications";
 import { RevenueChart } from "./dashboard/revenue-chart";
 import { StatsGrid } from "./dashboard/stats-grid";
 import { useOwnerDashboard } from './hooks';
-import { hapticFeedback } from '../../utils/haptics';
 
 export default function Dashboard() {
   // === HOOK DE DASHBOARD DEL PROPIETARIO ===
@@ -22,6 +23,8 @@ export default function Dashboard() {
     occupiedVsTotal,
     loadOwnerStats,
   } = useOwnerDashboard();
+
+  const [isPressed, setIsPressed] = useState(false);
 
   // Mostrar loading
   if (loading) {
@@ -43,15 +46,19 @@ export default function Dashboard() {
         <Text className="text-gray-600 text-center mb-4">
           {error}
         </Text>
-        <Text 
-          className="text-blue-600 text-center underline"
+        <Pressable
+          className={`${isPressed ? pressedPrimaryButton : standarPrimaryButton} rounded-xl py-3 px-6 min-w-[120px]`}
+          onPressIn={() => setIsPressed(true)}
+          onPressOut={() => setIsPressed(false)}
           onPress={() => {
             hapticFeedback.buttonPress();
             loadOwnerStats();
           }}
         >
-          Reintentar
-        </Text>
+          <Text className="text-white text-center font-semibold">
+            Reintentar
+          </Text>
+        </Pressable>
       </View>
     );
   }

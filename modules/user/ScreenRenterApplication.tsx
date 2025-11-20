@@ -3,6 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { Alert, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { RenterApplication } from '../../interfaces/application/RenterApplicationInterface';
 import { getRenterApplications, updateRenterApplication } from '../../libs/userServices/application/api-service';
+import {
+  standarEmptyStateText,
+  standarEmptyStateTextSecondary,
+  standarHeaderBackground,
+  standarHeaderText,
+  standarHeaderTextSecondary,
+  standarScreenBackground
+} from '../../utils/TokensDesing';
 import ApplicationRenterCard from './Atoms/ApplicationRenterCard';
 
 export default function ScreenRenterApplication() {
@@ -184,11 +192,11 @@ export default function ScreenRenterApplication() {
   const activeApplications = applications.filter(app => ['approved', 'signed'].includes(app.status));
 
   return (
-    <View className="flex-1 bg-white-traffic">
+    <View className={`flex-1 ${standarScreenBackground}`}>
       {/* Header */}
-      <View className="bg-lavender-indigo p-6 pt-12">
-        <Text className="text-white-traffic text-2xl font-semibold">Mis Solicitudes</Text>
-        <Text className="text-white-traffic text-sm opacity-80 mt-1">
+      <View className={`${standarHeaderBackground} p-6 pt-12`}>
+        <Text className={`${standarHeaderText} text-2xl font-semibold`}>Mis Solicitudes</Text>
+        <Text className={`${standarHeaderTextSecondary} text-sm mt-1`}>
           {pendingApplications.length} pendientes • {documentsRequiredApplications.length} docs requeridos • {preApprovedApplications.length} pre-aprobadas • {activeApplications.length} activas
         </Text>
       </View>
@@ -206,16 +214,16 @@ export default function ScreenRenterApplication() {
       >
         {loading ? (
           <View className="flex-1 justify-center items-center py-20">
-            <Text className="text-gray-500 text-center mb-2">
+            <Text className={`${standarEmptyStateText} mb-2`}>
               Cargando aplicaciones...
             </Text>
           </View>
         ) : applications.length === 0 ? (
           <View className="flex-1 justify-center items-center py-20">
-            <Text className="text-gray-500 text-center mb-2">
+            <Text className={`${standarEmptyStateText} mb-2`}>
               No tienes solicitudes de arrendamiento
             </Text>
-            <Text className="text-gray-400 text-center text-sm">
+            <Text className={standarEmptyStateTextSecondary}>
               Cuando solicites una propiedad, aparecerá aquí
             </Text>
           </View>

@@ -3,6 +3,7 @@ import { Image, Text, View } from 'react-native';
 import ButtonAtom from '../../../components/atoms/ButtonAtom';
 import Label from '../../../components/atoms/Label';
 import { Application } from '../../../interfaces/application/ApplicationInterface';
+import { standarDangerButton, standarPrimaryButton, standarPrimaryOutlineButton } from '../../../utils/TokensDesing';
 
 interface ApplicationOwnerCardProps {
   application: Application;
@@ -105,6 +106,7 @@ export default function ApplicationOwnerCard({
                 icon="document-text-outline"
                 iconPosition="left"
                 fullWidth={true}
+                className={standarPrimaryButton}
               />
             </View>
             
@@ -117,6 +119,7 @@ export default function ApplicationOwnerCard({
                 icon="close-outline"
                 iconPosition="left"
                 fullWidth={true}
+                className={standarDangerButton}
               />
             </View>
           </View>
@@ -134,6 +137,7 @@ export default function ApplicationOwnerCard({
                 icon="checkmark-outline"
                 iconPosition="left"
                 fullWidth={true}
+                className={standarPrimaryButton}
               />
             </View>
             
@@ -146,6 +150,7 @@ export default function ApplicationOwnerCard({
                 icon="close-outline"
                 iconPosition="left"
                 fullWidth={true}
+                className={standarDangerButton}
               />
             </View>
           </View>
@@ -163,6 +168,7 @@ export default function ApplicationOwnerCard({
                 icon="close-outline"
                 iconPosition="left"
                 fullWidth={true}
+                className={standarPrimaryOutlineButton}
               />
             </View>
           </View>
@@ -180,6 +186,7 @@ export default function ApplicationOwnerCard({
                 icon="create-outline"
                 iconPosition="left"
                 fullWidth={true}
+                className={standarPrimaryButton}
               />
             </View>
             
@@ -192,6 +199,7 @@ export default function ApplicationOwnerCard({
                 icon="close-outline"
                 iconPosition="left"
                 fullWidth={true}
+                className={standarDangerButton}
               />
             </View>
           </View>
@@ -209,6 +217,7 @@ export default function ApplicationOwnerCard({
                 icon="close-circle-outline"
                 iconPosition="left"
                 fullWidth={true}
+                  className={standarDangerButton}
               />
             </View>
           </View>

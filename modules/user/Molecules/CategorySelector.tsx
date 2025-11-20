@@ -1,5 +1,6 @@
-import React from 'react';
-import { View, ScrollView, Pressable, Text } from 'react-native';
+import React, { useState } from 'react';
+import { Pressable, ScrollView, Text, View } from 'react-native';
+import { standarChipPressed, standarChipSelected, standarChipUnselected } from '../../../utils/TokensDesing';
 
 interface Category {
   id: number;
@@ -19,6 +20,8 @@ export default function CategorySelector({
   selectedCategory,
   onCategorySelect
 }: CategorySelectorProps) {
+  const [pressedCategory, setPressedCategory] = useState<string | null>(null);
+
   return (
     <View className="px-6 mb-6">
       <ScrollView
@@ -28,8 +31,14 @@ export default function CategorySelector({
       >
         <Pressable
           onPress={() => onCategorySelect('todos')}
+          onPressIn={() => setPressedCategory('todos')}
+          onPressOut={() => setPressedCategory(null)}
           className={`flex-row items-center gap-2 px-4 py-2 rounded-full mr-3 ${
-            selectedCategory === 'todos' ? "bg-violet" : "bg-gray-100"
+            pressedCategory === 'todos' && selectedCategory === 'todos' 
+              ? standarChipPressed 
+              : selectedCategory === 'todos' 
+                ? standarChipSelected 
+                : standarChipUnselected
           }`}
         >
           <Text>🏠</Text>
@@ -43,8 +52,14 @@ export default function CategorySelector({
           <Pressable
             key={category.id}
             onPress={() => onCategorySelect(category.value)}
+            onPressIn={() => setPressedCategory(category.value)}
+            onPressOut={() => setPressedCategory(null)}
             className={`flex-row items-center gap-2 px-4 py-2 rounded-full mr-3 ${
-              selectedCategory === category.value ? "bg-violet" : "bg-gray-100"
+              pressedCategory === category.value && selectedCategory === category.value
+                ? standarChipPressed
+                : selectedCategory === category.value
+                  ? standarChipSelected
+                  : standarChipUnselected
             }`}
           >
             <Text>{category.icon}</Text>
