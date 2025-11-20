@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Image, Text, View } from 'react-native';
 import ButtonAtom from '../../../components/atoms/ButtonAtom';
 import Label from '../../../components/atoms/Label';
+import PhoneCallButton from '../../../components/atoms/PhoneCallButton';
+import WhatsAppButton from '../../../components/atoms/WhatsAppButton';
+import LeaseSigningModal from '../../../components/molecules/LeaseSigningModal';
 import { Application } from '../../../interfaces/application/ApplicationInterface';
 import { standarDangerButton, standarPrimaryButton, standarPrimaryOutlineButton } from '../../../utils/TokensDesing';
 
@@ -28,6 +31,16 @@ export default function ApplicationOwnerCard({
   onSign,
   onTerminate,
 }: ApplicationOwnerCardProps) {
+  const [showSigningModal, setShowSigningModal] = useState(false);
+  
+  const handleSignClick = () => {
+    setShowSigningModal(true);
+  };
+
+  const handleConfirmSign = () => {
+    setShowSigningModal(false);
+    onSign?.(application.id);
+  };
   
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -180,7 +193,7 @@ export default function ApplicationOwnerCard({
             <View className="flex-1 mr-2">
               <ButtonAtom
                 title="Firmar"
-                onPress={() => onSign?.(application.id)}
+                onPress={handleSignClick}
                 variant="habitta-primary"
                 size="medium"
                 icon="create-outline"
@@ -278,14 +291,50 @@ export default function ApplicationOwnerCard({
           <Text className="text-sm text-gray-600 mt-1">
             {application.renter.email}
           </Text>
+          <Text className="text-sm text-gray-600 mt-1">
+            {application.renter.phone}
+          </Text>
+          <View className="flex-row gap-2 mt-2">
+            <WhatsAppButton
+              phoneNumber={application.renter.phone}
+              message={`Hola ${application.renter.name}, te contacto sobre tu solicitud para la propiedad "${application.property.title}".`}
+              variant="small"
+              showLabel={false}
+            />
+            <PhoneCallButton
+              phoneNumber={application.renter.phone}
+              variant="small"
+              showLabel={false}
+            />
+          </View>
           <Text className="text-sm text-gray-600">
             Fecha de solicitud: {new Date(application.application_date).toLocaleDateString()}
+          </Text>
+        </View>
+      </View>
+      
+      {/* Mi Mensaje */}
+      <View className="mb-4">
+        <Label text="Mensaje" size="md" weight="semibold" />
+        <View className="bg-gray-50 rounded-2xl p-3 mt-2">
+          <Text className="text-sm text-gray-700">
+            "{application.description}"
           </Text>
         </View>
       </View>
 
       {/* Botones de Acción */}
       {renderActionButtons()}
+
+      {/* Modal de Firma */}
+      <LeaseSigningModal
+        visible={showSigningModal}
+        application={application}
+        onClose={() => setShowSigningModal(false)}
+        onConfirm={handleConfirmSign}
+        title="Confirmar Firma del Contrato"
+        confirmText="Firmar"
+      />
     </View>
   );
 }

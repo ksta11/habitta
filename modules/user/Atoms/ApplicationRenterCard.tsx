@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Image, Text, View } from 'react-native';
 import ButtonAtom from '../../../components/atoms/ButtonAtom';
 import Label from '../../../components/atoms/Label';
+import PhoneCallButton from '../../../components/atoms/PhoneCallButton';
+import WhatsAppButton from '../../../components/atoms/WhatsAppButton';
+import ApplicationDetailModal from '../../../components/molecules/ApplicationDetailModal';
 import { RenterApplication } from '../../../interfaces/application/RenterApplicationInterface';
 import { standarDangerButton, standarPrimaryButton, standarSuccessButton } from '../../../utils/TokensDesing';
 
@@ -20,6 +23,16 @@ export default function ApplicationRenterCard({
   onUploadDocuments,
   onTerminate,
 }: ApplicationRenterCardProps) {
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  
+  const handleAcceptClick = () => {
+    setShowDetailModal(true);
+  };
+
+  const handleConfirmAccept = () => {
+    setShowDetailModal(false);
+    onAccept?.(application.id);
+  };
   
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -141,7 +154,7 @@ export default function ApplicationRenterCard({
             <View className="flex-1 mr-3">
               <ButtonAtom
                 title="Aceptar"
-                onPress={() => onAccept?.(application.id)}
+                onPress={handleAcceptClick}
                 variant="habitta-primary"
                 size="medium"
                 icon="checkmark-outline"
@@ -254,9 +267,26 @@ export default function ApplicationRenterCard({
           <Text className="text-sm text-gray-600">
             Nombre: {application.property.owner.name}
           </Text>
-          <Text className="text-sm text-gray-600 mt-1">
-            Telefono: {application.property.owner.phone}
-          </Text>
+          {application.status !== 'pending' && application.status !== 'rejected' && application.status !== 'withdrawn' && (
+            <View>
+              <Text className="text-sm text-gray-600 mt-1">
+                Telefono: {application.property.owner.phone}
+              </Text>
+              <View className="flex-row gap-2 mt-2">
+                <WhatsAppButton
+                  phoneNumber={application.property.owner.phone}
+                  message={`Hola, me interesa la propiedad "${application.property.title}". Me gustaría obtener más información.`}
+                  variant="small"
+                  showLabel={false}
+                />
+                <PhoneCallButton
+                  phoneNumber={application.property.owner.phone}
+                  variant="small"
+                  showLabel={false}
+                />
+              </View>
+            </View>
+          )}
           <Text className="text-sm text-gray-600">
             Fecha de solicitud: {new Date(application.application_date).toLocaleDateString()}
           </Text>
@@ -275,6 +305,16 @@ export default function ApplicationRenterCard({
 
       {/* Botones de Acción */}
       {renderActionButtons()}
+
+      {/* Modal de Detalle */}
+      <ApplicationDetailModal
+        visible={showDetailModal}
+        application={application}
+        onClose={() => setShowDetailModal(false)}
+        onConfirm={handleConfirmAccept}
+        title="Revisar Solicitud"
+        confirmText="Confirmar"
+      />
     </View>
   );
 }

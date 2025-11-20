@@ -59,44 +59,31 @@ export default function ScreenRenterApplication() {
   };
 
   const handleAccept = async (applicationId: string) => {
-    Alert.alert(
-      'Aceptar Pre-aprobación',
-      '¿Estás seguro de que quieres aceptar esta pre-aprobación?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Aceptar',
-          style: 'default',
-          onPress: async () => {
-            try {
-              console.log('🔄 Aceptando pre-aprobación:', applicationId);
-              
-              const response = await updateRenterApplication(applicationId, { status: 'approved' });
-              
-              if (response.success) {
-                console.log('✅ Pre-aprobación aceptada exitosamente');
-                
-                Alert.alert(
-                  'Pre-aprobación Aceptada',
-                  '¡Has aceptado la pre-aprobación! El propietario será notificado.',
-                  [{ text: 'OK' }]
-                );
-                
-                // Recargar aplicaciones para mostrar el estado actualizado
-                await loadApplications();
-                
-              } else {
-                console.log('❌ Error al aceptar pre-aprobación:', response.message);
-                Alert.alert('Error', response.message);
-              }
-            } catch (error) {
-              console.error('💥 Error crítico al aceptar pre-aprobación:', error);
-              Alert.alert('Error', 'Error de conexión al aceptar la pre-aprobación');
-            }
-          }
-        }
-      ]
-    );
+    try {
+      console.log('🔄 Aceptando pre-aprobación:', applicationId);
+      
+      const response = await updateRenterApplication(applicationId, { status: 'approved' });
+      
+      if (response.success) {
+        console.log('✅ Pre-aprobación aceptada exitosamente');
+        
+        Alert.alert(
+          'Pre-aprobación Aceptada',
+          '¡Has aceptado la pre-aprobación! El propietario será notificado.',
+          [{ text: 'OK' }]
+        );
+        
+        // Recargar aplicaciones para mostrar el estado actualizado
+        await loadApplications();
+        
+      } else {
+        console.log('❌ Error al aceptar pre-aprobación:', response.message);
+        Alert.alert('Error', response.message);
+      }
+    } catch (error) {
+      console.error('💥 Error crítico al aceptar pre-aprobación:', error);
+      Alert.alert('Error', 'Error de conexión al aceptar la pre-aprobación');
+    }
   };
 
   const handleUploadDocuments = async (applicationId: string) => {
