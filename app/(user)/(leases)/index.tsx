@@ -1,4 +1,3 @@
-export default function LeasesScreen() {
+import ScreenLeases from '../../../modules/user/leases/ScreenLeases';
 
-
-    return null;  }
+export default ScreenLeases;

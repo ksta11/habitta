@@ -18,5 +18,11 @@ export { useOwnerApplications } from './useOwnerApplications';
 // Hooks de Property Edit
 export { useEditProperty } from './useEditProperty';
 
+// Hooks de Leases
+export { useOwnerLeases } from './useOwnerLeases';
+
+// Hooks de Maintenance
+export { useOwnerMaintenanceRequests } from './useOwnerMaintenanceRequests';
+
 // Agregar aquí nuevos hooks cuando se creen:
 // export { useOwnerSettings } from './useOwnerSettings';
