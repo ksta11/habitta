@@ -1,6 +1,6 @@
 import { useFocusEffect, useRouter } from "expo-router";
-import React from 'react';
-import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { ActivityIndicator, ScrollView, Text, View, Pressable } from 'react-native';
 import { DashboardHeader } from "./dashboard/dashboard-header";
 import { QuickActions } from "./dashboard/quick-actions";
 import { RecentApplications } from "./dashboard/recent-applications";
@@ -10,8 +10,13 @@ import { useOwnerDashboard } from './hooks';
 import { hapticFeedback } from '../../utils/haptics';
 import { useAuth } from "../../contexts/AuthContext";
 import { useReviewNavigation } from "../user/hooks";
+import { standarPrimaryButton, pressedPrimaryButton } from '../../utils/TokensDesing';
+
 
 export default function Dashboard() {
+  // Estado para el botón presionado
+  const [isPressed, setIsPressed] = useState(false);
+
   // === HOOK DE DASHBOARD DEL PROPIETARIO ===
   const {
     loading,
