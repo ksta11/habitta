@@ -5,6 +5,7 @@ import {
   acceptAndScheduleMaintenanceRequest,
   approveMaintenanceRequest,
   completeMaintenanceWork,
+  createOwnerMaintenanceRequest,
   getOwnerMaintenanceRequests,
   rejectMaintenanceRequest,
   reviewMaintenanceRequest,
@@ -18,6 +19,7 @@ interface UseOwnerMaintenanceRequestsReturn {
   loading: boolean;
   refreshing: boolean;
   processing: boolean;
+  creating: boolean;
   error: string | null;
 
   // Estados derivados
@@ -34,6 +36,16 @@ interface UseOwnerMaintenanceRequestsReturn {
   refresh: () => Promise<void>;
   
   // Acciones del owner
+  createRequest: (data: {
+    id_property: string;
+    id_owner: string;
+    id_user: string;
+    title: string;
+    description: string;
+    responsibility: 'owner' | 'user';
+    scheduled_date: string; // OBLIGATORIO para escenario 2
+    cost_estimate?: number;
+  }) => Promise<boolean>;
   reviewRequest: (requestId: string, notes?: string) => Promise<boolean>;
   acceptAndSchedule: (requestId: string, scheduledDate: string, estimatedCost?: number) => Promise<boolean>;
   approveRequest: (requestId: string, estimatedCost?: number, scheduledDate?: string, notes?: string) => Promise<boolean>;
@@ -50,6 +62,7 @@ export const useOwnerMaintenanceRequests = (): UseOwnerMaintenanceRequestsReturn
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   /**
@@ -93,6 +106,60 @@ export const useOwnerMaintenanceRequests = (): UseOwnerMaintenanceRequestsReturn
     hapticFeedback.refresh();
     await loadRequests();
     setRefreshing(false);
+  }, [loadRequests]);
+
+  /**
+   * Crear nueva solicitud de mantenimiento como owner (Escenario 2)
+   */
+  const createRequest = useCallback(async (data: {
+    id_property: string;
+    id_owner: string;
+    id_user: string;
+    title: string;
+    description: string;
+    responsibility: 'owner' | 'user';
+    scheduled_date: string; // OBLIGATORIO para escenario 2
+    cost_estimate?: number;
+  }): Promise<boolean> => {
+    try {
+      setCreating(true);
+      console.log('➕ [useOwnerMaintenanceRequests] Creando solicitud como owner');
+      console.log('📋 Datos:', data);
+      
+      hapticFeedback.buttonPress();
+      
+      const response = await createOwnerMaintenanceRequest(data);
+      
+      if (response.success) {
+        console.log('✅ Solicitud creada:', response.data.id_maintenance);
+        
+        setError(null);
+        hapticFeedback.success();
+        
+        // Recargar lista
+        await loadRequests();
+        
+        Alert.alert(
+          'Solicitud Creada',
+          'La solicitud de mantenimiento ha sido creada exitosamente.',
+          [{ text: 'OK', onPress: () => hapticFeedback.buttonPressLight() }]
+        );
+        
+        return true;
+      } else {
+        console.log('❌ Error:', response.message);
+        hapticFeedback.error();
+        Alert.alert('Error', response.message);
+        return false;
+      }
+    } catch (err) {
+      console.error('❌ Error crítico:', err);
+      hapticFeedback.error();
+      Alert.alert('Error', 'Error al crear solicitud de mantenimiento');
+      return false;
+    } finally {
+      setCreating(false);
+    }
   }, [loadRequests]);
 
   /**
@@ -410,6 +477,7 @@ export const useOwnerMaintenanceRequests = (): UseOwnerMaintenanceRequestsReturn
     loading,
     refreshing,
     processing,
+    creating,
     error,
 
     // Estados derivados
@@ -426,6 +494,7 @@ export const useOwnerMaintenanceRequests = (): UseOwnerMaintenanceRequestsReturn
     refresh,
     
     // Acciones
+    createRequest,
     reviewRequest,
     acceptAndSchedule,
     approveRequest,

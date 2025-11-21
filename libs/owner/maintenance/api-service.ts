@@ -201,6 +201,80 @@ export const updateOwnerMaintenanceRequest = async (
 };
 
 /**
+ * Crea una nueva solicitud de mantenimiento como owner (Escenario 2)
+ * NOTA: scheduled_date es OBLIGATORIO cuando el owner crea el mantenimiento
+ */
+export const createOwnerMaintenanceRequest = async (requestData: {
+  id_property: string;
+  id_owner: string;
+  id_user: string;
+  title: string;
+  description: string;
+  responsibility: 'owner' | 'user';
+  scheduled_date: string; // OBLIGATORIO para escenario 2
+  cost_estimate?: number;
+}): Promise<UpdateOwnerMaintenanceRequestResponse> => {
+  try {
+    console.log('🏠 Creando solicitud de mantenimiento como owner...');
+    console.log('📋 Datos:', requestData);
+    
+    const token = await getAuthToken();
+    console.log('🔑 Token obtenido:', token ? `${token.substring(0, 20)}...` : 'null');
+    
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    const url = `${API_BASE_URL}/api/maintenances`;
+    console.log('🌐 URL completa:', url);
+
+    // El backend requiere estos campos para escenario 2 (owner-initiated)
+    const payload = {
+      id_property: requestData.id_property,
+      id_owner: requestData.id_owner,
+      id_user: requestData.id_user,
+      title: requestData.title,
+      description: requestData.description,
+      responsibility: requestData.responsibility,
+      scheduled_date: requestData.scheduled_date, // OBLIGATORIO
+      cost_estimate: requestData.cost_estimate,
+      created_by: 'owner', // Indica que el owner crea la solicitud
+    };
+
+    console.log('📤 Payload:', payload);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    
+    console.log('📡 Status de respuesta:', response.status);
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error('❌ Error en respuesta:', data);
+      throw new Error(data.message || 'Error al crear solicitud de mantenimiento');
+    }
+
+    console.log('✅ Solicitud creada:', data.data?.id_maintenance);
+    
+    return data;
+  } catch (error) {
+    console.error('❌ Error al crear solicitud:', error);
+    return {
+      success: false,
+      data: {} as any,
+      message: error instanceof Error ? error.message : 'Error inesperado'
+    };
+  }
+};
+
+/**
  * Funciones helper para acciones específicas del owner
  */
 

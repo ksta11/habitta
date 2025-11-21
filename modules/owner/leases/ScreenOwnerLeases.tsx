@@ -113,6 +113,25 @@ export default function ScreenOwnerLeases() {
           <Text className="text-white text-2xl ml-3">→</Text>
         </View>
 
+        {/* Botón para crear Mantenimiento como Owner */}
+        <View 
+          className="bg-green-600 rounded-xl p-4 mb-4 flex-row items-center justify-between active:opacity-80"
+          onTouchEnd={() => {
+            hapticFeedback.buttonPress();
+            router.push('/(owner)/(leases)/maintenance/create');
+          }}
+        >
+          <View className="flex-1">
+            <Text className="text-white font-bold text-lg mb-1">
+              + Crear Mantenimiento
+            </Text>
+            <Text className="text-white/80 text-sm">
+              Programar mantenimiento preventivo o reparación
+            </Text>
+          </View>
+          <Text className="text-white text-2xl ml-3">+</Text>
+        </View>
+
         {leases.length === 0 ? (
           <View className="flex-1 justify-center items-center py-20">
             <Text className="text-gray-500 text-center mb-2">

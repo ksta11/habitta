@@ -159,42 +159,6 @@ export default function ScreenOwnerMaintenanceList() {
         </View>
       </View>
 
-      {/* Filtros */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        className="px-4 py-3 border-b border-gray-200"
-      >
-        {[
-          { key: 'all', label: 'Todas', count: requests.length },
-          { key: 'pending', label: 'Pendientes', count: pendingCount },
-          { key: 'in_review', label: 'En Revisión', count: inReviewCount },
-          { key: 'approved', label: 'Aprobadas', count: inProgressCount },
-          { key: 'in_progress', label: 'En Progreso', count: inProgressCount },
-          { key: 'completed', label: 'Completadas', count: completedCount },
-        ].map((filter) => (
-          <Pressable
-            key={filter.key}
-            onPress={() => handleFilterChange(filter.key as OwnerMaintenanceFilter)}
-            className={`mr-3 px-4 py-2 rounded-full ${
-              activeFilter === filter.key
-                ? 'bg-lavender-indigo'
-                : 'bg-gray-100'
-            }`}
-          >
-            <Text
-              className={`font-semibold ${
-                activeFilter === filter.key
-                  ? 'text-white-traffic'
-                  : 'text-gray-600'
-              }`}
-            >
-              {filter.label} ({filter.count})
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
-
       <ScrollView
         className="flex-1 p-4"
         refreshControl={
