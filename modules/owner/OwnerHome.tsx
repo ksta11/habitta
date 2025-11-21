@@ -55,15 +55,19 @@ export default function Dashboard() {
         <Text className="text-gray-600 text-center mb-4">
           {error}
         </Text>
-        <Text 
-          className="text-blue-600 text-center underline"
+        <Pressable
+          className={`${isPressed ? pressedPrimaryButton : standarPrimaryButton} rounded-xl py-3 px-6 min-w-[120px]`}
+          onPressIn={() => setIsPressed(true)}
+          onPressOut={() => setIsPressed(false)}
           onPress={() => {
             hapticFeedback.buttonPress();
             loadOwnerStats();
           }}
         >
-          Reintentar
-        </Text>
+          <Text className="text-white text-center font-semibold">
+            Reintentar
+          </Text>
+        </Pressable>
       </View>
     );
   }

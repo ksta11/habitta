@@ -1,9 +1,10 @@
 import { FontAwesome } from "@expo/vector-icons";
-import React from "react";
+import React, { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Label from "../../../components/atoms/Label";
 import ProfileMenu from "../../../components/molecules/ProfileMenu";
 import { hapticFeedback } from "../../../utils/haptics";
+import { standarIconButton, standarIconButtonPressed } from "../../../utils/TokensDesing";
 
 interface HomeHeaderProps {
   onNavigateToReviews: () => void;
@@ -24,6 +25,8 @@ export default function HomeHeader({
   onNavigateToSettings,
   onLogout
 }: HomeHeaderProps) {
+  const [isInboxPressed, setIsInboxPressed] = useState(false);
+
   return (
     <View className="flex-row items-center justify-between px-6 py-4">
       <View className="flex-row items-center gap-3">
@@ -51,7 +54,9 @@ export default function HomeHeader({
             onNavigateToReviews();
             console.log("🚀 [HomeHeader] Callback ejecutado");
           }}
-          className="w-10 h-10 bg-violet rounded-full flex items-center justify-center shadow-sm"
+          onPressIn={() => setIsInboxPressed(true)}
+          onPressOut={() => setIsInboxPressed(false)}
+          className={`w-10 h-10 ${isInboxPressed ? standarIconButtonPressed : standarIconButton}`}
         >
           <FontAwesome name="inbox" size={16} color="white" />
         </Pressable>

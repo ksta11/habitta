@@ -3,6 +3,7 @@ import { Alert, Modal, Text, TextInput, View } from 'react-native';
 import ButtonAtom from '../../../components/atoms/ButtonAtom';
 import { createApplication } from '../../../libs/application/api-service';
 import { hapticFeedback } from '../../../utils/haptics';
+import { standarPrimaryButton, standarPrimaryOutlineButton } from '../../../utils/TokensDesing';
 
 interface ContactHostModalProps {
   visible: boolean;
@@ -119,6 +120,7 @@ export default function ContactHostModal({
                 variant="outline"
                 size="medium"
                 fullWidth
+                className={standarPrimaryOutlineButton}
               />
             </View>
             <View className="flex-1">
@@ -130,6 +132,7 @@ export default function ContactHostModal({
                 fullWidth
                 loading={isLoading}
                 disabled={isLoading}
+                className={standarPrimaryButton}
               />
             </View>
           </View>

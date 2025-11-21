@@ -3,6 +3,7 @@ import { Image, Text, View } from 'react-native';
 import ButtonAtom from '../../../components/atoms/ButtonAtom';
 import Label from '../../../components/atoms/Label';
 import { RenterApplication } from '../../../interfaces/application/RenterApplicationInterface';
+import { standarDangerButton, standarPrimaryButton, standarSuccessButton } from '../../../utils/TokensDesing';
 
 interface ApplicationRenterCardProps {
   application: RenterApplication;
@@ -97,6 +98,7 @@ export default function ApplicationRenterCard({
                 icon="close-outline"
                 iconPosition="left"
                 fullWidth={true}
+                className={standarDangerButton}
               />
             </View>
           </View>
@@ -114,6 +116,7 @@ export default function ApplicationRenterCard({
                 icon="cloud-upload-outline"
                 iconPosition="left"
                 fullWidth={true}
+                className={standarPrimaryButton}
               />
             </View>
             
@@ -126,6 +129,7 @@ export default function ApplicationRenterCard({
                 icon="close-outline"
                 iconPosition="left"
                 fullWidth={true}
+                className={standarDangerButton}
               />
             </View>
           </View>
@@ -143,6 +147,7 @@ export default function ApplicationRenterCard({
                 icon="checkmark-outline"
                 iconPosition="left"
                 fullWidth={true}
+                className={standarSuccessButton}
               />
             </View>
             
@@ -155,6 +160,7 @@ export default function ApplicationRenterCard({
                 icon="close-outline"
                 iconPosition="left"
                 fullWidth={true}
+                className={standarDangerButton}
               />
             </View>
           </View>
@@ -172,6 +178,7 @@ export default function ApplicationRenterCard({
                 icon="close-outline"
                 iconPosition="left"
                 fullWidth={true}
+                className={standarDangerButton}
               />
             </View>
           </View>
@@ -189,6 +196,7 @@ export default function ApplicationRenterCard({
                 icon="close-circle-outline"
                 iconPosition="left"
                 fullWidth={true}
+                className={standarDangerButton}
               />
             </View>
           </View>

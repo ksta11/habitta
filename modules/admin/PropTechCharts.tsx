@@ -147,8 +147,8 @@ export const PropTechCharts: React.FC<PropTechChartsProps> = ({ variant = 'dashb
             />
           </View>
           <View className="flex-row flex-wrap justify-around mt-6">
-            {mockChartData.propertyTypes.map((item, index) => (
-              <View key={index} className="flex-row items-center mb-2 w-[45%]">
+            {mockChartData.propertyTypes.map((item) => (
+              <View key={item.label} className="flex-row items-center mb-2 w-[45%]">
                 <View 
                   className="w-3 h-3 rounded-full mr-2"
                   style={{ backgroundColor: item.color }}

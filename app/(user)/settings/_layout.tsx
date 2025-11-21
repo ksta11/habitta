@@ -1,38 +1,47 @@
+import React from 'react';
 import { Stack } from 'expo-router';
+import HeaderBackButton from '../../../components/atoms/HeaderBackButton';
 
 export default function AuthLayout() {
   return (
-    <Stack 
-      screenOptions={{ 
-        headerShown: true,
-        headerTransparent: true, // Hace el header transparente
-        headerTitle: '', // Sin título
+    <Stack
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#531A99',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+        headerLeft: () => <HeaderBackButton />,
       }}
     >
-      <Stack.Screen 
-        name="index" 
+      <Stack.Screen
+        name="index"
         options={{
-          title: 'settings', // Sin título para que no se vea texto
-          headerStyle: {
-            backgroundColor: '#7C3AED',
-          },
-          headerTintColor: '#FFFFFF',
-          headerShadowVisible: false,
-          headerTransparent: false, // Asegurar que no sea transparente para el color
-          headerBackVisible: false, // Ocultar el botón de back nativo
+          title: 'Configuración',
+          headerLeft: () => null,
         }}
       />
       <Stack.Screen 
         name="editProfile" 
+        options={{ 
+          headerShown: true,
+          title: 'Editar Perfil'
+        }} 
+      />
+      <Stack.Screen
+        name="payment/viewPayments"
         options={{
-          title: 'Edit Profile', // Sin título para que no se vea texto
-          headerStyle: {
-            backgroundColor: '#7C3AED',
-          },
-          headerTintColor: '#FFFFFF',
-          headerShadowVisible: false,
-          headerTransparent: false, // Asegurar que no sea transparente para el color
-          headerBackVisible: false, // Ocultar el botón de back nativo
+          headerShown: true,
+          title: 'Gestion de Pagos',
+        }}
+      />
+      <Stack.Screen
+        name="payment/make/[id]"
+        options={{
+          headerShown: true,
+          title: 'Ventana de Pago',
         }}
       />
     </Stack>
