@@ -10,13 +10,13 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import ReviewCommentInput from '../../../components/molecules/ReviewCommentInput';
-import ReviewSubmitButton from '../../../components/molecules/ReviewSubmitButton';
-import UserInfoCard from '../../../components/molecules/UserInfoCard';
-import { UserDAO } from '../../../interfaces/UserInterface';
-import { Review, debugTokenInfo, getReview, updateReview } from '../../../libs/user/review-service';
-import { getUserById } from '../../../libs/userServices/api-service';
-import ReviewHeader from './../reviews/molecules/ReviewHeader';
+import ReviewCommentInput from '../../components/molecules/ReviewCommentInput';
+import ReviewSubmitButton from '../../components/molecules/ReviewSubmitButton';
+import UserInfoCard from '../../components/molecules/UserInfoCard';
+import { UserDAO } from '../../interfaces/UserInterface';
+import { Review, debugTokenInfo, getReview, updateReview } from '../../libs/user/review-service';
+import { getUserById } from '../../libs/userServices/api-service';
+import ReviewHeader from './molecules/ReviewHeader';
 
 export default function ReviewForm() {
   const router = useRouter();
@@ -181,16 +181,9 @@ export default function ReviewForm() {
   return (
     <View style={{ flex: 1, backgroundColor: '#ffffff', paddingTop: insets.top }}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      
-      {/* Header */}
-      <ReviewHeader 
-        title="Dejar reseña" 
-        onBack={() => router.back()} 
-      />
-
       {/* Content */}
       <ScrollView 
-        className="flex-1 px-6 py-6"
+        className="flex-1 px-6"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
       >

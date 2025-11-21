@@ -6,10 +6,9 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import EmptyReviews from '../../../components/molecules/EmptyReviews';
-import ReviewCard from '../../../components/molecules/ReviewCard';
-import { useReviewNavigation, useReviews } from '../hooks';
-import ReviewHeader from './molecules/ReviewHeader';
+import EmptyReviews from '../../components/molecules/EmptyReviews';
+import ReviewCard from '../../components/molecules/ReviewCard';
+import { useReviewNavigation, useReviews } from '../user/hooks';
 
 /**
  * Módulo de lista de reviews
@@ -29,8 +28,7 @@ export default function ReviewListModule() {
   } = useReviews();
   
   const { 
-    navigateToReview, 
-    navigateBack 
+    navigateToReview,
   } = useReviewNavigation();
 
   const insets = useSafeAreaInsets();
@@ -50,15 +48,10 @@ export default function ReviewListModule() {
   // UI Principal
   return (
     <View style={{ flex: 1, backgroundColor: '#ffffff', paddingTop: insets.top }}>
-      {/* Header */}
-      <ReviewHeader 
-        title="Reviews Pendientes" 
-        onBack={navigateBack} 
-      />
 
       {/* Content */}
       <ScrollView 
-        className="flex-1 px-6 py-6"
+        className="flex-1 px-6"
         showsVerticalScrollIndicator={false}
       >
         {reviews.length === 0 ? (
