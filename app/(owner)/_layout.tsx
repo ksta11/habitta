@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 import { FontAwesome } from "@expo/vector-icons";
-import { Tabs } from 'expo-router';
-import { AuthGuard } from '../../middleware/AuthGuard';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { hapticFeedback } from '../../utils/haptics';
+import { Tabs } from "expo-router";
+import { AuthGuard } from "../../middleware/AuthGuard";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { hapticFeedback } from "../../utils/haptics";
 
 export default function OwnerTabsLayout() {
   const insets = useSafeAreaInsets();
@@ -11,7 +11,7 @@ export default function OwnerTabsLayout() {
 
   return (
     <AuthGuard requiredRole="owner">
-        <Tabs
+      <Tabs
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: "#320964", // deep-violet
@@ -52,7 +52,7 @@ export default function OwnerTabsLayout() {
         <Tabs.Screen
           name="(properties)"
           options={{
-            title: 'Propiedades',
+            title: "Propiedades",
             tabBarIcon: ({ color, size }) => (
               <FontAwesome name="building" size={size} color={color} />
             ),
@@ -63,7 +63,7 @@ export default function OwnerTabsLayout() {
         <Tabs.Screen
           name="(applications)"
           options={{
-            title: 'Solicitudes',
+            title: "Solicitudes",
             tabBarIcon: ({ color, size }) => (
               <FontAwesome name="envelope" size={size} color={color} />
             ),
@@ -74,10 +74,7 @@ export default function OwnerTabsLayout() {
         <Tabs.Screen
           name="(settings)"
           options={{
-            title: "Ajustes",
-            tabBarIcon: ({ color, size }) => (
-              <FontAwesome name="cog" size={size} color={color} />
-            ),
+            href: null,
           }}
         />
 
@@ -88,6 +85,18 @@ export default function OwnerTabsLayout() {
             href: null,
           }}
         />
+
+        {/* Tab arrendamientos */}
+        <Tabs.Screen
+          name="(leases)"
+          options={{
+            title: "Arrendamientos",
+            tabBarIcon: ({ color, size }) => (
+              <FontAwesome name="envelope" size={size} color={color} />
+            ),
+          }}
+        />
+    
       </Tabs>
     </AuthGuard>
   );
