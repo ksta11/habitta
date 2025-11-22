@@ -1,17 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ActivityIndicator, Alert, ScrollView, View, FlatList } from 'react-native';
-import { Property } from '../../../interfaces/property/PropertyInterface';
-import { getPropertyById } from '../../../libs/owner/property/api-service';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, FlatList, ScrollView, View } from 'react-native';
+import PropertyAmenities from '../../../components/molecules/PropertyAmenities';
+import PropertyBottomActions from '../../../components/molecules/PropertyBottomActions';
+import PropertyDescription from '../../../components/molecules/PropertyDescription';
 import PropertyHeader from '../../../components/molecules/PropertyHeader';
 import PropertyImageGallery from '../../../components/molecules/PropertyImageGallery';
-import PropertyTitle from '../../../components/molecules/PropertyTitle';
-import PropertyPriceCard from '../../../components/molecules/PropertyPriceCard';
-import PropertyDescription from '../../../components/molecules/PropertyDescription';
-import PropertyAmenities from '../../../components/molecules/PropertyAmenities';
-import PropertyLocation from '../../../components/molecules/PropertyLocation';
 import PropertyInfoCard from '../../../components/molecules/PropertyInfoCard';
-import PropertyBottomActions from '../../../components/molecules/PropertyBottomActions';
+import PropertyLocation from '../../../components/molecules/PropertyLocation';
+import PropertyPriceCard from '../../../components/molecules/PropertyPriceCard';
+import PropertyTitle from '../../../components/molecules/PropertyTitle';
+import { Property } from '../../../interfaces/property/PropertyInterface';
+import { getPropertyById } from '../../../libs/owner/property/api-service';
 import ContactHostModal from '../Organisms/ContactHostModal';
 
 // Servicios que podrían tener las propiedades

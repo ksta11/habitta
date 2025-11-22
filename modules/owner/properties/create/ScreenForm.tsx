@@ -99,9 +99,8 @@ export default function ScreenForm() {
     const propertyData = { ...data, id_owner: user?.id };
     const result = await createHooks.submitProperty(propertyData as any);
     if (result && result.success) {
-      // Si todo ok, limpiar y navegar
-      form.reset();
-      router.push('/(owner)/(properties)/index');
+      // Si todo ok, navegar
+      setTimeout(() => router.replace('../'), 300);
     } else {
       console.log('❌ Error al crear propiedad:', result?.message);
       Alert.alert('Error', result?.message || 'No se pudo crear la propiedad');

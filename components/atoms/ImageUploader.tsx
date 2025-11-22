@@ -169,7 +169,6 @@ export default function ImageUploader({
       className={`rounded border border-gray-300 p-4 shadow-sm ${
         disabled ? 'opacity-50' : 'active:opacity-70'
       } ${className}`}
-      activeOpacity={0.7}
     >
       <View className="flex flex-row items-center justify-center gap-4">
         <Text className={`font-medium ${disabled ? 'text-gray-500' : 'text-gray-900'}`}>

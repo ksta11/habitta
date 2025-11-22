@@ -2,10 +2,10 @@ import React from 'react';
 import { Controller } from 'react-hook-form';
 import { Text, View } from 'react-native';
 import ButtonAtom from '../../../../components/atoms/ButtonAtom';
-import Input from '../../../../components/atoms/Input';
 import NumericField from '../../../../components/atoms/NumericField';
 import PickerAtom from '../../../../components/atoms/Picker';
 import ProgressBar from '../../../../components/atoms/ProgressBar';
+import ServicesSelector from '../../../../components/molecules/ServicesSelector';
 import { FormStepProps } from '../../../../interfaces/property/types';
 
 export default function ScreenStep2({
@@ -111,16 +111,10 @@ export default function ScreenStep2({
         name="services"
         control={control}
         render={({ field: { onChange, value } }) => (
-          <Input
-            label="Servicios"
-            placeholder="Servicios (ej: agua, luz, internet)"
+          <ServicesSelector
             value={value}
-            onChangeText={onChange}
+            onChange={onChange}
             error={errors.services?.message}
-            borderColor="#A346E6"
-            backgroundColor="#F6F6F6"
-            labelColor="#A346E6"
-            textColor="#1F1F1F"
           />
         )}
       />
