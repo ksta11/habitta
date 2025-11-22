@@ -1,6 +1,6 @@
-import React from 'react';
-import { Pressable, Text, ActivityIndicator, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { hapticFeedback } from '../../utils/haptics';
 
 interface ButtonAtomProps {
