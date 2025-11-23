@@ -96,16 +96,7 @@ export default function PaymentCard({ payment }: Props) {
   const router = useRouter();
 
   const onPay = () => {
-    Alert.alert('Pagar', `Simulando pago de ${formatCurrency(amount, currency)} a ${counterparty_name || 'destinatario'}`);
     router.push(`./make/${payment.id_pay}`);
-  };
-
-  const onCancel = () => {
-    Alert.alert('Cancelar', 'Simulando cancelación del pago', [{ text: 'OK' }]);
-  };
-
-  const onMarkReceived = () => {
-    Alert.alert('Marcar recibido', 'Simulando marcar como recibido', [{ text: 'OK' }]);
   };
 
   const onView = () => {
