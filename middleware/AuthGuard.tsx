@@ -44,7 +44,7 @@ export function AuthGuard({ children, requiredRole }: AuthGuardProps) {
       if (user?.role === 'admin') {
         correctRoute = '/(admin)/home';
       } else if (user?.role === 'owner') {
-        correctRoute = '/(owner)/(properties)';
+        correctRoute = '/(owner)/(home)';
       }
       
       router.replace(correctRoute);

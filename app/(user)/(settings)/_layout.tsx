@@ -20,7 +20,13 @@ export default function AuthLayout() {
         name="index"
         options={{
           title: 'Configuración',
-          headerLeft: () => null,
+        }}
+      />
+      <Stack.Screen
+        name="profile"
+        options={{
+          headerShown: true,
+          title: 'Perfil',
         }}
       />
       <Stack.Screen 

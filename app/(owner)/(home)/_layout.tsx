@@ -19,6 +19,7 @@ export default function PropertiesLayout() {
         name="index"
         options={{
           title: 'Inicio',
+          headerLeft: () => null,
         }}
       />
     </Stack>

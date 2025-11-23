@@ -135,7 +135,7 @@ export default function PropertyDetailsModule() {
   // Handlers
   const handleGoBack = () => {
     // Navegar específicamente a la vista general de propiedades
-    router.push('/(user)/home');
+    router.push('/(user)/(home)');
   };
 
   const handleContactHost = () => {

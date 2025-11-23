@@ -131,7 +131,7 @@ export const UserHome = () => {
           userPhoto={undefined} // El tipo User no tiene photoUrl aún
           onNavigateToProfile={() => {
             hapticFeedback.buttonPressLight();
-            router.push("/(user)/profile");
+            router.push("/(user)/(settings)/profile");
           }}
           onNavigateToSettings={() => {
             hapticFeedback.buttonPressLight();

@@ -21,7 +21,12 @@ export default function SettingsLayout() {
         name="index"
         options={{
           title: 'Configuración',
-          headerLeft: () => null,
+        }}
+      />
+      <Stack.Screen
+        name="profile"
+        options={{
+          title: 'Perfil',
         }}
       />
       <Stack.Screen 

@@ -88,7 +88,7 @@ export default function Dashboard() {
                           userPhoto={undefined} // El tipo User no tiene photoUrl aún
                           onNavigateToProfile={() => {
                             hapticFeedback.buttonPressLight();
-                           //router.push("/(owner)/(settings)/editProfile");
+                           router.push("/(owner)/(settings)/profile");
                           }}
                           onNavigateToSettings={() => {
                             hapticFeedback.buttonPressLight();

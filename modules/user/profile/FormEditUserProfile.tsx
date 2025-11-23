@@ -123,7 +123,7 @@ export default function FormEditUserProfile() {
             if (router.canGoBack()) {
               router.back();
             } else {
-              router.replace("/(user)/profile");
+              router.replace("/(user)/(settings)/profile");
             }
           }}
         >

@@ -19,6 +19,7 @@ export default function ApplicationsLayout() {
         name="index"
         options={{
           title: 'Solicitudes de Arriendo',
+          headerLeft: () => null,
         }}
       />
       <Stack.Screen

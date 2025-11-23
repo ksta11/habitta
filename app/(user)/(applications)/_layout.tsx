@@ -11,12 +11,14 @@ export default function ApplicationsLayout() {
         headerTitleStyle: {
           fontWeight: 'bold',
         },
+          headerLeft: () => <HeaderBackButton />,
       }}
     >
       <Stack.Screen
         name="index"
         options={{
           title: 'Solicitudes de Arriendo',
+          headerLeft: () => null,
         }}
       />
       <Stack.Screen

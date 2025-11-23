@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView, RefreshControl, ActivityIndicator } from 'react-native';
 import Label from '../../../components/atoms/Label';
-import { useProfile } from '../hooks';
+import { useProfile } from './hooks/useProfile';
 
 export default function ProfileScreen() {
   // === HOOK DE PERFIL ===

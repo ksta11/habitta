@@ -20,6 +20,7 @@ export default function PropertiesLayout() {
         name="index"
         options={{
           title: 'Propiedades',
+          headerLeft: () => null,
         }}
       />
       <Stack.Screen 
