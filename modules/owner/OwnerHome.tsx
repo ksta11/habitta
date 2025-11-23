@@ -1,16 +1,16 @@
-import { useFocusEffect, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import React, { useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, View, Pressable } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { useAuth } from "../../contexts/AuthContext";
+import { hapticFeedback } from '../../utils/haptics';
+import { pressedPrimaryButton, standarPrimaryButton } from '../../utils/TokensDesing';
+import { useReviewNavigation } from "../user/hooks";
 import { DashboardHeader } from "./dashboard/dashboard-header";
 import { QuickActions } from "./dashboard/quick-actions";
 import { RecentApplications } from "./dashboard/recent-applications";
 import { RevenueChart } from "./dashboard/revenue-chart";
 import { StatsGrid } from "./dashboard/stats-grid";
 import { useOwnerDashboard } from './hooks';
-import { hapticFeedback } from '../../utils/haptics';
-import { useAuth } from "../../contexts/AuthContext";
-import { useReviewNavigation } from "../user/hooks";
-import { standarPrimaryButton, pressedPrimaryButton } from '../../utils/TokensDesing';
 
 
 export default function Dashboard() {
@@ -26,6 +26,9 @@ export default function Dashboard() {
     scheduledMaintenances,
     lastMonthIncome,
     monthlyIncome,
+    incomePeriod,
+    incomeLoading,
+    setIncomePeriod,
     recentApplications,
     occupiedVsTotal,
     loadOwnerStats,
@@ -111,7 +114,12 @@ export default function Dashboard() {
                 </View>
                 <View>
                     <View className="mt-6">
-                        <RevenueChart monthlyIncome={monthlyIncome} />
+                        <RevenueChart 
+                          monthlyIncome={monthlyIncome} 
+                          selectedPeriod={incomePeriod}
+                          onPeriodChange={setIncomePeriod}
+                          loading={incomeLoading}
+                        />
                     </View>
                     <View className="mt-6">
                         <RecentApplications applications={recentApplications} />
