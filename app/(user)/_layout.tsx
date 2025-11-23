@@ -63,7 +63,7 @@ export default function UserTabsLayout() {
         <Tabs.Screen
           name="(leases)"
           options={{
-            title: 'leases',
+            title: 'Alquiler',
             tabBarIcon: ({ color, size }) => (
               <FontAwesome name="envelope" size={size} color={color} />
             ),

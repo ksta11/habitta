@@ -18,7 +18,7 @@ export default function LeasesLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: 'Mis Arrendamientos',
+          title: 'Mi Alquiler',
           headerLeft: () => null,
         }}
       />

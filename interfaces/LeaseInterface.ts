@@ -75,3 +75,28 @@ export interface GetLeasePaymentHistoryResponse {
   data: PaymentHistory[];
   message?: string;
 }
+
+export interface LatestPayment {
+  id_pay: string;
+  id_payer: string;
+  id_receiver: string;
+  related_type: string;
+  id_related: string;
+  concept: string;
+  description: string;
+  amount: number;
+  currency: string;
+  method?: string;
+  payment_date?: string;
+  due_date: string;
+  reference_code: string;
+  notes?: string;
+  created_at: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded' | 'overdue' | 'cancelled';
+}
+
+export interface GetLatestPaymentResponse {
+  success: boolean;
+  data: LatestPayment | null;
+  message?: string;
+}

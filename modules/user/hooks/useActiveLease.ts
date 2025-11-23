@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Lease, LeaseDocument, PaymentHistory } from '../../../interfaces/LeaseInterface';
-import { getActiveLease, getLeaseDocuments, getLeasePaymentHistory } from '../../../libs/user/lease/api-service';
+import { LatestPayment, Lease, LeaseDocument, PaymentHistory } from '../../../interfaces/LeaseInterface';
+import { getActiveLease, getLatestPayment, getLeaseDocuments, getLeasePaymentHistory } from '../../../libs/user/lease/api-service';
 import { hapticFeedback } from '../../../utils/haptics';
 
 interface UseActiveLeaseReturn {
@@ -8,6 +8,7 @@ interface UseActiveLeaseReturn {
   lease: Lease | null;
   documents: LeaseDocument[];
   paymentHistory: PaymentHistory[];
+  latestPayment: LatestPayment | null;
   loading: boolean;
   refreshing: boolean;
   error: string | null;
@@ -17,11 +18,14 @@ interface UseActiveLeaseReturn {
   isExpiringSoon: boolean;
   daysRemaining: number;
   nextPaymentDate: Date | null;
+  shouldShowPaymentButton: boolean;
+  paymentId: string | null;
 
   // Funciones
   loadLease: () => Promise<void>;
   loadDocuments: () => Promise<void>;
   loadPaymentHistory: () => Promise<void>;
+  loadLatestPayment: () => Promise<void>;
   refresh: () => Promise<void>;
 }
 
@@ -32,6 +36,7 @@ export const useActiveLease = (): UseActiveLeaseReturn => {
   const [lease, setLease] = useState<Lease | null>(null);
   const [documents, setDocuments] = useState<LeaseDocument[]>([]);
   const [paymentHistory, setPaymentHistory] = useState<PaymentHistory[]>([]);
+  const [latestPayment, setLatestPayment] = useState<LatestPayment | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,11 +55,12 @@ export const useActiveLease = (): UseActiveLeaseReturn => {
         setLease(response.data);
         setError(null);
         
-        // Cargar documentos y historial de pagos si existe el lease
+        // Cargar documentos, historial de pagos y último pago si existe el lease
         if (response.data.id) {
           await Promise.all([
             loadDocuments(response.data.id),
             loadPaymentHistory(response.data.id),
+            loadLatestPayment(response.data.id),
           ]);
         }
       } else {
@@ -127,6 +133,39 @@ export const useActiveLease = (): UseActiveLeaseReturn => {
   }, [lease?.id]);
 
   /**
+   * Cargar último pago
+   */
+  const loadLatestPayment = useCallback(async (applicationId?: string) => {
+    try {
+      const id = applicationId || lease?.id;
+      if (!id) {
+        console.log('⚠️ [useActiveLease] No hay ID de aplicación para cargar último pago');
+        return;
+      }
+
+      console.log('💳 [useActiveLease] Cargando último pago...');
+      
+      const response = await getLatestPayment(id);
+
+      if (response.success) {
+        if (response.data) {
+          console.log('✅ [useActiveLease] Último pago cargado:', response.data.id_pay);
+          setLatestPayment(response.data);
+        } else {
+          console.log('ℹ️ [useActiveLease] No hay pagos registrados');
+          setLatestPayment(null);
+        }
+      } else {
+        console.log('❌ [useActiveLease] Error al cargar último pago:', response.message);
+        setLatestPayment(null);
+      }
+    } catch (err) {
+      console.error('❌ [useActiveLease] Error al cargar último pago:', err);
+      setLatestPayment(null);
+    }
+  }, [lease?.id]);
+
+  /**
    * Refrescar todos los datos
    */
   const refresh = useCallback(async () => {
@@ -178,7 +217,9 @@ export const useActiveLease = (): UseActiveLeaseReturn => {
   /**
    * Calcular próxima fecha de pago
    */
-  const nextPaymentDate = lease
+  const nextPaymentDate = latestPayment?.due_date
+    ? new Date(latestPayment.due_date)
+    : lease
     ? (() => {
         const today = new Date();
         const paymentDay = lease.payment_day;
@@ -191,11 +232,24 @@ export const useActiveLease = (): UseActiveLeaseReturn => {
       })()
     : null;
 
+  /**
+   * Verificar si debe mostrar el botón de pago
+   */
+  const shouldShowPaymentButton = latestPayment
+    ? ['pending', 'processing', 'failed', 'overdue'].includes(latestPayment.status)
+    : false;
+
+  /**
+   * Obtener ID del pago para el botón
+   */
+  const paymentId = latestPayment?.id_pay || null;
+
   return {
     // Estado
     lease,
     documents,
     paymentHistory,
+    latestPayment,
     loading,
     refreshing,
     error,
@@ -205,11 +259,14 @@ export const useActiveLease = (): UseActiveLeaseReturn => {
     isExpiringSoon,
     daysRemaining,
     nextPaymentDate,
+    shouldShowPaymentButton,
+    paymentId,
 
     // Funciones
     loadLease,
     loadDocuments,
     loadPaymentHistory,
+    loadLatestPayment,
     refresh,
   };
 };

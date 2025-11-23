@@ -1,6 +1,7 @@
 import { FontAwesome } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, Linking, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import Label from '../../../components/atoms/Label';
 import ConfirmMaintenanceModal from '../../../components/molecules/ConfirmMaintenanceModal';
@@ -22,12 +23,15 @@ export default function ScreenLeases() {
   // Hook del arrendamiento activo
   const {
     lease,
+    latestPayment,
     loading: leaseLoading,
     refreshing: leaseRefreshing,
     hasActiveLease,
     isExpiringSoon,
     daysRemaining,
     nextPaymentDate,
+    shouldShowPaymentButton,
+    paymentId,
     refresh: refreshLease,
   } = useActiveLease();
 
@@ -49,9 +53,18 @@ export default function ScreenLeases() {
   /**
    * Refrescar todos los datos
    */
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     await Promise.all([refreshLease(), refreshMaintenance()]);
-  };
+  }, [refreshLease, refreshMaintenance]);
+
+  /**
+   * Refrescar datos cada vez que la pantalla gana foco
+   */
+  useFocusEffect(
+    useCallback(() => {
+      handleRefresh();
+    }, [handleRefresh])
+  );
 
   /**
    * Navegar a solicitar mantenimiento
@@ -115,6 +128,16 @@ export default function ScreenLeases() {
     if (lease?.contract_url) {
       hapticFeedback.buttonPressLight();
       Linking.openURL(lease.contract_url);
+    }
+  };
+
+  /**
+   * Ir a la pantalla de pago
+   */
+  const handleMakePayment = () => {
+    if (paymentId) {
+      hapticFeedback.buttonPress();
+      router.push(`/(user)/(settings)/payment/make/${paymentId}`);
     }
   };
 
@@ -265,23 +288,39 @@ export default function ScreenLeases() {
           </View>
         )}
 
-        {/* Información de Próximo Pago */}
+        {/* Información de Pago */}
         {nextPaymentDate && (
           <View className="bg-violet/5 rounded-2xl p-4 border border-violet/20">
             <View className="flex-row items-center mb-2">
-              <FontAwesome name="calendar" size={18} color="#531A99" />
-              <Text className="text-violet font-semibold ml-2">Próximo Pago</Text>
+              <FontAwesome 
+                name={latestPayment?.status === 'completed' ? "check-circle" : "calendar"} 
+                size={18} 
+                color="#531A99" 
+              />
+              <Text className="text-violet font-semibold ml-2">
+                {latestPayment?.status === 'completed' ? 'Alquiler al día' : 'Próximo Pago'}
+              </Text>
             </View>
             <Text className="text-2xl font-bold text-erie-black">
               ${lease.monthly_rent.toLocaleString()}
             </Text>
-            <Text className="text-gray-600 mt-1">
-              Fecha: {nextPaymentDate.toLocaleDateString('es-ES', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-              })}
-            </Text>
+            {latestPayment?.status !== 'completed' && (
+              <Text className="text-gray-600 mt-1">
+                Fecha: {nextPaymentDate.toLocaleDateString('es-ES', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                })}
+              </Text>
+            )}
+            {shouldShowPaymentButton && paymentId && (
+              <Pressable
+                onPress={handleMakePayment}
+                className="bg-violet rounded-xl py-3 px-6 mt-4 items-center"
+              >
+                <Text className="text-white font-semibold">Pagar ahora</Text>
+              </Pressable>
+            )}
           </View>
         )}
       </View>

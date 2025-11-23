@@ -90,7 +90,7 @@ export default function OwnerTabsLayout() {
         <Tabs.Screen
           name="(leases)"
           options={{
-            title: "Arrendamientos",
+            title: "Alquileres",
             tabBarIcon: ({ color, size }) => (
               <FontAwesome name="envelope" size={size} color={color} />
             ),
