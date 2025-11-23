@@ -20,6 +20,7 @@ export default function ScreenStep3({
   isFirstStep,
   isLastStep,
   onSubmit,
+  onStepPress,
   // optional props injected from create hook via parent
   plans = [],
   loadingPlans = false,
@@ -52,6 +53,7 @@ export default function ScreenStep3({
             { icon: 'image-outline', title: 'Imágenes', description: 'Sube fotos' },
           ]}
           currentStep={3}
+          onStepPress={onStepPress}
         />
         <Text className="text-2xl font-bold my-4">Nueva Propiedad - Paso 3</Text>
       <Controller

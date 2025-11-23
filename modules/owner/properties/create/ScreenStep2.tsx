@@ -16,6 +16,7 @@ export default function ScreenStep2({
   isFirstStep,
   isLastStep,
   onSubmit,
+  onStepPress,
 }: FormStepProps) {
   const { errors } = formState;
   return (
@@ -27,6 +28,7 @@ export default function ScreenStep2({
           { icon: 'image-outline', title: 'Imágenes', description: 'Sube fotos' },
         ]}
         currentStep={2}
+        onStepPress={onStepPress}
       />
       <Text className="text-2xl font-bold my-4">Nueva Propiedad - Paso 2</Text>
       <Controller
