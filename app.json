@@ -42,7 +42,12 @@
           "backgroundColor": "#360f67"
         }
       ],
-      "expo-notifications"
+      [
+        "expo-notifications",
+        {
+          "sounds": ["./assets/sounds/notification.wav"]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

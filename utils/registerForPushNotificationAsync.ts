@@ -7,11 +7,11 @@ export async function registerForPushNotificationsAsync() {
   if (Platform.OS === "android") {
     await Notifications.setNotificationChannelAsync("default", {
       name: "default",
-      importance: Notifications.AndroidImportance.MAX,
+      importance: Notifications.AndroidImportance.HIGH,
       sound: "default",
       enableVibrate: true,
       enableLights: true,
-      vibrationPattern: [0, 250, 250, 250],
+      vibrationPattern: [],
       lightColor: "#FF231F7C",
     });
   }
