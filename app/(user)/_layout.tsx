@@ -39,7 +39,7 @@ export default function UserTabsLayout() {
           >
         {/* Tab Home */}
         <Tabs.Screen
-          name="home"
+          name="(home)"
           options={{
             title: "Inicio",
             tabBarIcon: ({ color, size }) => (
@@ -81,14 +81,7 @@ export default function UserTabsLayout() {
         
         {/* Tab Configuración */}
         <Tabs.Screen
-          name="settings"
-          options={{
-            href: null, 
-          }}
-        />
-
-        <Tabs.Screen
-          name="(home)"
+          name="(settings)"
           options={{
             href: null, 
           }}

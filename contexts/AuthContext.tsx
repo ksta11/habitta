@@ -299,7 +299,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             break;
           case 'user':
           default:
-            redirectPath = '/(user)/home';
+            redirectPath = '/(user)/(home)';
             break;
         }
         console.log('🚀 Redirigiendo a:', redirectPath);

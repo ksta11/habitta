@@ -11,7 +11,6 @@ export default function ApplicationsLayout() {
         headerTitleStyle: {
           fontWeight: 'bold',
         },
-        headerLeft: () => <HeaderBackButton />,
       }}
     >
       <Stack.Screen

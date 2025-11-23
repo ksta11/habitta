@@ -89,7 +89,7 @@ const ScreenSettings = () => {
         />
         
         <View className="mt-4 space-y-3">
-          <Link href="/(user)/settings/editProfile" asChild>
+          <Link href="/(user)/(settings)/editProfile" asChild>
             <Pressable className="py-3 border-b border-gray-100">
               <Label text="Editar Perfil" size="md" />
             </Pressable>
@@ -97,7 +97,7 @@ const ScreenSettings = () => {
           
           
 
-          <Link href="/(user)/settings/payment/viewPayments" asChild>
+          <Link href="/(user)/(settings)/payment/viewPayments" asChild>
             <Pressable className="py-3 border-b border-gray-100">
               <Label text="Gestionar Pagos" size="md" />
             </Pressable>
