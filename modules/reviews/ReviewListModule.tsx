@@ -8,7 +8,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import EmptyReviews from '../../components/molecules/EmptyReviews';
 import ReviewCard from '../../components/molecules/ReviewCard';
-import { useReviewNavigation, useReviews } from '../user/hooks';
+import { useReviewNavigation} from '../user/hooks/useReviewNavigation';
+import { useReviews } from '../user/hooks/useReviews';
 
 /**
  * Módulo de lista de reviews

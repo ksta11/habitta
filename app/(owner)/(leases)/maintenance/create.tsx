@@ -15,7 +15,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import ButtonAtom from '../../../../components/atoms/ButtonAtom';
 import Label from '../../../../components/atoms/Label';
 import { hapticFeedback } from '../../../../utils/haptics';
-import { useOwnerLeases } from '../../../../modules/owner/hooks';
+import { useOwnerLeases } from '../../../../modules/owner/hooks/useOwnerLeases';
 import { useOwnerMaintenanceRequests } from '../../../../modules/owner/hooks/useOwnerMaintenanceRequests';
 
 export default function ScreenCreateOwnerMaintenance() {
