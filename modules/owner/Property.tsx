@@ -5,7 +5,7 @@ import ButtonAtom from '../../components/atoms/ButtonAtom';
 import OptionModal from '../../components/atoms/OptionModal';
 import { standarDangerButton, standarPrimaryButton, standarSecondaryButton } from '../../utils/TokensDesing';
 import PropertyCard from './Atoms/PropertyCard';
-import { useOwnerProperties } from './hooks';
+import { useOwnerProperties } from './hooks/useOwnerProperties';
 
 export default function PropertyScreen() {
   const router = useRouter();

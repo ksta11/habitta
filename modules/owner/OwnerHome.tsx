@@ -6,10 +6,10 @@ import { QuickActions } from "./dashboard/quick-actions";
 import { RecentApplications } from "./dashboard/recent-applications";
 import { RevenueChart } from "./dashboard/revenue-chart";
 import { StatsGrid } from "./dashboard/stats-grid";
-import { useOwnerDashboard } from './hooks';
+import { useOwnerDashboard } from './hooks/useOwnerDashboard';
 import { hapticFeedback } from '../../utils/haptics';
 import { useAuth } from "../../contexts/AuthContext";
-import { useReviewNavigation } from "../user/hooks";
+import { useReviewNavigation } from "../user/hooks/useReviewNavigation";
 import { standarPrimaryButton, pressedPrimaryButton } from '../../utils/TokensDesing';
 
 

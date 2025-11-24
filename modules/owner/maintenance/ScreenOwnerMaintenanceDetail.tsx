@@ -11,7 +11,7 @@ import { OwnerMaintenanceRequest } from '../../../interfaces/owner/OwnerMaintena
 import { getOwnerMaintenanceRequestById } from '../../../libs/owner/maintenance/api-service';
 import { hapticFeedback } from '../../../utils/haptics';
 import { Badge } from '../../../components/atoms/Badge';
-import { useOwnerMaintenanceRequests } from '../hooks';
+import { useOwnerMaintenanceRequests } from '../hooks/useOwnerMaintenanceRequests';
 
 export default function ScreenOwnerMaintenanceDetail() {
   const router = useRouter();
@@ -87,16 +87,16 @@ export default function ScreenOwnerMaintenanceDetail() {
   };
 
   const handleCallRenter = () => {
-    if (request) {
+    if (request?.user?.phone) {
       hapticFeedback.buttonPressLight();
-      Linking.openURL(`tel:${request.renter.phone}`);
+      Linking.openURL(`tel:${request.user.phone}`);
     }
   };
 
   const handleEmailRenter = () => {
-    if (request) {
+    if (request?.user?.email) {
       hapticFeedback.buttonPressLight();
-      Linking.openURL(`mailto:${request.renter.email}`);
+      Linking.openURL(`mailto:${request.user.email}`);
     }
   };
 
@@ -135,8 +135,7 @@ export default function ScreenOwnerMaintenanceDetail() {
     );
   }
 
-  const categoryData = MAINTENANCE_CATEGORIES[request.category];
-  const priorityData = MAINTENANCE_PRIORITIES[request.priority];
+  // category y priority no existen en OwnerMaintenanceRequest, así que los manejamos como opcionales
   const statusData = MAINTENANCE_STATUSES[request.status];
 
   const canApprove = request.status === 'pending' || request.status === 'in_review';
@@ -156,67 +155,59 @@ export default function ScreenOwnerMaintenanceDetail() {
 
       <ScrollView className="flex-1">
         <View className="p-6">
-          {/* Estado y Prioridad */}
+          {/* Estado */}
           <View className="flex-row justify-between mb-4">
             <Badge variant="info">{statusData.label}</Badge>
-            <Badge variant={request.priority === 'high' || request.priority === 'urgent' ? 'error' : 'warning'}>
-              {priorityData.label}
-            </Badge>
+            <Text className="text-gray-500 text-sm">
+              {new Date(request.created_at).toLocaleDateString('es-ES')}
+            </Text>
           </View>
 
           {/* Propiedad */}
-          <View className="bg-violet-50 rounded-xl p-4 mb-4">
-            <View className="flex-row">
-              {request.property.images && request.property.images.length > 0 && (
-                <Image
-                  source={{ uri: request.property.images[0].url_image }}
-                  className="w-20 h-20 rounded-lg mr-3"
-                />
-              )}
-              <View className="flex-1">
-                <Text className="text-erie-black font-bold text-base mb-1">
-                  {request.property.title}
-                </Text>
-                <Text className="text-gray-600 text-sm">
-                  {request.property.address}
-                </Text>
+          {request.property && (
+            <View className="bg-violet-50 rounded-xl p-4 mb-4">
+              <View className="flex-row">
+                <View className="flex-1">
+                  <Text className="text-erie-black font-bold text-base mb-1">
+                    {request.property.title}
+                  </Text>
+                  <Text className="text-gray-600 text-sm">
+                    {request.property.address}
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
+          )}
 
           {/* Inquilino */}
-          <View className="bg-white border border-gray-200 rounded-xl p-4 mb-4">
-            <Text className="text-gray-600 text-sm mb-2">Solicitado por:</Text>
-            <Text className="text-erie-black font-bold text-lg mb-1">
-              {request.renter.name}
-            </Text>
-            <Text className="text-gray-600 text-sm mb-3">{request.renter.email}</Text>
-            <View className="flex-row">
-              <Pressable
-                onPress={handleCallRenter}
-                className="flex-1 bg-lavender-indigo rounded-full py-3 mr-2 flex-row items-center justify-center"
-              >
-                <FontAwesome name="phone" size={16} color="#ffffff" />
-                <Text className="text-white-traffic font-semibold ml-2">Llamar</Text>
-              </Pressable>
-              <Pressable
-                onPress={handleEmailRenter}
-                className="flex-1 bg-white border border-lavender-indigo rounded-full py-3 flex-row items-center justify-center"
-              >
-                <FontAwesome name="envelope" size={16} color="#531A99" />
-                <Text className="text-lavender-indigo font-semibold ml-2">Email</Text>
-              </Pressable>
-            </View>
-          </View>
-
-          {/* Categoría y Título */}
-          <View className="mb-4">
-            <View className="flex-row items-center mb-2">
-              <FontAwesome name={categoryData.icon as any} size={20} color="#531A99" />
-              <Text className="text-gray-600 ml-2 text-base capitalize">
-                {categoryData.label}
+          {request.user && (
+            <View className="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+              <Text className="text-gray-600 text-sm mb-2">Solicitado por:</Text>
+              <Text className="text-erie-black font-bold text-lg mb-1">
+                {request.user.name}
               </Text>
+              <Text className="text-gray-600 text-sm mb-3">{request.user.email}</Text>
+              <View className="flex-row">
+                <Pressable
+                  onPress={handleCallRenter}
+                  className="flex-1 bg-lavender-indigo rounded-full py-3 mr-2 flex-row items-center justify-center"
+                >
+                  <FontAwesome name="phone" size={16} color="#ffffff" />
+                  <Text className="text-white-traffic font-semibold ml-2">Llamar</Text>
+                </Pressable>
+                <Pressable
+                  onPress={handleEmailRenter}
+                  className="flex-1 bg-white border border-lavender-indigo rounded-full py-3 flex-row items-center justify-center"
+                >
+                  <FontAwesome name="envelope" size={16} color="#531A99" />
+                  <Text className="text-lavender-indigo font-semibold ml-2">Email</Text>
+                </Pressable>
+              </View>
             </View>
+          )}
+
+          {/* Título */}
+          <View className="mb-4">
             <Text className="text-erie-black font-bold text-xl">{request.title}</Text>
           </View>
 
@@ -229,9 +220,9 @@ export default function ScreenOwnerMaintenanceDetail() {
           <View className="bg-white border border-gray-200 rounded-xl p-4 mb-4">
             <Text className="text-gray-600 font-semibold mb-3">Fechas:</Text>
             <View className="mb-2">
-              <Text className="text-gray-600 text-sm">Solicitado:</Text>
+              <Text className="text-gray-600 text-sm">Creado:</Text>
               <Text className="text-erie-black font-semibold">
-                {formatDate(request.request_date)}
+                {formatDate(request.created_at)}
               </Text>
             </View>
             {request.scheduled_date && (
@@ -242,44 +233,26 @@ export default function ScreenOwnerMaintenanceDetail() {
                 </Text>
               </View>
             )}
-            {request.completion_date && (
+            {request.completed_date && (
               <View>
                 <Text className="text-gray-600 text-sm">Completado:</Text>
                 <Text className="text-green-600 font-semibold">
-                  {formatDate(request.completion_date)}
+                  {formatDate(request.completed_date)}
                 </Text>
               </View>
             )}
           </View>
 
-          {/* Notas del Owner */}
-          {request.owner_notes && (
-            <View className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
-              <Text className="text-blue-700 font-semibold mb-2">Tus Notas:</Text>
-              <Text className="text-blue-900">{request.owner_notes}</Text>
-            </View>
-          )}
-
           {/* Costos */}
-          {(request.estimated_cost || request.actual_cost) && (
+          {request.cost_estimate && (
             <View className="bg-white border border-gray-200 rounded-xl p-4 mb-4">
               <Text className="text-gray-600 font-semibold mb-3">Costos:</Text>
-              {request.estimated_cost && (
-                <View className="flex-row justify-between mb-2">
-                  <Text className="text-gray-600">Estimado:</Text>
-                  <Text className="text-orange-600 font-bold">
-                    {formatCurrency(request.estimated_cost)}
-                  </Text>
-                </View>
-              )}
-              {request.actual_cost && (
-                <View className="flex-row justify-between">
-                  <Text className="text-gray-600">Real:</Text>
-                  <Text className="text-green-600 font-bold">
-                    {formatCurrency(request.actual_cost)}
-                  </Text>
-                </View>
-              )}
+              <View className="flex-row justify-between mb-2">
+                <Text className="text-gray-600">Costo Estimado:</Text>
+                <Text className="text-orange-600 font-bold">
+                  {formatCurrency(request.cost_estimate)}
+                </Text>
+              </View>
             </View>
           )}
 

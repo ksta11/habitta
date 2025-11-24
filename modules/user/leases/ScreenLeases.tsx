@@ -7,7 +7,9 @@ import ConfirmMaintenanceModal from '../../../components/molecules/ConfirmMainte
 import LeaseCard from '../../../components/molecules/LeaseCard';
 import MaintenanceRequestCard from '../../../components/molecules/MaintenanceRequestCard';
 import { hapticFeedback } from '../../../utils/haptics';
-import { useActiveLease, useMaintenanceRequests } from '../hooks';
+import { useActiveLease } from '../hooks/useActiveLease';
+import { useMaintenanceRequests } from '../hooks/useMaintenanceRequests';
+
 
 export default function ScreenLeases() {
   const router = useRouter();

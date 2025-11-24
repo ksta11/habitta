@@ -6,7 +6,7 @@ import CompleteMaintenanceModal from '../../../components/molecules/CompleteMain
 import OwnerMaintenanceRequestCard from '../../../components/molecules/OwnerMaintenanceRequestCard';
 import { OwnerMaintenanceFilter } from '../../../interfaces/owner/OwnerMaintenanceInterface';
 import { hapticFeedback } from '../../../utils/haptics';
-import { useOwnerMaintenanceRequests } from '../hooks';
+import { useOwnerMaintenanceRequests } from '../hooks/useOwnerMaintenanceRequests';
 
 export default function ScreenOwnerMaintenanceList() {
   const router = useRouter();
