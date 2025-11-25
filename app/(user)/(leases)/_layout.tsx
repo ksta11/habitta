@@ -1,4 +1,5 @@
 import { Stack } from 'expo-router';
+import HeaderBackButton from '../../../components/atoms/HeaderBackButton';
 
 export default function LeasesLayout() {
   return (
@@ -11,12 +12,14 @@ export default function LeasesLayout() {
         headerTitleStyle: {
           fontWeight: 'bold',
         },
+        headerLeft: () => <HeaderBackButton />,
       }}
     >
       <Stack.Screen
         name="index"
         options={{
-          title: 'Mi Arrendamiento',
+          title: 'Mi Alquiler',
+          headerLeft: () => null,
         }}
       />
       <Stack.Screen

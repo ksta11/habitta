@@ -1,32 +1,65 @@
-import React, { useEffect, useRef, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ActivityIndicator, Alert, ScrollView, View, FlatList } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, FlatList, ScrollView, View } from 'react-native';
+import PropertyAmenities from '../../../components/molecules/PropertyAmenities';
+import PropertyBottomActions from '../../../components/molecules/PropertyBottomActions';
+import PropertyDescription from '../../../components/molecules/PropertyDescription';
+import PropertyImageGallery from '../../../components/molecules/PropertyImageGallery';
+import PropertyInfoCard from '../../../components/molecules/PropertyInfoCard';
+import PropertyLocation from '../../../components/molecules/PropertyLocation';
+import PropertyPriceCard from '../../../components/molecules/PropertyPriceCard';
+import PropertyTitle from '../../../components/molecules/PropertyTitle';
 import { Property } from '../../../interfaces/property/PropertyInterface';
 import { getPropertyById } from '../../../libs/owner/property/api-service';
-import PropertyHeader from '../../../components/molecules/PropertyHeader';
-import PropertyImageGallery from '../../../components/molecules/PropertyImageGallery';
-import PropertyTitle from '../../../components/molecules/PropertyTitle';
-import PropertyPriceCard from '../../../components/molecules/PropertyPriceCard';
-import PropertyDescription from '../../../components/molecules/PropertyDescription';
-import PropertyAmenities from '../../../components/molecules/PropertyAmenities';
-import PropertyLocation from '../../../components/molecules/PropertyLocation';
-import PropertyInfoCard from '../../../components/molecules/PropertyInfoCard';
-import PropertyBottomActions from '../../../components/molecules/PropertyBottomActions';
 import ContactHostModal from '../Organisms/ContactHostModal';
 
-// Servicios que podrían tener las propiedades
-const defaultAmenities = [
-  { icon: () => '📶', name: "WiFi gratuito" },
-  { icon: () => '🚗', name: "Estacionamiento" },
-  { icon: () => '🏋️', name: "Gimnasio" },
-  { icon: () => '☕', name: "Cocina equipada" },
-  { icon: () => '🛡️', name: "Seguridad 24/7" },
-];
+// Mapeo de íconos para cada tipo de servicio
+const serviceIcons: { [key: string]: string } = {
+  agua: '💧',
+  gas: '🔥',
+  luz: '⚡',
+  internet: '📶',
+  parabolica: '📺',
+  administracion: '🏢',
+  parqueadero: '🚗',
+  nevera: '🧊',
+  lavadora: '🧺',
+  televisor: '📺',
+  sofa: '🛋️',
+  cama: '🛏️',
+  mesa: '🍽️',
+  sillas: '🪑',
+  lavavajillas: '🍽️',
+  microondas: '🔥',
+  'aire acondicionado': '❄️',
+  calefaccion: '🔥',
+};
+
+// Mapeo de nombres legibles para los servicios
+const serviceNames: { [key: string]: string } = {
+  agua: 'Agua',
+  gas: 'Gas',
+  luz: 'Luz',
+  internet: 'Internet',
+  parabolica: 'Parabólica',
+  administracion: 'Administración',
+  parqueadero: 'Parqueadero',
+  nevera: 'Nevera',
+  lavadora: 'Lavadora',
+  televisor: 'Televisor',
+  sofa: 'Sofá',
+  cama: 'Cama',
+  mesa: 'Mesa',
+  sillas: 'Sillas',
+  lavavajillas: 'Lavavajillas',
+  microondas: 'Microondas',
+  'aire acondicionado': 'Aire acondicionado',
+  calefaccion: 'Calefacción',
+};
 
 export default function PropertyDetailsModule() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const [isFavorite, setIsFavorite] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
@@ -83,7 +116,16 @@ export default function PropertyDetailsModule() {
 
   // Función helper para obtener amenidades basadas en los servicios
   const getAmenities = (services: string) => {
-    return defaultAmenities;
+    if (!services) return [];
+    
+    const serviceList = services.split(',').map(s => s.trim().toLowerCase());
+    
+    return serviceList
+      .filter(service => service && serviceIcons[service])
+      .map(service => ({
+        icon: () => serviceIcons[service],
+        name: serviceNames[service] || service.charAt(0).toUpperCase() + service.slice(1)
+      }));
   };
 
   useEffect(() => {
@@ -93,11 +135,7 @@ export default function PropertyDetailsModule() {
   // Handlers
   const handleGoBack = () => {
     // Navegar específicamente a la vista general de propiedades
-    router.push('/(user)/home');
-  };
-
-  const handleToggleFavorite = () => {
-    setIsFavorite(!isFavorite);
+    router.push('/(user)/(home)');
   };
 
   const handleContactHost = () => {
@@ -155,12 +193,6 @@ export default function PropertyDetailsModule() {
 
   return (
     <View className="flex-1 bg-white">
-      {/* Header with Back Button */}
-      <PropertyHeader
-        onGoBack={handleGoBack}
-        onToggleFavorite={handleToggleFavorite}
-        isFavorite={isFavorite}
-      />
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Image Gallery */}

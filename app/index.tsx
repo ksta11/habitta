@@ -18,11 +18,11 @@ export default function Index() {
             redirectPath = '/(admin)/home';
             break;
           case 'owner':
-            redirectPath = '/(owner)/(properties)';
+            redirectPath = '/(owner)/(home)';
             break;
           case 'user':
           default:
-            redirectPath = '/(user)/home';
+            redirectPath = '/(user)/(home)';
             break;
         }
         console.log('🔄 Usuario autenticado, redirigiendo a:', redirectPath);

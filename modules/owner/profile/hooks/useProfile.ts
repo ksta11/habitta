@@ -162,7 +162,7 @@ export const useProfile = (): UseProfileReturn => {
    * Navega a la pantalla de edición de perfil
    */
   const navigateToEditProfile = () => {
-    router.push("/(user)/(settings)/editProfile");
+    router.push("/(owner)/(settings)/editProfile/editProfile");
   };
 
   // === CARGA AUTOMÁTICA AL ENFOCAR ===

@@ -87,6 +87,10 @@ export default function MakePayment({ idPay }: MakePaymentProps) {
       const { error: presentError } = await presentPaymentSheet();
       if (presentError) {
         setPayLoading(false);
+        // Si el usuario canceló el pago, no mostrar error
+        if (presentError.code === 'Canceled' || presentError.message === 'The payment flow has been cancelled') {
+          return;
+        }
         showAlert('error', 'Error en el pago', presentError.message || 'Error al procesar el pago');
         return;
       }

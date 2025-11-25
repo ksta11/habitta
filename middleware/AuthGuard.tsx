@@ -39,12 +39,12 @@ export function AuthGuard({ children, requiredRole }: AuthGuardProps) {
   useEffect(() => {
     // Verificar rol si es requerido - mover a useEffect para evitar setState during render
     if (!isLoading && isAuthenticated && requiredRole && user?.role !== requiredRole) {
-      let correctRoute: Parameters<typeof router.replace>[0] = '/(user)/home'; // Default for user role
+      let correctRoute: Parameters<typeof router.replace>[0] = '/(user)/(home)'; // Default for user role
       
       if (user?.role === 'admin') {
         correctRoute = '/(admin)/home';
       } else if (user?.role === 'owner') {
-        correctRoute = '/(owner)/(properties)';
+        correctRoute = '/(owner)/(home)';
       }
       
       router.replace(correctRoute);

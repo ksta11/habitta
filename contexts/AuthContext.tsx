@@ -295,11 +295,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             redirectPath = '/(admin)/home';
             break;
           case 'owner':
-            redirectPath = '/(owner)/(properties)';
+            redirectPath = '/(owner)/(home)';
             break;
           case 'user':
           default:
-            redirectPath = '/(user)/home';
+            redirectPath = '/(user)/(home)';
             break;
         }
         console.log('🚀 Redirigiendo a:', redirectPath);
@@ -343,11 +343,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             redirectPath = '/(admin)/home';
             break;
           case 'owner':
-            redirectPath = '/(owner)/(properties)';
+            redirectPath = '/(owner)/(home)';
             break;
           case 'user':
           default:
-            redirectPath = '/(user)/home';
+            redirectPath = '/(user)/(home)';
             break;
         }
         router.replace(redirectPath);

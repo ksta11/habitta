@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   GetActiveLeaseResponse,
+  GetLatestPaymentResponse,
   GetLeaseDocumentsResponse,
   GetLeasePaymentHistoryResponse,
   Lease
@@ -95,8 +96,8 @@ export const getActiveLease = async (): Promise<GetActiveLeaseResponse> => {
       id_owner: ownerId || '', // Usar el id del owner
       start_date: signedApplication.application_date, // Fecha de firma del contrato
       end_date: endDate.toISOString(), // 12 meses después
-      monthly_rent: signedApplication.property.price,
-      deposit: signedApplication.property.price, // Típicamente 1 mes de renta
+      monthly_rent: signedApplication.rentAmount || signedApplication.property.price,
+      deposit: signedApplication.rentAmount || signedApplication.property.price, // Típicamente 1 mes de renta
       status: 'active',
       payment_day: 1, // Día 1 de cada mes por defecto
       contract_url: '', // Se agregará cuando esté disponible
@@ -232,6 +233,73 @@ export const getLeasePaymentHistory = async (leaseId: string): Promise<GetLeaseP
     return {
       success: false,
       data: [],
+      message: error instanceof Error ? error.message : 'Error inesperado'
+    };
+  }
+};
+
+/**
+ * Obtiene el último pago de una aplicación
+ */
+export const getLatestPayment = async (applicationId: string): Promise<GetLatestPaymentResponse> => {
+  try {
+    console.log('💰 Obteniendo último pago de aplicación:', applicationId);
+    
+    const token = await AsyncStorage.getItem(TOKEN_KEY);
+    if (!token) {
+      console.log('❌ No se encontró token de autenticación');
+      return {
+        success: false,
+        data: null,
+        message: 'Token de autenticación no encontrado'
+      };
+    }
+
+    const url = `${API_BASE_URL}/api/payments/application/${applicationId}/latest`;
+    console.log('🌐 URL de consulta:', url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('📡 Status de respuesta:', response.status);
+
+    const data = await response.json();
+    console.log('📋 Respuesta del servidor:', data);
+
+    if (!response.ok) {
+      console.log('❌ Error en la respuesta del servidor:', response.status);
+      return {
+        success: false,
+        data: null,
+        message: data.message || 'Error al obtener último pago'
+      };
+    }
+
+    if (data.success && data.data) {
+      console.log('✅ Último pago obtenido:', data.data.id_pay);
+      return {
+        success: true,
+        data: data.data,
+        message: 'Último pago obtenido exitosamente'
+      };
+    } else {
+      console.log('ℹ️ No hay pagos para esta aplicación');
+      return {
+        success: true,
+        data: null,
+        message: 'No hay pagos registrados'
+      };
+    }
+  } catch (error) {
+    console.error('❌ Error al obtener último pago:', error);
+    return {
+      success: false,
+      data: null,
       message: error instanceof Error ? error.message : 'Error inesperado'
     };
   }

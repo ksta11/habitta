@@ -1,6 +1,7 @@
 
 import * as ImagePicker from 'expo-image-picker';
-import React, { useEffect, useState } from 'react';
+import { useRouter } from 'expo-router';
+import React, { useEffect } from 'react';
 import { Controller } from 'react-hook-form';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import ButtonAtom from '../../../../components/atoms/ButtonAtom';
@@ -19,12 +20,14 @@ export default function ScreenStep3({
   isFirstStep,
   isLastStep,
   onSubmit,
+  onStepPress,
   // optional props injected from create hook via parent
   plans = [],
   loadingPlans = false,
   loadPlans,
   isSubmitting = false,
 }: FormStepProps) {
+  const router = useRouter();
   const { errors } = formState;
 
   // Price input uses the reusable NumericField component (float mode)
@@ -50,6 +53,7 @@ export default function ScreenStep3({
             { icon: 'image-outline', title: 'Imágenes', description: 'Sube fotos' },
           ]}
           currentStep={3}
+          onStepPress={onStepPress}
         />
         <Text className="text-2xl font-bold my-4">Nueva Propiedad - Paso 3</Text>
       <Controller
@@ -70,7 +74,16 @@ export default function ScreenStep3({
           />
         )}
       />
-      <Text className="mb-2 font-semibold">Tipo de plan</Text>
+      <View className="flex-row items-center justify-between mb-2">
+        <Text className="font-semibold">Tipo de plan</Text>
+        <Pressable
+          onPress={() => router.push('/(owner)/(properties)/plans' as any)}
+          className="flex-row items-center"
+        >
+          <Text className="text-sm text-violet font-semibold mr-1">Ver detalles de planes</Text>
+          <Text className="text-violet">→</Text>
+        </Pressable>
+      </View>
       {loadingPlans ? (
         <Text className="text-sm text-gray-500">Cargando planes...</Text>
       ) : (

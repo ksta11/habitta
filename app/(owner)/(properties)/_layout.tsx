@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router';
 import HeaderBackButton from '../../../components/atoms/HeaderBackButton';
+import { SafeAreaFrameContext } from 'react-native-safe-area-context';
 
 export default function PropertiesLayout() {
   return (
@@ -19,6 +20,7 @@ export default function PropertiesLayout() {
         name="index"
         options={{
           title: 'Propiedades',
+          headerLeft: () => null,
         }}
       />
       <Stack.Screen 
@@ -34,6 +36,12 @@ export default function PropertiesLayout() {
           headerShown: false,
           title: 'Editar Propiedad'
         }} 
+      />
+      <Stack.Screen
+        name="plans/index"
+        options={{
+          title: 'Planes',
+        }}
       />
     </Stack>
   );

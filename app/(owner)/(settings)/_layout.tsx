@@ -4,23 +4,29 @@ import HeaderBackButton from '../../../components/atoms/HeaderBackButton';
 
 export default function SettingsLayout() {
   return (
-    <Stack
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: '#531A99',
-        },
-        headerTintColor: '#fff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-        headerLeft: () => <HeaderBackButton />,
-      }}
-    >
+      <Stack
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: '#531A99',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerLeft: () => <HeaderBackButton />,
+        }}
+      >
+        
       <Stack.Screen
         name="index"
         options={{
           title: 'Configuración',
-          headerLeft: () => null,
+        }}
+      />
+      <Stack.Screen
+        name="profile"
+        options={{
+          title: 'Perfil',
         }}
       />
       <Stack.Screen 

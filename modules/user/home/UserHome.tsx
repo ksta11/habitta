@@ -1,7 +1,6 @@
 import { useFocusEffect, useRouter } from "expo-router";
 import React from "react";
 import { FlatList, RefreshControl, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Label from "../../../components/atoms/Label";
 import PropertyCard from "../../../components/molecules/PropertyCard";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -37,10 +36,6 @@ export const UserHome = () => {
 
   // Contexto de autenticación
   const { user, logout } = useAuth();
-
-  // Obtener safe area insets manualmente
-  const insets = useSafeAreaInsets();
-  console.log('🏠 [UserHome] SafeAreaInsets obtenidos:', insets);
 
   // === HOOKS DE PROPIEDADES ===
   const {
@@ -133,7 +128,7 @@ export const UserHome = () => {
 
   return (
     <View className="flex-1 bg-white">
-      <View style={{ paddingTop: insets.top }}>
+      <View>
         <HomeHeader 
           onNavigateToReviews={navigateToReviewList}
           userName={user?.name || user?.email || "Usuario"}
@@ -141,11 +136,11 @@ export const UserHome = () => {
           userPhoto={undefined} // El tipo User no tiene photoUrl aún
           onNavigateToProfile={() => {
             hapticFeedback.buttonPressLight();
-            router.push("/(user)/profile");
+            router.push("/(user)/(settings)/profile");
           }}
           onNavigateToSettings={() => {
             hapticFeedback.buttonPressLight();
-            router.push("/(user)/settings");
+            router.push("/(user)/(settings)");
           }}
           onLogout={async () => {
             hapticFeedback.buttonPress();

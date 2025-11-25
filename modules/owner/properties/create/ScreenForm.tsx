@@ -99,9 +99,8 @@ export default function ScreenForm() {
     const propertyData = { ...data, id_owner: user?.id };
     const result = await createHooks.submitProperty(propertyData as any);
     if (result && result.success) {
-      // Si todo ok, limpiar y navegar
-      form.reset();
-      router.push('/(owner)/(properties)/index');
+      // Si todo ok, navegar
+      setTimeout(() => router.replace('../'), 300);
     } else {
       console.log('❌ Error al crear propiedad:', result?.message);
       Alert.alert('Error', result?.message || 'No se pudo crear la propiedad');
@@ -120,6 +119,14 @@ export default function ScreenForm() {
     }
   };
 
+  // Función para ir a un step específico (solo hacia atrás)
+  const goToStep = (stepNumber: number) => {
+    const stepIndex = stepNumber - 1; // Convertir de 1-based a 0-based
+    if (stepIndex < currentStep && stepIndex >= 0) {
+      setCurrentStep(stepIndex);
+    }
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <StepComponent
@@ -129,6 +136,7 @@ export default function ScreenForm() {
         onSubmit={handleStepSubmit}
         isLastStep={currentStep === steps.length - 1}
         isFirstStep={currentStep === 0}
+        onStepPress={goToStep}
         // Props from create hook
         plans={createHooks.plans}
         loadingPlans={createHooks.loadingPlans}

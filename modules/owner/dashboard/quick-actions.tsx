@@ -8,10 +8,10 @@ import { pressedPrimaryButton, pressedSecondaryButton, standarLavenderButton, st
 
 const actions = [
   {
-    title: "Publicar Inmueble",
-    description: "Agregar nueva propiedad",
+    title: "Ver Inmuebles",
+    description: "Agregar o edita propiedades",
     icon: "add" as const,
-    link: "/(owner)/(properties)/create/Form",
+    link: "/(owner)/(properties)",
     token: standarPrimaryButton,
     pressedToken: pressedPrimaryButton,
   },

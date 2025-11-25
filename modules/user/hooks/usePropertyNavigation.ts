@@ -60,9 +60,9 @@ export const usePropertyNavigation = () => {
     } else {
       // Si no hay historial, ir al home del contexto correspondiente
       if (context === 'owner') {
-        router.replace('/(owner)/home' as any);
+        router.replace('/(owner)/(home)' as any);
       } else {
-        router.replace('/(user)/home' as any);
+        router.replace('/(user)/(home)' as any);
       }
     }
   };
@@ -75,9 +75,9 @@ export const usePropertyNavigation = () => {
     console.log(`🔍 [usePropertyNavigation] Navegando a búsqueda en contexto ${context}`);
 
     if (context === 'owner') {
-      router.push('/(owner)/home' as any);
+      router.push('/(owner)/(home)' as any);
     } else {
-      router.push('/(user)/home' as any);
+      router.push('/(user)/(home)' as any);
     }
   };
 

@@ -5,6 +5,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
 import { DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
+import { AuthGuard } from '../../middleware/AuthGuard';
 
 function CustomDrawerContent(props: any) {
   const { logout } = useAuth();
@@ -31,43 +32,45 @@ function CustomDrawerContent(props: any) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'white', paddingTop: insets.top }}>
-      <DrawerContentScrollView {...props} contentContainerStyle={{ paddingTop: 0 }}>
-        {/* Header del drawer */}
-        <View className="bg-black px-6 py-8 mb-4">
-          <View className="flex-row items-center">
-            <View className="bg-white p-3 rounded-full mr-4">
-              <FontAwesome name="shield" size={24} color="#1F1F1F" />
-            </View>
-            <View>
-              <Text className="text-white font-bold text-lg">Admin Panel</Text>
-              <Text className="text-red-100 text-sm">Panel de Administración</Text>
+    <AuthGuard requiredRole="admin">
+      <View style={{ flex: 1, backgroundColor: 'white', paddingTop: insets.top }}>
+        <DrawerContentScrollView {...props} contentContainerStyle={{ paddingTop: 0 }}>
+          {/* Header del drawer */}
+          <View className="bg-black px-6 py-8 mb-4">
+            <View className="flex-row items-center">
+              <View className="bg-white p-3 rounded-full mr-4">
+                <FontAwesome name="shield" size={24} color="#1F1F1F" />
+              </View>
+              <View>
+                <Text className="text-white font-bold text-lg">Admin Panel</Text>
+                <Text className="text-red-100 text-sm">Panel de Administración</Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        {/* Items del drawer */}
-        <DrawerItemList {...props} />
-        
-        {/* Separador */}
-        <View className="border-t border-gray-200 mt-4 pt-4 mx-4">
-          <DrawerItem
-            label="Cerrar Sesión"
-            onPress={handleLogout}
-            icon={({ color, size }) => (
-              <FontAwesome name="sign-out" size={size} color="#dc2626" />
-            )}
-            labelStyle={{ 
-              color: '#dc2626', 
-              fontWeight: '600' 
-            }}
-            style={{
-              marginHorizontal: 0,
-            }}
-          />
-        </View>
-      </DrawerContentScrollView>
-    </View>
+          {/* Items del drawer */}
+          <DrawerItemList {...props} />
+          
+          {/* Separador */}
+          <View className="border-t border-gray-200 mt-4 pt-4 mx-4">
+            <DrawerItem
+              label="Cerrar Sesión"
+              onPress={handleLogout}
+              icon={({ color, size }) => (
+                <FontAwesome name="sign-out" size={size} color="#dc2626" />
+              )}
+              labelStyle={{ 
+                color: '#dc2626', 
+                fontWeight: '600' 
+              }}
+              style={{
+                marginHorizontal: 0,
+              }}
+            />
+          </View>
+        </DrawerContentScrollView>
+      </View>
+    </AuthGuard>
   );
 }
 

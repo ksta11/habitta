@@ -6,10 +6,6 @@ export interface OwnerDashboard {
         rentedProperties: number;
         pendingApplications: number;
         scheduledMaintenances: number;
-        monthlyIncome: {
-            month: string;
-            amount: number;
-        }[];
         recentApplications: {
             id: string;
             applicantName: string;
