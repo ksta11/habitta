@@ -12,7 +12,8 @@ import {
 import MaintenanceRequestCard from '../../../components/molecules/MaintenanceRequestCard';
 import { MaintenanceStatus } from '../../../interfaces/MaintenanceInterface';
 import { hapticFeedback } from '../../../utils/haptics';
-import { useActiveLease, useMaintenanceRequests } from '../hooks';
+import { useActiveLease } from '../hooks/useActiveLease';
+import { useMaintenanceRequests } from '../hooks/useMaintenanceRequests';
 
 type FilterType = 'all' | MaintenanceStatus;
 

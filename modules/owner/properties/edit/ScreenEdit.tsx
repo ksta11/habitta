@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, ScrollView, ActivityIndicator, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Controller } from 'react-hook-form';
-import { useEditProperty } from '../../hooks';
+import { useEditProperty } from '../../hooks/useEditProperty';
 import ImageCarousel from '../../../../components/atoms/ImageCarousel';
 import Input from '../../../../components/atoms/Input';
 import PickerAtom from '../../../../components/atoms/Picker';

@@ -9,7 +9,7 @@ import LabeledInput from "../../../components/molecules/LabeledInput";
 import PasswordInput from "../../../components/molecules/PasswordInput";
 import ModernButton from "../../../components/atoms/ModernButton";
 import ConfirmModal from "../../../components/atoms/ConfirmModal";
-import { useEditUserProfile } from "../hooks";
+import { useEditUserProfile } from "../profile/hooks/useEditUserProfile";
 import { hapticFeedback } from "../../../utils/haptics";
 
 export default function FormEditUserProfile() {

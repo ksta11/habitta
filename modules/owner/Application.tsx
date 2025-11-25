@@ -1,7 +1,7 @@
 import React from 'react';
 import { RefreshControl, ScrollView, Text, View } from 'react-native';
 import ApplicationOwnerCard from './Atoms/ApplicationOwnerCard';
-import { useOwnerApplications } from './hooks';
+import { useOwnerApplications } from './hooks/useOwnerApplications';
 
 export default function ScreenApplication() {
   // === HOOK DE APLICACIONES DEL PROPIETARIO ===
