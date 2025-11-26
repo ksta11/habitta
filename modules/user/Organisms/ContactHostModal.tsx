@@ -36,6 +36,12 @@ export default function ContactHostModal({
       return;
     }
 
+    if (message.trim().length > 150) {
+      hapticFeedback.error();
+      Alert.alert("Error", "El mensaje no puede exceder los 150 caracteres");
+      return;
+    }
+
     // Haptic al presionar enviar
     hapticFeedback.buttonPress();
     setIsLoading(true);
@@ -106,6 +112,7 @@ export default function ContactHostModal({
               multiline
               numberOfLines={4}
               textAlignVertical="top"
+              maxLength={150}
               className="border border-gray-300 rounded-lg p-3 text-sm text-gray-900 bg-gray-50"
               style={{ minHeight: 100 }}
             />

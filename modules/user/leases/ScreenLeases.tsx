@@ -176,7 +176,7 @@ export default function ScreenLeases() {
           <Pressable
             onPress={() => {
               hapticFeedback.buttonPress();
-              router.push('/(user)/home');
+              router.push('../(home)');
             }}
             className="bg-violet rounded-xl py-4 px-8"
           >

@@ -136,7 +136,7 @@ export default function ScreenStep2({
           <ButtonAtom
             title="Siguiente"
             onPress={onSubmit}
-            variant="primary"
+            variant="habitta-primary"
             size="large"
             icon="arrow-forward-outline"
             iconPosition="right"

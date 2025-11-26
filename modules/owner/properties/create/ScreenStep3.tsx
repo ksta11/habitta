@@ -187,7 +187,7 @@ export default function ScreenStep3({
               onPress={onSubmit}
               loading={isSubmitting}
               disabled={isSubmitting}
-              variant={isLastStep ? 'success' : 'primary'}
+              variant="habitta-primary"
               size="large"
               icon={isLastStep ? 'save-outline' : 'arrow-forward-outline'}
               iconPosition={isLastStep ? 'left' : 'right'}

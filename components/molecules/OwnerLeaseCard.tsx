@@ -227,14 +227,14 @@ export default function OwnerLeaseCard({
         </View>
 
         {/* Botón Ver Detalles */}
-        {onPress && (
+        {/* {onPress && (
           <Pressable
             onPress={handleCardPress}
             className="mt-3 bg-lavender-indigo rounded-full py-3 items-center"
           >
             <Text className="text-white-traffic font-bold">Ver Detalles</Text>
           </Pressable>
-        )}
+        )} */}
       </Card>
     </Pressable>
   );
