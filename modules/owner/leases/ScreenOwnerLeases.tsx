@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, Text, View } from 'react-native';
 import OwnerLeaseCard from '../../../components/molecules/OwnerLeaseCard';
-import { useOwnerLeases } from '../hooks';
+import { useOwnerLeases } from '../hooks/useOwnerLeases';
 import { hapticFeedback } from '../../../utils/haptics';
 
 export default function ScreenOwnerLeases() {

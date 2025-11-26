@@ -4,13 +4,13 @@ import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-nati
 import { useAuth } from "../../contexts/AuthContext";
 import { hapticFeedback } from '../../utils/haptics';
 import { pressedPrimaryButton, standarPrimaryButton } from '../../utils/TokensDesing';
-import { useReviewNavigation } from "../user/hooks";
 import { DashboardHeader } from "./dashboard/dashboard-header";
 import { QuickActions } from "./dashboard/quick-actions";
 import { RecentApplications } from "./dashboard/recent-applications";
 import { RevenueChart } from "./dashboard/revenue-chart";
 import { StatsGrid } from "./dashboard/stats-grid";
-import { useOwnerDashboard } from './hooks';
+import { useOwnerDashboard } from './hooks/useOwnerDashboard';
+import { useReviewNavigation } from "../user/hooks/useReviewNavigation";
 
 
 export default function Dashboard() {

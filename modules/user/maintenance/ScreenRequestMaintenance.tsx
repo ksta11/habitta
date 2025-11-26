@@ -17,7 +17,8 @@ import {
   CreateMaintenanceRequestDTO
 } from '../../../interfaces/MaintenanceInterface';
 import { hapticFeedback } from '../../../utils/haptics';
-import { useActiveLease, useMaintenanceRequests } from '../hooks';
+import { useActiveLease } from '../hooks/useActiveLease';
+import { useMaintenanceRequests } from '../hooks/useMaintenanceRequests';
 
 export default function ScreenRequestMaintenance() {
   const router = useRouter();
