@@ -1,11 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Text, View } from 'react-native';
 import ButtonAtom from '../../components/atoms/ButtonAtom';
 import PaymentModal from '../../components/atoms/PaymentModal';
+import { Payment as payment } from '../../interfaces/PaymentInterface';
 import { formatCurrency } from '../../utils/format';
-import { Payment as payment} from '../../interfaces/PaymentInterface';
-import { useRouter } from 'expo-router';
 
 interface Props {
   payment: payment;
@@ -215,19 +215,17 @@ export default function PaymentCard({ payment }: Props) {
           <>
             {/* pending: Ver recibo, Enviar Recordatorio, Marcar como pagado */}
             {status === 'pending' && (
-              <>
-                <View className="flex-1">
-                  <ButtonAtom title="Ver recibo" onPress={onView} variant="habitta-outline" fullWidth icon="receipt-outline" />
+              <View className="flex-1 mt-4 gap-2">
+                <ButtonAtom title="Ver recibo" onPress={onView} variant="habitta-outline" fullWidth icon="receipt-outline" />
+                <View className="flex-row gap-2">
+                  <View className="flex-1">
+                    <ButtonAtom title="Enviar Recordatorio" onPress={() => Alert.alert('Recordatorio', 'Recordatorio enviado')} variant="outline" fullWidth icon="notifications-outline" />
+                  </View>
+                  <View className="flex-1">
+                    <ButtonAtom title="Marcar como pagado" onPress={() => Alert.alert('Marcar', 'Marcado como pagado')} variant="success" fullWidth icon="checkmark-done-outline" />
+                  </View>
                 </View>
-                <View className="w-2" />
-                <View className="flex-1">
-                  <ButtonAtom title="Enviar Recordatorio" onPress={() => Alert.alert('Recordatorio', 'Recordatorio enviado')} variant="outline" fullWidth icon="notifications-outline" />
-                </View>
-                <View className="w-2" />
-                <View className="flex-1">
-                  <ButtonAtom title="Marcar como pagado" onPress={() => Alert.alert('Marcar', 'Marcado como pagado')} variant="success" fullWidth icon="checkmark-done-outline" />
-                </View>
-              </>
+              </View>
             )}
 
             {/* completed: Ver recibo */}
@@ -239,36 +237,32 @@ export default function PaymentCard({ payment }: Props) {
 
             {/* failed: Ver recibo + Enviar Recordatorio + Marcar como pagado */}
             {status === 'failed' && (
-              <>
-                <View className="flex-1">
-                  <ButtonAtom title="Ver recibo" onPress={onView} variant="habitta-outline" fullWidth icon="receipt-outline" />
+              <View className="mt-4 gap-2">
+                <ButtonAtom title="Ver recibo" onPress={onView} variant="habitta-outline" fullWidth icon="receipt-outline" />
+                <View className="flex-row gap-2">
+                  <View className="flex-1">
+                    <ButtonAtom title="Enviar Recordatorio" onPress={() => Alert.alert('Recordatorio', 'Recordatorio enviado')} variant="outline" fullWidth icon="notifications-outline" />
+                  </View>
+                  <View className="flex-1">
+                    <ButtonAtom title="Marcar como pagado" onPress={() => Alert.alert('Marcar', 'Marcado como pagado')} variant="success" fullWidth icon="checkmark-done-outline" />
+                  </View>
                 </View>
-                <View className="w-2" />
-                <View className="flex-1">
-                  <ButtonAtom title="Enviar Recordatorio" onPress={() => Alert.alert('Recordatorio', 'Recordatorio enviado')} variant="outline" fullWidth icon="notifications-outline" />
-                </View>
-                <View className="w-2" />
-                <View className="flex-1">
-                  <ButtonAtom title="Marcar como pagado" onPress={() => Alert.alert('Marcar', 'Marcado como pagado')} variant="success" fullWidth icon="checkmark-done-outline" />
-                </View>
-              </>
+              </View>
             )}
 
             {/* overdue: Ver recibo + Enviar aviso de mora + Marcar como pagado */}
             {status === 'overdue' && (
-              <>
-                <View className="flex-1">
-                  <ButtonAtom title="Ver recibo" onPress={onView} variant="habitta-outline" fullWidth icon="receipt-outline" />
+              <View className="mt-4 gap-2">
+                <ButtonAtom title="Ver recibo" onPress={onView} variant="habitta-outline" fullWidth icon="receipt-outline" />
+                <View className="flex-row gap-2">
+                  <View className="flex-1">
+                    <ButtonAtom title="Enviar aviso de mora" onPress={() => Alert.alert('Aviso', 'Aviso de mora enviado')} variant="danger" fullWidth icon="alert-circle-outline" />
+                  </View>
+                  <View className="flex-1">
+                    <ButtonAtom title="Marcar como pagado" onPress={() => Alert.alert('Marcar', 'Marcado como pagado')} variant="success" fullWidth icon="checkmark-done-outline" />
+                  </View>
                 </View>
-                <View className="w-2" />
-                <View className="flex-1">
-                  <ButtonAtom title="Enviar aviso de mora" onPress={() => Alert.alert('Aviso', 'Aviso de mora enviado')} variant="danger" fullWidth icon="alert-circle-outline" />
-                </View>
-                <View className="w-2" />
-                <View className="flex-1">
-                  <ButtonAtom title="Marcar como pagado" onPress={() => Alert.alert('Marcar', 'Marcado como pagado')} variant="success" fullWidth icon="checkmark-done-outline" />
-                </View>
-              </>
+              </View>
             )}
 
             {/* refunded: Ver recibo */}

@@ -69,7 +69,7 @@ export default function ButtonAtom({
   const getSizeClasses = () => {
     const sizes = {
       small: 'py-2 px-4 min-h-[36px] rounded-2xl',
-      medium: 'py-3 px-6 min-h-[48px] rounded-[20px]',
+      medium: 'py-3 px-8 min-h-[48px] rounded-[20px]',
       large: 'py-4 px-8 min-h-[56px] rounded-3xl'
     };
     
@@ -120,7 +120,7 @@ export default function ButtonAtom({
             size="small" 
             color={variant === 'outline' || variant === 'ghost' || variant === 'habitta-outline' ? 
               (variant === 'habitta-outline' ? '#531A99' : '#3B82F6') : '#FFFFFF'}
-            style={{ marginRight: 8 }}
+            style={{ marginRight: 4 }}
           />
           <Text 
             className={textClasses}
@@ -141,7 +141,7 @@ export default function ButtonAtom({
               size={contentSizes.iconSize} 
               color={variant === 'outline' || variant === 'ghost' || variant === 'habitta-outline' ? 
                 (variant === 'habitta-outline' ? '#531A99' : '#3B82F6') : '#FFFFFF'}
-              style={{ marginRight: 8 }}
+              style={{ marginRight: 4 }}
             />
           )}
           <Text 
@@ -156,7 +156,7 @@ export default function ButtonAtom({
               size={contentSizes.iconSize} 
               color={variant === 'outline' || variant === 'ghost' || variant === 'habitta-outline' ? 
                 (variant === 'habitta-outline' ? '#531A99' : '#3B82F6') : '#FFFFFF'}
-              style={{ marginLeft: 8 }}
+              style={{ marginLeft: 4 }}
             />
           )}
         </View>
