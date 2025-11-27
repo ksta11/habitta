@@ -8,6 +8,7 @@ import NetInfo from '@react-native-community/netinfo';
 import { useFonts } from "expo-font";
 import * as Notifications from 'expo-notifications';
 import { Stack } from "expo-router";
+import * as ExpoSplashScreen from 'expo-splash-screen';
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { Alert, Platform, StatusBar as RNStatusBar } from "react-native";
@@ -47,9 +48,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     async function prepare() {
-      // Esperar al menos 2 segundos para mostrar el splash screen
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setIsAppReady(true);
+      await ExpoSplashScreen.preventAutoHideAsync();
     }
     
     if (fontsLoaded) {
@@ -84,7 +83,7 @@ export default function RootLayout() {
   }, []);
   
   if (!fontsLoaded || !isAppReady) {
-    return <SplashScreen />;
+    return <SplashScreen onAnimationFinish={() => setIsAppReady(true)} />;
   }
   
   if (!fontsLoaded) {
