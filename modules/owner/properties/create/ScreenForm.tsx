@@ -2,7 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Alert, View } from 'react-native';
+import { View } from 'react-native';
+import AlertModal from '../../../../components/atoms/AlertModal';
 import { useAuth } from '../../../../contexts/AuthContext';
 import { CreatePropertyFormType, CreatePropertySchema } from '../../../../schemes/PropertySchema';
 import useOwnerCreateProperties from '../../hooks/useOwnerCreateProperties';
@@ -35,6 +36,8 @@ const stepFields: FieldName[][] = [
 export default function ScreenForm() {
   const [currentStep, setCurrentStep] = useState(0);
   const { user } = useAuth();
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertData, setAlertData] = useState<{ type: 'success' | 'error' | 'info' | 'warning'; title: string; message: string } | null>(null);
   const form = useForm<CreatePropertyFormType>({
     resolver: zodResolver(CreatePropertySchema),
     mode: 'onChange', // Solo valida al hacer submit
@@ -103,7 +106,8 @@ export default function ScreenForm() {
       setTimeout(() => router.replace('../'), 300);
     } else {
       console.log('❌ Error al crear propiedad:', result?.message);
-      Alert.alert('Error', result?.message || 'No se pudo crear la propiedad');
+      setAlertData({ type: 'error', title: 'Error', message: result?.message || 'No se pudo crear la propiedad' });
+      setAlertVisible(true);
     }
     return result;
   };
@@ -142,6 +146,15 @@ export default function ScreenForm() {
         loadingPlans={createHooks.loadingPlans}
         loadPlans={createHooks.loadPlans}
         isSubmitting={createHooks.isSubmitting}
+      />
+
+      {/* Modal de Alerta */}
+      <AlertModal
+        visible={alertVisible}
+        type={alertData?.type}
+        title={alertData?.title || ''}
+        message={alertData?.message || ''}
+        onClose={() => setAlertVisible(false)}
       />
     </View>
   );
