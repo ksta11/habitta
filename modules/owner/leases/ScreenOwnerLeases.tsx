@@ -58,10 +58,7 @@ export default function ScreenOwnerLeases() {
   return (
     <View className="flex-1 bg-white-traffic">
       {/* Header con Stats */}
-      <View className="bg-lavender-indigo p-6 pt-12">
-        <Text className="text-white-traffic text-2xl font-semibold mb-4">
-          Mis Arrendamientos
-        </Text>
+      <View className="bg-gray-400 p-6 pt-12">
 
         {/* Stats Cards */}
         <View className="flex-row mb-4">
@@ -99,7 +96,7 @@ export default function ScreenOwnerLeases() {
       >
         {/* Botón para ver Solicitudes de Mantenimiento */}
         <View 
-          className="bg-violet rounded-xl p-4 mb-4 flex-row items-center justify-between active:opacity-80"
+          className="bg-gray-500 rounded-xl p-4 mb-4 flex-row items-center justify-between active:opacity-80"
           onTouchEnd={handleViewMaintenance}
         >
           <View className="flex-1">
@@ -115,7 +112,7 @@ export default function ScreenOwnerLeases() {
 
         {/* Botón para crear Mantenimiento como Owner */}
         <View 
-          className="bg-green-600 rounded-xl p-4 mb-4 flex-row items-center justify-between active:opacity-80"
+          className="bg-violet rounded-xl p-4 mb-4 flex-row items-center justify-between active:opacity-80"
           onTouchEnd={() => {
             hapticFeedback.buttonPress();
             router.push('/(owner)/(leases)/maintenance/create');
