@@ -14,7 +14,8 @@ import { hapticFeedback } from '../../../utils/haptics';
  * @returns Estado y funciones para manejar propiedades
  */
 export const useProperties = () => {
-  const [properties, setProperties] = useState<Property[]>([]);
+  const [allProperties, setAllProperties] = useState<Property[]>([]); // ✅ Todas las propiedades sin filtrar
+  const [properties, setProperties] = useState<Property[]>([]); // ✅ Propiedades filtradas mostradas
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +32,8 @@ export const useProperties = () => {
       const response = await getAllPublishedProperties();
 
       if (response.success) {
-        setProperties(response.data);
+        setAllProperties(response.data); // ✅ Guardar todas las propiedades
+        setProperties(response.data); // ✅ Mostrar todas inicialmente
         console.log(`✅ [useProperties] ${response.data.length} propiedades cargadas`);
       } else {
         console.log('❌ [useProperties] Error:', response.message);
@@ -55,6 +57,41 @@ export const useProperties = () => {
   };
 
   /**
+   * 🔍 Filtra propiedades en el frontend por término de búsqueda
+   */
+  const filterPropertiesBySearchTerm = (searchTerm: string): Property[] => {
+    if (!searchTerm || searchTerm.trim() === '') {
+      console.log('🔍 [useProperties] Sin término de búsqueda, mostrando todas');
+      return allProperties;
+    }
+
+    const term = searchTerm.toLowerCase().trim();
+    console.log('🔍 [useProperties] Filtrando por término:', term);
+
+    const filtered = allProperties.filter((property) => {
+      // Buscar en título
+      const matchesTitle = property.title?.toLowerCase().includes(term);
+      
+      // Buscar en descripción
+      const matchesDescription = property.description?.toLowerCase().includes(term);
+      
+      // Buscar en dirección
+      const matchesAddress = property.address?.toLowerCase().includes(term);
+      
+      // Buscar en ciudad
+      const matchesCity = property.city?.toLowerCase().includes(term);
+      
+      // Buscar en tipo de propiedad
+      const matchesType = property.type?.toLowerCase().includes(term);
+
+      return matchesTitle || matchesDescription || matchesAddress || matchesCity || matchesType;
+    });
+
+    console.log(`🔍 [useProperties] ${filtered.length} propiedades coinciden con "${term}"`);
+    return filtered;
+  };
+
+  /**
    * Busca propiedades con filtros específicos
    */
   const searchPropertiesWithFilters = async (filters: PropertySearchFilters) => {
@@ -66,8 +103,19 @@ export const useProperties = () => {
       const response = await searchProperties(filters);
 
       if (response.success) {
-        setProperties(response.data);
-        console.log(`✅ [useProperties] ${response.data.length} propiedades encontradas`);
+        // ✅ Guardar todas las propiedades del backend
+        setAllProperties(response.data);
+        
+        // ✅ Si hay searchTerm, filtrar en el frontend
+        if (filters.searchTerm && filters.searchTerm.trim() !== '') {
+          const filtered = filterPropertiesBySearchTerm(filters.searchTerm);
+          setProperties(filtered);
+          console.log(`✅ [useProperties] ${filtered.length} propiedades filtradas de ${response.data.length}`);
+        } else {
+          setProperties(response.data);
+          console.log(`✅ [useProperties] ${response.data.length} propiedades encontradas`);
+        }
+        
         return response.data;
       } else {
         console.log('❌ [useProperties] Error en búsqueda:', response.message);
@@ -125,6 +173,7 @@ export const useProperties = () => {
   return {
     // Estado
     properties,
+    allProperties, // ✅ Exponer todas las propiedades
     loading,
     refreshing,
     error,
@@ -132,6 +181,7 @@ export const useProperties = () => {
     // Funciones
     loadProperties,
     searchPropertiesWithFilters,
+    filterPropertiesBySearchTerm, // ✅ Exponer función de filtrado
     refresh,
 
     // Utilidades
