@@ -8,6 +8,10 @@
     "userInterfaceStyle": "light",
     "scheme": "habitta",
     "newArchEnabled": true,
+    "notification": {
+      "icon": "./assets/images/notification-icon.png",
+      "color": "#ffffff"
+    },
     "splash": {
       "image": "./assets/icon.png",
       "backgroundColor": "#ffffff",
