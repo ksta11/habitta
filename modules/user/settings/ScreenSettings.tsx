@@ -1,6 +1,7 @@
 import { Link, router } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Pressable, ScrollView, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
+import AlertModal from '../../../components/atoms/AlertModal';
 import ConfirmModal from '../../../components/atoms/ConfirmModal';
 import Label from '../../../components/atoms/Label';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -15,6 +16,9 @@ const ScreenSettings = () => {
   };
 
   const [confirmVisible, setConfirmVisible] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertData, setAlertData] = useState<{ type: 'success' | 'error' | 'info' | 'warning'; title: string; message: string } | null>(null);
+  const [pendingAction, setPendingAction] = useState<string | null>(null);
 
   const confirmDeleteAccount = async () => {
     setConfirmVisible(false);
@@ -26,50 +30,27 @@ const ScreenSettings = () => {
 
       if (result.verify) {
         console.log('✅ Cuenta eliminada exitosamente');
-        Alert.alert(
-          'Cuenta Eliminada',
-          'Tu cuenta ha sido eliminada exitosamente. Serás redirigido al login.',
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                router.replace('/auth/login');
-              },
-            },
-          ]
-        );
+        setPendingAction('deleteSuccess');
+        setAlertData({ type: 'success', title: 'Cuenta Eliminada', message: 'Tu cuenta ha sido eliminada exitosamente. Serás redirigido al login.' });
+        setAlertVisible(true);
       } else {
         console.log('❌ Error eliminando cuenta:', result.message);
-        Alert.alert('Error', result.message || 'No se pudo eliminar la cuenta. Intenta de nuevo.', [{ text: 'OK' }]);
+        setAlertData({ type: 'error', title: 'Error', message: result.message || 'No se pudo eliminar la cuenta. Intenta de nuevo.' });
+        setAlertVisible(true);
       }
     } catch (error) {
       console.error('❌ Error inesperado:', error);
-      Alert.alert('Error', 'Ocurrió un error inesperado. Intenta de nuevo.', [{ text: 'OK' }]);
+      setAlertData({ type: 'error', title: 'Error', message: 'Ocurrió un error inesperado. Intenta de nuevo.' });
+      setAlertVisible(true);
     } finally {
       setIsDeleting(false);
     }
   };
 
   const handleLogout = () => {
-    Alert.alert(
-      'Cerrar Sesión',
-      '¿Estás seguro que deseas cerrar sesión?',
-      [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
-        {
-          text: 'Cerrar Sesión',
-          style: 'destructive',
-          onPress: async () => {
-            console.log('🚪 Cerrando sesión...');
-            await logout(); // ✅ Usa la función del contexto que limpia todo
-            router.replace('/auth/login');
-          },
-        },
-      ]
-    );
+    setPendingAction('logout');
+    setAlertData({ type: 'warning', title: 'Cerrar Sesión', message: '¿Estás seguro que deseas cerrar sesión?' });
+    setAlertVisible(true);
   };
 
 
@@ -230,6 +211,26 @@ const ScreenSettings = () => {
         cancelText="Cancelar"
         confirmText="Eliminar Cuenta"
       />
+
+      {/* Alert Modal */}
+      {alertVisible && alertData && (
+        <AlertModal
+          visible={alertVisible}
+          onClose={() => {
+            setAlertVisible(false);
+            if (pendingAction === 'logout') {
+              logout();
+              router.replace('/auth/login');
+            } else if (pendingAction === 'deleteSuccess') {
+              router.replace('/auth/login');
+            }
+            setPendingAction(null);
+          }}
+          type={alertData.type}
+          title={alertData.title}
+          message={alertData.message}
+        />
+      )}
     </>
   );
 };

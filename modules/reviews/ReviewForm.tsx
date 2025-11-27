@@ -2,7 +2,6 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   ScrollView,
   StatusBar,
   Switch,
@@ -10,13 +9,13 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AlertModal from '../../components/atoms/AlertModal';
 import ReviewCommentInput from '../../components/molecules/ReviewCommentInput';
 import ReviewSubmitButton from '../../components/molecules/ReviewSubmitButton';
 import UserInfoCard from '../../components/molecules/UserInfoCard';
 import { UserDAO } from '../../interfaces/UserInterface';
 import { Review, debugTokenInfo, getReview, updateReview } from '../../libs/user/review-service';
 import { getUserById } from '../../libs/userServices/api-service';
-import ReviewHeader from './molecules/ReviewHeader';
 
 export default function ReviewForm() {
   const router = useRouter();
@@ -32,6 +31,8 @@ export default function ReviewForm() {
   const [submitting, setSubmitting] = useState(false);
   // recommended: true => recomendado, false => no recomendado
   const [recommended, setRecommended] = useState<boolean | null>(true);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertData, setAlertData] = useState<{ type: 'success' | 'error' | 'info' | 'warning'; title: string; message: string } | null>(null);
 
   // Cargar datos de la review al montar el componente
   useEffect(() => {
@@ -105,12 +106,14 @@ export default function ReviewForm() {
         }
       } else {
         console.log('❌ Error al cargar review:', response.message);
-        Alert.alert('Error', response.message || 'No se pudo cargar la información de la review');
+        setAlertData({ type: 'error', title: 'Error', message: response.message || 'No se pudo cargar la información de la review' });
+        setAlertVisible(true);
         router.back();
       }
     } catch (error) {
       console.error('💥 Error crítico al cargar review:', error);
-      Alert.alert('Error', 'Error al cargar los datos');
+      setAlertData({ type: 'error', title: 'Error', message: 'Error al cargar los datos' });
+      setAlertVisible(true);
       router.back();
     } finally {
       setLoading(false);
@@ -119,7 +122,8 @@ export default function ReviewForm() {
 
   const handleSubmit = async () => {
     if (!reviewId) {
-      Alert.alert('Error', 'No se encontró la información de la review');
+      setAlertData({ type: 'error', title: 'Error', message: 'No se encontró la información de la review' });
+      setAlertVisible(true);
       return;
     }
 
@@ -144,21 +148,20 @@ export default function ReviewForm() {
       const response = await updateReview(reviewId, reviewData);
       
       if (response.success) {
-        Alert.alert(
-          "Reseña enviada",
-          "Tu reseña ha sido publicada exitosamente",
-          [
-            {
-              text: "OK",
-              onPress: () => router.back(),
-            },
-          ]
-        );
+        setAlertData({
+          type: 'success',
+          title: 'Reseña enviada',
+          message: 'Tu reseña ha sido publicada exitosamente'
+        });
+        setAlertVisible(true);
+        setTimeout(() => router.back(), 2000);
       } else {
-        Alert.alert('Error', response.message || 'No se pudo enviar la reseña');
+        setAlertData({ type: 'error', title: 'Error', message: response.message || 'No se pudo enviar la reseña' });
+        setAlertVisible(true);
       }
     } catch (error) {
-      Alert.alert('Error', 'Error al enviar la reseña');
+      setAlertData({ type: 'error', title: 'Error', message: 'Error al enviar la reseña' });
+      setAlertVisible(true);
     } finally {
       setSubmitting(false);
     }
@@ -211,6 +214,15 @@ export default function ReviewForm() {
         onSubmit={handleSubmit}
         isValid={isFormValid}
         isSubmitting={submitting}
+      />
+
+      {/* Modal de Alerta */}
+      <AlertModal
+        visible={alertVisible}
+        type={alertData?.type}
+        title={alertData?.title || ''}
+        message={alertData?.message || ''}
+        onClose={() => setAlertVisible(false)}
       />
     </View>
   );
