@@ -11,6 +11,7 @@ interface InputProps {
   keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
   style?: 'modern' | 'classic';
+  maxLength?: number;
 }
 
 export default function Input({
@@ -21,7 +22,8 @@ export default function Input({
   error,
   keyboardType = 'default',
   autoCapitalize = 'sentences',
-  style = 'modern'
+  style = 'modern',
+  maxLength
 }: InputProps) {
   const getInputStyle = () => {
     if (style === 'modern') {
@@ -59,6 +61,7 @@ export default function Input({
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
+        maxLength={maxLength}
         placeholderTextColor="#9CA3AF"
       />
       {error && (

@@ -6,9 +6,24 @@ export const RegisterSchema = z.object({
   phone: z
     .string()
     .min(1, 'El teléfono es requerido')
-    .min(10, 'El teléfono debe tener al menos 10 dígitos')
     .regex(/^[0-9+\-\s()]+$/, 'El teléfono debe contener solo números y caracteres válidos')
-    .trim(),
+    .trim()
+    .refine(
+      (val) => {
+        // Contar solo los dígitos numéricos (sin +, -, espacios, paréntesis)
+        const digitsOnly = val.replace(/[^0-9]/g, '');
+        return digitsOnly.length >= 10;
+      },
+      { message: 'El teléfono debe tener al menos 10 dígitos' }
+    )
+    .refine(
+      (val) => {
+        // Contar solo los dígitos numéricos (sin +, -, espacios, paréntesis)
+        const digitsOnly = val.replace(/[^0-9]/g, '');
+        return digitsOnly.length <= 15;
+      },
+      { message: 'El teléfono no puede tener más de 15 dígitos' }
+    ),
   email: z
     .string()
     .min(1, 'El email es requerido')

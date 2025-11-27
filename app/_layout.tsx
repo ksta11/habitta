@@ -1,20 +1,11 @@
-import {
-  Nunito_400Regular,
-  Nunito_500Medium,
-  Nunito_600SemiBold,
-  Nunito_700Bold,
-} from "@expo-google-fonts/nunito";
-import NetInfo from '@react-native-community/netinfo';
-import { useFonts } from "expo-font";
 import * as Notifications from 'expo-notifications';
 import { Stack } from "expo-router";
 import * as ExpoSplashScreen from 'expo-splash-screen';
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
-import { Alert, Platform, StatusBar as RNStatusBar } from "react-native";
 import SplashScreen from "../components/SplashScreen/SplashScreen";
 import { AuthProvider } from "../contexts/AuthContext";
 import { NotificationProvider } from "../contexts/NotificationContext";
+import { useAppInitialization } from "../hooks/useAppInitialization";
 import "../global.css";
 
 Notifications.setNotificationHandler({
@@ -28,13 +19,8 @@ Notifications.setNotificationHandler({
 });
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    Nunito_400Regular,
-    Nunito_500Medium,
-    Nunito_600SemiBold,
-    Nunito_700Bold,
-  });
-  const [isAppReady, setIsAppReady] = useState(false);
+  // Hook personalizado que maneja toda la lógica de inicialización
+  const { isReady, isConnected } = useAppInitialization();
 
   const [connect, setConnect] = useState<boolean | undefined>(true);
 
@@ -84,10 +70,6 @@ export default function RootLayout() {
   
   if (!fontsLoaded || !isAppReady) {
     return <SplashScreen onAnimationFinish={() => setIsAppReady(true)} />;
-  }
-  
-  if (!fontsLoaded) {
-    return null;
   }
 
   return (

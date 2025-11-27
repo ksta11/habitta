@@ -45,6 +45,12 @@ export const searchProperties = async (filters: PropertySearchFilters): Promise<
     const queryParams = new URLSearchParams();
     
     // Mapear filtros a los parámetros del backend
+    // 🔍 BÚSQUEDA POR TEXTO
+    if (filters.searchTerm && filters.searchTerm.trim() !== '') {
+      queryParams.append('searchTerm', filters.searchTerm.trim());
+      console.log('🔍 Agregando término de búsqueda:', filters.searchTerm.trim());
+    }
+    
     if (filters.city && filters.city !== 'todos') {
       queryParams.append('city', filters.city);
     }
