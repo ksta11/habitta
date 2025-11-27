@@ -1,8 +1,8 @@
+import { FontAwesome } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -11,12 +11,12 @@ import {
   TextInput,
   View
 } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
+import AlertModal from '../../../../components/atoms/AlertModal';
 import ButtonAtom from '../../../../components/atoms/ButtonAtom';
 import Label from '../../../../components/atoms/Label';
-import { hapticFeedback } from '../../../../utils/haptics';
 import { useOwnerLeases } from '../../../../modules/owner/hooks/useOwnerLeases';
 import { useOwnerMaintenanceRequests } from '../../../../modules/owner/hooks/useOwnerMaintenanceRequests';
+import { hapticFeedback } from '../../../../utils/haptics';
 
 export default function ScreenCreateOwnerMaintenance() {
   const router = useRouter();
@@ -30,6 +30,10 @@ export default function ScreenCreateOwnerMaintenance() {
   const [responsibility, setResponsibility] = useState<'owner' | 'user'>('owner');
   const [scheduledHours, setScheduledHours] = useState(24); // Por defecto mañana
   const [estimatedCost, setEstimatedCost] = useState('');
+
+  // Estado para el modal de alerta
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertData, setAlertData] = useState<{title: string, message: string, type: 'error'} | null>(null);
 
   const getScheduledDate = (): Date => {
     const date = new Date();
@@ -51,19 +55,22 @@ export default function ScreenCreateOwnerMaintenance() {
     // Validaciones
     if (!selectedLeaseId) {
       hapticFeedback.error();
-      Alert.alert('Error', 'Debes seleccionar una propiedad arrendada');
+      setAlertData({ title: 'Error', message: 'Debes seleccionar una propiedad arrendada', type: 'error' });
+      setAlertVisible(true);
       return;
     }
 
     if (title.trim().length < 3) {
       hapticFeedback.error();
-      Alert.alert('Error', 'El título debe tener al menos 3 caracteres');
+      setAlertData({ title: 'Error', message: 'El título debe tener al menos 3 caracteres', type: 'error' });
+      setAlertVisible(true);
       return;
     }
 
     if (description.trim().length < 10) {
       hapticFeedback.error();
-      Alert.alert('Error', 'La descripción debe tener al menos 10 caracteres');
+      setAlertData({ title: 'Error', message: 'La descripción debe tener al menos 10 caracteres', type: 'error' });
+      setAlertVisible(true);
       return;
     }
 
@@ -71,7 +78,8 @@ export default function ScreenCreateOwnerMaintenance() {
     const selectedLease = leases.find(l => l.id === selectedLeaseId);
     if (!selectedLease) {
       hapticFeedback.error();
-      Alert.alert('Error', 'Arrendamiento no encontrado');
+      setAlertData({ title: 'Error', message: 'Arrendamiento no encontrado', type: 'error' });
+      setAlertVisible(true);
       return;
     }
 
@@ -392,6 +400,15 @@ export default function ScreenCreateOwnerMaintenance() {
           />
         </View>
       </ScrollView>
+
+      {/* Modal de Alerta */}
+      <AlertModal
+        visible={alertVisible}
+        type={alertData?.type}
+        title={alertData?.title || ''}
+        message={alertData?.message || ''}
+        onClose={() => setAlertVisible(false)}
+      />
     </KeyboardAvoidingView>
   );
 }
