@@ -168,6 +168,7 @@ export default function RegisterForm() {
                   value={value}
                   onChangeText={onChange}
                   keyboardType="phone-pad"
+                  maxLength={20}
                   error={errors.phone?.message}
                 />
               )}
