@@ -15,7 +15,7 @@ export default function OwnerTabsLayout() {
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: "#320964", // deep-violet
-          tabBarInactiveTintColor: "#BD93EF", // lavender-bright
+          tabBarInactiveTintColor: "#6B7280", // gray-500
           tabBarStyle: {
             backgroundColor: "#ffffff",
             borderTopWidth: 1,
@@ -92,7 +92,7 @@ export default function OwnerTabsLayout() {
           options={{
             title: "Alquileres",
             tabBarIcon: ({ color, size }) => (
-              <FontAwesome name="envelope" size={size} color={color} />
+              <FontAwesome name="handshake-o" size={size} color={color} />
             ),
           }}
         />

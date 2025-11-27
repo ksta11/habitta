@@ -1,6 +1,6 @@
 import { Link, router } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Linking, Pressable, ScrollView, View } from 'react-native';
 import AlertModal from '../../../components/atoms/AlertModal';
 import ConfirmModal from '../../../components/atoms/ConfirmModal';
 import Label from '../../../components/atoms/Label';
@@ -79,24 +79,10 @@ const ScreenSettings = () => {
           
 
           <Link href="/(user)/(settings)/payment/viewPayments" asChild>
-            <Pressable className="py-3 border-b border-gray-100">
+            <Pressable className="py-3">
               <Label text="Gestionar Pagos" size="md" />
             </Pressable>
           </Link>
-          
-          <Pressable 
-            className="py-3 border-b border-gray-100"
-            // onPress={() => console.log('Configuración de privacidad no implementada aún')}
-          >
-            <Label text="Configuración de Privacidad" size="md" />
-          </Pressable>
-          
-          <Pressable 
-            className="py-3"
-            // onPress={() => console.log('Seguridad de cuenta no implementada aún')}
-          >
-            <Label text="Seguridad de Cuenta" size="md" />
-          </Pressable>
         </View>
       </View>
 
@@ -111,55 +97,16 @@ const ScreenSettings = () => {
         <View className="mt-4 space-y-3">
           <Pressable 
             className="py-3 border-b border-gray-100"
-            // onPress={() => console.log('Centro de ayuda no implementado aún')}
-          >
-            <Label text="Centro de Ayuda" size="md" />
-          </Pressable>
-          
-          <Pressable 
-            className="py-3 border-b border-gray-100"
-            // onPress={() => console.log('Contacto de soporte no implementado aún')}
+            onPress={() => Linking.openURL('mailto:habittagroupsa@gmail.com')}
           >
             <Label text="Contactar Soporte" size="md" />
           </Pressable>
           
           <Pressable 
             className="py-3"
-            // onPress={() => console.log('Acerca de la app no implementado aún')}
+            onPress={() => Linking.openURL('https://www.habitta.cc')}
           >
             <Label text="Acerca de la App" size="md" />
-          </Pressable>
-        </View>
-      </View>
-
-      {/* Sección Cache & Cellular */}
-      <View className="bg-white rounded-lg p-6 shadow-sm mb-6">
-        <Label 
-          text="Cache & Cellular" 
-          size="lg" 
-          weight="semibold"
-        />
-        
-        <View className="mt-4 space-y-3">
-          <Pressable 
-            className="py-3 border-b border-gray-100"
-            // onPress={() => console.log('Limpiar caché no implementado aún')}
-          >
-            <Label text="Limpiar Caché" size="md" />
-          </Pressable>
-          
-          <Pressable 
-            className="py-3 border-b border-gray-100"
-            // onPress={() => console.log('Uso de datos no implementado aún')}
-          >
-            <Label text="Uso de Datos" size="md" />
-          </Pressable>
-          
-          <Pressable 
-            className="py-3"
-            // onPress={() => console.log('Modo sin conexión no implementado aún')}
-          >
-            <Label text="Modo Sin Conexión" size="md" />
           </Pressable>
         </View>
       </View>
@@ -173,13 +120,6 @@ const ScreenSettings = () => {
         />
         
         <View className="mt-4 space-y-3">
-          <Pressable 
-            className="py-3 border-b border-gray-100"
-            // onPress={() => console.log('Exportar datos no implementado aún')}
-          >
-            <Label text="Exportar Datos" size="md" />
-          </Pressable>
-          
           <Pressable 
             className="py-3 border-b border-gray-100"
             onPress={handleDeleteAccount}
