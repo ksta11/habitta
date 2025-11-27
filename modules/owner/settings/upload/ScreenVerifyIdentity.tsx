@@ -2,7 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
+import AlertModal from '../../../../components/atoms/AlertModal';
 import ButtonAtom from '../../../../components/atoms/ButtonAtom';
 import FileUploader from '../../../../components/atoms/FileUploader';
 import Input from '../../../../components/atoms/Input';
@@ -25,10 +26,13 @@ export default function VerifyIdentityPage() {
 
   const [uploadDisabled, setUploadDisabled] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertData, setAlertData] = useState<{ type: 'success' | 'error' | 'info' | 'warning'; title: string; message: string } | null>(null);
 
   const onSubmit = async (data: VerifyIdentityForm) => {
     if (!data.files || data.files.length === 0) {
-      Alert.alert('Error', 'Debes subir el documento en PDF');
+      setAlertData({ type: 'error', title: 'Error', message: 'Debes subir el documento en PDF' });
+      setAlertVisible(true);
       return;
     }
 
@@ -37,15 +41,21 @@ export default function VerifyIdentityPage() {
     try {
       const resp = await submitIdentityVerification(file, data.documentType, data.documentNumber);
       if (resp.success) {
-        Alert.alert('Éxito', resp.message || 'Solicitud enviada correctamente', [
-          { text: 'OK', onPress: () => router.replace('/(owner)/(settings)') }
-        ]);
+        setAlertData({
+          type: 'success',
+          title: 'Éxito',
+          message: resp.message || 'Solicitud enviada correctamente'
+        });
+        setAlertVisible(true);
+        setTimeout(() => router.replace('/(owner)/(settings)'), 2000);
       } else {
-        Alert.alert('Error', resp.message || 'No se pudo enviar la solicitud');
+        setAlertData({ type: 'error', title: 'Error', message: resp.message || 'No se pudo enviar la solicitud' });
+        setAlertVisible(true);
       }
     } catch (err) {
       console.error('Error al enviar verificación:', err);
-      Alert.alert('Error', err instanceof Error ? err.message : 'Error de conexión');
+      setAlertData({ type: 'error', title: 'Error', message: err instanceof Error ? err.message : 'Error de conexión' });
+      setAlertVisible(true);
     } finally {
       setSubmitting(false);
     }
@@ -159,6 +169,15 @@ export default function VerifyIdentityPage() {
           </View>
         </View>
       </ScrollView>
+
+      {/* Modal de Alerta */}
+      <AlertModal
+        visible={alertVisible}
+        type={alertData?.type}
+        title={alertData?.title || ''}
+        message={alertData?.message || ''}
+        onClose={() => setAlertVisible(false)}
+      />
     </KeyboardAvoidingView>
   );
 }

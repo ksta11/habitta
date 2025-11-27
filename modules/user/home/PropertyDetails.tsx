@@ -1,6 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, ScrollView, View } from 'react-native';
+import { ActivityIndicator, FlatList, ScrollView, View } from 'react-native';
+import AlertModal from '../../../components/atoms/AlertModal';
 import PropertyAmenities from '../../../components/molecules/PropertyAmenities';
 import PropertyBottomActions from '../../../components/molecules/PropertyBottomActions';
 import PropertyDescription from '../../../components/molecules/PropertyDescription';
@@ -64,6 +65,8 @@ export default function PropertyDetailsModule() {
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [isContactModalVisible, setIsContactModalVisible] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertData, setAlertData] = useState<{ type: 'success' | 'error' | 'info' | 'warning'; title: string; message: string } | null>(null);
   const flatListRef = useRef<FlatList<any>>(null);
 
   // Función para cargar los detalles de la propiedad
@@ -83,14 +86,13 @@ export default function PropertyDetailsModule() {
         console.log('✅ Propiedad cargada exitosamente:', response.data.title);
       } else {
         console.log('❌ Error al cargar propiedad:', response.message);
-        Alert.alert(
-          "Error",
-          response.message || "No se pudo cargar la propiedad"
-        );
+        setAlertData({ type: 'error', title: 'Error', message: response.message || "No se pudo cargar la propiedad" });
+        setAlertVisible(true);
       }
     } catch (error) {
       console.error('💥 Error crítico:', error);
-      Alert.alert("Error", "Error de conexión al cargar la propiedad");
+      setAlertData({ type: 'error', title: 'Error', message: "Error de conexión al cargar la propiedad" });
+      setAlertVisible(true);
     } finally {
       setLoading(false);
     }
@@ -257,6 +259,17 @@ export default function PropertyDetailsModule() {
         propertyId={property?.id || ''}
         onSuccess={handleApplicationSuccess}
       />
+
+      {/* Alert Modal */}
+      {alertVisible && alertData && (
+        <AlertModal
+          visible={alertVisible}
+          onClose={() => setAlertVisible(false)}
+          type={alertData.type}
+          title={alertData.title}
+          message={alertData.message}
+        />
+      )}
     </View>
   );
 }

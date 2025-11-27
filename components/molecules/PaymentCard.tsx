@@ -1,11 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import ButtonAtom from '../../components/atoms/ButtonAtom';
 import PaymentModal from '../../components/atoms/PaymentModal';
 import { Payment as payment } from '../../interfaces/PaymentInterface';
 import { formatCurrency } from '../../utils/format';
+import AlertModal from '../atoms/AlertModal';
 
 interface Props {
   payment: payment;
@@ -95,6 +96,10 @@ export default function PaymentCard({ payment }: Props) {
   const { concept, amount, currency, created_at, status, counterparty_name, my_role } = payment;
   const router = useRouter();
 
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertData, setAlertData] = useState<{ type: 'success' | 'error' | 'info' | 'warning'; title: string; message: string } | null>(null);
+
   const onPay = () => {
     router.push(`./make/${payment.id_pay}`);
   };
@@ -103,8 +108,6 @@ export default function PaymentCard({ payment }: Props) {
     // Open receipt modal
     setShowReceipt(true);
   };
-  
-  const [showReceipt, setShowReceipt] = useState(false);
 
   return (
     <View className="bg-white rounded-lg p-4 shadow mb-3">
@@ -183,7 +186,7 @@ export default function PaymentCard({ payment }: Props) {
                 </View>
                 <View className="w-2" />
                 <View className="flex-1">
-                  <ButtonAtom title="Reintentar Pago" onPress={() => Alert.alert('Reintentar', 'Simulando reintento de pago')} variant="primary" fullWidth icon="refresh-outline" />
+                  <ButtonAtom title="Reintentar Pago" onPress={() => { setAlertData({ type: 'info', title: 'Reintentar', message: 'Simulando reintento de pago' }); setAlertVisible(true); }} variant="primary" fullWidth icon="refresh-outline" />
                 </View>
               </>
             )}
@@ -219,10 +222,10 @@ export default function PaymentCard({ payment }: Props) {
                 <ButtonAtom title="Ver recibo" onPress={onView} variant="habitta-outline" fullWidth icon="receipt-outline" />
                 <View className="flex-row gap-2">
                   <View className="flex-1">
-                    <ButtonAtom title="Enviar Recordatorio" onPress={() => Alert.alert('Recordatorio', 'Recordatorio enviado')} variant="outline" fullWidth icon="notifications-outline" />
+                    <ButtonAtom title="Enviar Recordatorio" onPress={() => { setAlertData({ type: 'success', title: 'Recordatorio', message: 'Recordatorio enviado' }); setAlertVisible(true); }} variant="outline" fullWidth icon="notifications-outline" />
                   </View>
                   <View className="flex-1">
-                    <ButtonAtom title="Marcar como pagado" onPress={() => Alert.alert('Marcar', 'Marcado como pagado')} variant="success" fullWidth icon="checkmark-done-outline" />
+                    <ButtonAtom title="Marcar como pagado" onPress={() => { setAlertData({ type: 'success', title: 'Marcar', message: 'Marcado como pagado' }); setAlertVisible(true); }} variant="success" fullWidth icon="checkmark-done-outline" />
                   </View>
                 </View>
               </View>
@@ -241,10 +244,10 @@ export default function PaymentCard({ payment }: Props) {
                 <ButtonAtom title="Ver recibo" onPress={onView} variant="habitta-outline" fullWidth icon="receipt-outline" />
                 <View className="flex-row gap-2">
                   <View className="flex-1">
-                    <ButtonAtom title="Enviar Recordatorio" onPress={() => Alert.alert('Recordatorio', 'Recordatorio enviado')} variant="outline" fullWidth icon="notifications-outline" />
+                    <ButtonAtom title="Enviar Recordatorio" onPress={() => { setAlertData({ type: 'success', title: 'Recordatorio', message: 'Recordatorio enviado' }); setAlertVisible(true); }} variant="outline" fullWidth icon="notifications-outline" />
                   </View>
                   <View className="flex-1">
-                    <ButtonAtom title="Marcar como pagado" onPress={() => Alert.alert('Marcar', 'Marcado como pagado')} variant="success" fullWidth icon="checkmark-done-outline" />
+                    <ButtonAtom title="Marcar como pagado" onPress={() => { setAlertData({ type: 'success', title: 'Marcar', message: 'Marcado como pagado' }); setAlertVisible(true); }} variant="success" fullWidth icon="checkmark-done-outline" />
                   </View>
                 </View>
               </View>
@@ -256,10 +259,10 @@ export default function PaymentCard({ payment }: Props) {
                 <ButtonAtom title="Ver recibo" onPress={onView} variant="habitta-outline" fullWidth icon="receipt-outline" />
                 <View className="flex-row gap-2">
                   <View className="flex-1">
-                    <ButtonAtom title="Enviar aviso de mora" onPress={() => Alert.alert('Aviso', 'Aviso de mora enviado')} variant="danger" fullWidth icon="alert-circle-outline" />
+                    <ButtonAtom title="Enviar aviso de mora" onPress={() => { setAlertData({ type: 'warning', title: 'Aviso', message: 'Aviso de mora enviado' }); setAlertVisible(true); }} variant="danger" fullWidth icon="alert-circle-outline" />
                   </View>
                   <View className="flex-1">
-                    <ButtonAtom title="Marcar como pagado" onPress={() => Alert.alert('Marcar', 'Marcado como pagado')} variant="success" fullWidth icon="checkmark-done-outline" />
+                    <ButtonAtom title="Marcar como pagado" onPress={() => { setAlertData({ type: 'success', title: 'Marcar', message: 'Marcado como pagado' }); setAlertVisible(true); }} variant="success" fullWidth icon="checkmark-done-outline" />
                   </View>
                 </View>
               </View>
@@ -278,6 +281,15 @@ export default function PaymentCard({ payment }: Props) {
       {showReceipt && (
         <PaymentModal visible={showReceipt} onClose={() => setShowReceipt(false)} payment={payment} />
       )}
+
+      {/* Modal de Alerta */}
+      <AlertModal
+        visible={alertVisible}
+        type={alertData?.type}
+        title={alertData?.title || ''}
+        message={alertData?.message || ''}
+        onClose={() => setAlertVisible(false)}
+      />
     </View>
   );
 }
