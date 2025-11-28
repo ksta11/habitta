@@ -392,7 +392,8 @@ export default function ScreenCreateOwnerMaintenance() {
           <ButtonAtom
             title={creating ? 'Creando...' : 'Crear Solicitud'}
             onPress={handleSubmit}
-            variant="success"
+
+            variant="habitta-primary"
             size="large"
             fullWidth
             loading={creating}

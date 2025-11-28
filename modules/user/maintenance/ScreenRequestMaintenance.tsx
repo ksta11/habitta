@@ -11,14 +11,22 @@ import {
   TextInput,
   View
 } from 'react-native';
+import { z } from 'zod';
 import Label from '../../../components/atoms/Label';
 import { useAuth } from '../../../contexts/AuthContext';
 import {
   CreateMaintenanceRequestDTO
 } from '../../../interfaces/MaintenanceInterface';
 import { hapticFeedback } from '../../../utils/haptics';
+import { secureTextField } from '../../../utils/validation';
 import { useActiveLease } from '../hooks/useActiveLease';
 import { useMaintenanceRequests } from '../hooks/useMaintenanceRequests';
+
+// 🔒 Schema de validación con Zod
+const maintenanceRequestSchema = z.object({
+  title: secureTextField(5, 100, 'El título contiene caracteres no permitidos'),
+  description: secureTextField(10, 500, 'La descripción contiene caracteres no permitidos'),
+});
 
 export default function ScreenRequestMaintenance() {
   const router = useRouter();
@@ -37,25 +45,36 @@ export default function ScreenRequestMaintenance() {
   }>({});
 
   /**
-   * Validar formulario
+   * 🔒 Validar formulario con Zod
+   * Protege contra SQL injection, caracteres peligrosos y buffer overflow
    */
   const validateForm = (): boolean => {
-    const newErrors: typeof errors = {};
+    console.log('🔍 [MaintenanceRequest] Validando formulario...');
+    
+    const result = maintenanceRequestSchema.safeParse({
+      title: title,
+      description: description,
+    });
 
-    if (!title.trim()) {
-      newErrors.title = 'El título es requerido';
-    } else if (title.trim().length < 5) {
-      newErrors.title = 'El título debe tener al menos 5 caracteres';
+    if (!result.success) {
+      // Mapear errores de Zod a nuestro formato
+      const newErrors: typeof errors = {};
+      
+      result.error.errors.forEach((error) => {
+        const field = error.path[0] as 'title' | 'description';
+        if (!newErrors[field]) {
+          newErrors[field] = error.message;
+        }
+      });
+
+      console.log('❌ [MaintenanceRequest] Validación falló:', newErrors);
+      setErrors(newErrors);
+      return false;
     }
 
-    if (!description.trim()) {
-      newErrors.description = 'La descripción es requerida';
-    } else if (description.trim().length < 10) {
-      newErrors.description = 'La descripción debe tener al menos 10 caracteres';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    console.log('✅ [MaintenanceRequest] Validación exitosa');
+    setErrors({});
+    return true;
   };
 
   /**
@@ -191,6 +210,7 @@ export default function ScreenRequestMaintenance() {
               value={title}
               onChangeText={(text) => {
                 setTitle(text);
+                // Limpiar error al escribir
                 if (errors.title) setErrors({ ...errors, title: undefined });
               }}
               placeholder="Ej: Fuga de agua en el baño"
@@ -202,6 +222,9 @@ export default function ScreenRequestMaintenance() {
             {errors.title && (
               <Text className="text-red-500 text-sm mt-1">{errors.title}</Text>
             )}
+            <Text className="text-gray-500 text-xs mt-1 text-right">
+              {title.length}/100
+            </Text>
           </View>
 
           {/* Categoría */}

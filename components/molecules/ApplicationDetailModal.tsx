@@ -263,7 +263,7 @@ export default function ApplicationDetailModal({
                 <ButtonAtom
                   title={confirmText}
                   onPress={handleConfirm}
-                  variant="success"
+                  variant="habitta-primary"
                   size="large"
                   icon="checkmark-circle"
                   iconPosition="left"
