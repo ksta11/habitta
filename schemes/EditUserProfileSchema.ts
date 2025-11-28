@@ -1,12 +1,8 @@
 import { z } from 'zod';
+import { textField } from '../utils/validation';
 
 export const editUserProfileSchema = z.object({
-  name: z
-  .string()
-  .min(1, 'El nombre es requerido')
-  .min(2, 'El nombre debe tener al menos 2 caracteres')
-  .max(50, 'El nombre no puede exceder 50 caracteres')
-  .trim().optional(),
+  name: textField(2, 50, 'El nombre contiene caracteres no permitidos').optional(),
   email: z
   .string()
   .min(1, 'El email es requerido')

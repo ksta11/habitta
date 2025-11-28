@@ -1,6 +1,7 @@
-import React from 'react';
-import { Pressable, Text, ActivityIndicator, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { hapticFeedback } from '../../utils/haptics';
 
 interface ButtonAtomProps {
   title: string;
@@ -36,7 +37,7 @@ export default function ButtonAtom({
       danger: 'bg-red-500 border-red-500 border-2',
       success: 'bg-green-500 border-green-500 border-2',
       warning: 'bg-yellow-500 border-yellow-500 border-2',
-      outline: 'bg-transparent border-blue-500 border-2',
+      outline: 'bg-white-traffic border-blue-500 border-2',
       ghost: 'bg-transparent border-transparent',
       'habitta-primary': 'bg-violet border-violet border-2',
       'habitta-secondary': 'bg-lavender-indigo border-lavender-indigo border-2',
@@ -68,7 +69,7 @@ export default function ButtonAtom({
   const getSizeClasses = () => {
     const sizes = {
       small: 'py-2 px-4 min-h-[36px] rounded-2xl',
-      medium: 'py-3 px-6 min-h-[48px] rounded-[20px]',
+      medium: 'py-3 px-8 min-h-[48px] rounded-[20px]',
       large: 'py-4 px-8 min-h-[56px] rounded-3xl'
     };
     
@@ -119,7 +120,7 @@ export default function ButtonAtom({
             size="small" 
             color={variant === 'outline' || variant === 'ghost' || variant === 'habitta-outline' ? 
               (variant === 'habitta-outline' ? '#531A99' : '#3B82F6') : '#FFFFFF'}
-            style={{ marginRight: 8 }}
+            style={{ marginRight: 4 }}
           />
           <Text 
             className={textClasses}
@@ -140,7 +141,7 @@ export default function ButtonAtom({
               size={contentSizes.iconSize} 
               color={variant === 'outline' || variant === 'ghost' || variant === 'habitta-outline' ? 
                 (variant === 'habitta-outline' ? '#531A99' : '#3B82F6') : '#FFFFFF'}
-              style={{ marginRight: 8 }}
+              style={{ marginRight: 4 }}
             />
           )}
           <Text 
@@ -155,7 +156,7 @@ export default function ButtonAtom({
               size={contentSizes.iconSize} 
               color={variant === 'outline' || variant === 'ghost' || variant === 'habitta-outline' ? 
                 (variant === 'habitta-outline' ? '#531A99' : '#3B82F6') : '#FFFFFF'}
-              style={{ marginLeft: 8 }}
+              style={{ marginLeft: 4 }}
             />
           )}
         </View>
@@ -185,7 +186,10 @@ export default function ButtonAtom({
         shadowRadius: 8,
         elevation: 6, // Para Android
       }}
-      onPress={onPress}
+      onPress={() => {
+        hapticFeedback.buttonPress();
+        onPress();
+      }}
       disabled={isDisabled}
     >
       {renderContent()}

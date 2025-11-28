@@ -1,5 +1,5 @@
-import { RenterApplication } from '../../../interfaces/application/RenterApplicationInterface';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { RenterApplication } from '../../../interfaces/application/RenterApplicationInterface';
 
 const TOKEN_KEY = '@habitta_token';
 const USER_KEY = '@habitta_user';
@@ -12,7 +12,7 @@ export interface GetRenterApplicationsResponse {
 }
 
 export interface UpdateRenterApplicationDTO {
-	status: 'pending' | 'pre_approved' | 'approved' | 'rejected' | 'withdrawn';
+	status: 'pending' | 'documents_required' | 'pre_approved' | 'approved' | 'signed' | 'rejected' | 'withdrawn' | 'terminated';
 }
 
 export interface UpdateRenterApplicationResponse {

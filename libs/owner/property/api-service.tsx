@@ -1,4 +1,4 @@
-import { CreatePropertyDTO, PropertyImage, GetOwnerPropertiesResponse, GetAllPropertiesResponse, GetPropertyByIdResponse, UpdatePropertyDTO, UpdatePropertyResponse, DeletePropertyResponse } from '../../../interfaces/property/PropertyInterface';
+import { CreatePropertyDTO, PropertyImage, GetOwnerPropertiesResponse, GetAllPropertiesResponse, GetPropertyByIdResponse, UpdatePropertyDTO, UpdatePropertyResponse, DeletePropertyResponse, Plan, GetPlansResponse } from '../../../interfaces/property/PropertyInterface';
 import { uploadImageToCloudinary } from '../../cloudinary/api-service';
 import { useAuth } from '../../../contexts/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -417,6 +417,112 @@ export const getAllProperties = async (): Promise<GetAllPropertiesResponse> => {
 		
 	} catch (error) {
 		console.error('💥 Error crítico al obtener todas las propiedades:', error);
+		return {
+			success: false,
+			data: [],
+			message: error instanceof Error ? error.message : 'Error de conexión',
+		};
+	}
+};
+
+export const getAllPublishedProperties = async (): Promise<GetAllPropertiesResponse> => {
+	try {
+		console.log('🏠 Iniciando obtención de todas las propiedades disponibles...');
+		
+		// Obtener token para la autorización (opcional según tu backend)
+		const token = await AsyncStorage.getItem(TOKEN_KEY);
+		
+		const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
+		const url = `${API_BASE_URL}/api/properties`;
+		console.log('🌐 URL de consulta:', url);
+		
+		// Headers con token si existe (algunos endpoints pueden no requerirlo)
+		const headers: Record<string, string> = {
+			'Content-Type': 'application/json',
+		};
+		
+		if (token) {
+			headers['Authorization'] = `Bearer ${token}`;
+		}
+		
+		const response = await fetch(url, {
+			method: 'GET',
+			headers,
+		});
+		
+		console.log('📡 Status de respuesta:', response.status);
+		
+		const data = await response.json();
+		console.log('📋 Respuesta completa:', data);
+		
+		if (!response.ok) {
+			console.log('❌ Error en la respuesta:', data.message);
+			return {
+				success: false,
+				data: [],
+				message: data.message || 'Error al obtener propiedades',
+			};
+		}
+		
+		console.log(`✅ Propiedades obtenidas exitosamente. Total: ${data.data ? data.data.length : 0}`);
+		
+		return {
+			success: true,
+			data: data.data || [],
+			message: data.message || 'Propiedades obtenidas exitosamente',
+		};
+		
+	} catch (error) {
+		console.error('💥 Error crítico al obtener todas las propiedades:', error);
+		return {
+			success: false,
+			data: [],
+			message: error instanceof Error ? error.message : 'Error de conexión',
+		};
+	}
+};
+
+export const getPlans = async (): Promise<GetPlansResponse> => {
+	try {
+		console.log('📋 Iniciando obtención de planes...');
+		const token = await AsyncStorage.getItem(TOKEN_KEY);
+		
+		const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
+		const url = `${API_BASE_URL}/api/plans`;
+		console.log('🌐 URL de consulta:', url);
+
+		const response = await fetch(url, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${token}`,
+			},
+		});
+		
+		console.log('📡 Status de respuesta:', response.status);
+		
+		const data = await response.json();
+		console.log('📋 Respuesta del servidor:', data);
+
+		if (!response.ok) {
+			console.log('❌ Error al obtener planes:', data.message);
+			return {
+				success: false,
+				data: [],
+				message: data.message || 'Error al obtener planes',
+			};
+		}
+
+		console.log(`✅ Planes obtenidos exitosamente. Total: ${data.data ? data.data.length : 0}`);
+
+		return {
+			success: true,
+			data: data.data || [],
+			message: data.message || 'Planes obtenidos exitosamente',
+		};
+
+	} catch (error) {
+		console.error('💥 Error crítico al obtener planes:', error);
 		return {
 			success: false,
 			data: [],

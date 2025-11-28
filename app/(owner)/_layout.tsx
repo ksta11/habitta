@@ -1,22 +1,28 @@
-import React from 'react';
+import React from "react";
 import { FontAwesome } from "@expo/vector-icons";
-import { Tabs } from 'expo-router';
-import { AuthGuard } from '../../middleware/AuthGuard';
+import { Tabs } from "expo-router";
+import { AuthGuard } from "../../middleware/AuthGuard";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { hapticFeedback } from "../../utils/haptics";
 
 export default function OwnerTabsLayout() {
+  const insets = useSafeAreaInsets();
+  const TAB_BAR_BASE_HEIGHT = 70; // base height used previously
+
   return (
     <AuthGuard requiredRole="owner">
       <Tabs
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: "#320964", // deep-violet
-          tabBarInactiveTintColor: "#BD93EF", // lavender-bright
+          tabBarInactiveTintColor: "#6B7280", // gray-500
           tabBarStyle: {
             backgroundColor: "#ffffff",
             borderTopWidth: 1,
             borderTopColor: "#e5e7eb", // gray-200
-            height: 70,
-            paddingBottom: 10,
+            // respect bottom safe area so buttons overlay looks integrated
+            height: TAB_BAR_BASE_HEIGHT + insets.bottom,
+            paddingBottom: insets.bottom + 10,
             paddingTop: 10,
           },
           tabBarLabelStyle: {
@@ -24,10 +30,16 @@ export default function OwnerTabsLayout() {
             fontWeight: "500",
           },
         }}
+        screenListeners={{
+          tabPress: () => {
+            // Feedback háptico al cambiar de tab
+            hapticFeedback.tabChange();
+          },
+        }}
       >
-        {/* Tab Configuración */}
+        {/* Tab inicio */}
         <Tabs.Screen
-          name="home"
+          name="(home)"
           options={{
             title: "Inicio",
             tabBarIcon: ({ color, size }) => (
@@ -40,7 +52,7 @@ export default function OwnerTabsLayout() {
         <Tabs.Screen
           name="(properties)"
           options={{
-            title: 'Propiedades',
+            title: "Propiedades",
             tabBarIcon: ({ color, size }) => (
               <FontAwesome name="building" size={size} color={color} />
             ),
@@ -51,7 +63,7 @@ export default function OwnerTabsLayout() {
         <Tabs.Screen
           name="(applications)"
           options={{
-            title: 'Solicitudes',
+            title: "Solicitudes",
             tabBarIcon: ({ color, size }) => (
               <FontAwesome name="envelope" size={size} color={color} />
             ),
@@ -60,14 +72,31 @@ export default function OwnerTabsLayout() {
 
         {/* Tab Configuración */}
         <Tabs.Screen
-          name="settings"
+          name="(settings)"
           options={{
-            title: "Ajustes",
+            href: null,
+          }}
+        />
+
+        {/* Ocultar ruta de reviews del tab bar */}
+        <Tabs.Screen
+          name="(review)"
+          options={{
+            href: null,
+          }}
+        />
+
+        {/* Tab arrendamientos */}
+        <Tabs.Screen
+          name="(leases)"
+          options={{
+            title: "Alquileres",
             tabBarIcon: ({ color, size }) => (
-              <FontAwesome name="cog" size={size} color={color} />
+              <FontAwesome name="handshake-o" size={size} color={color} />
             ),
           }}
         />
+    
       </Tabs>
     </AuthGuard>
   );

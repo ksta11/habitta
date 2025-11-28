@@ -42,3 +42,11 @@ restore-env.bat
 
 # typescript
 *.tsbuildinfo
+
+# firebase service account
+habitta11-firebase-adminsdk-fbsvc-8df9f5b2a8.json
+google-services.json
+
+# compiled files
+/android
+/ios

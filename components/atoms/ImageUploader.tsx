@@ -1,7 +1,8 @@
-import React from 'react';
-import { View, Text, Pressable, Alert } from 'react-native';
-import { Svg, Path } from 'react-native-svg';
 import * as ImagePicker from 'expo-image-picker';
+import React, { useState } from 'react';
+import { Alert, Pressable, Text, View } from 'react-native';
+import { Path, Svg } from 'react-native-svg';
+import AlertModal from './AlertModal';
 
 interface ImageUploaderProps {
   onImageSelect?: (images: ImagePicker.ImagePickerAsset[]) => void;
@@ -31,19 +32,25 @@ export default function ImageUploader({
   // Validar que maxImages esté entre 1 y 10
   const validMaxImages = Math.min(Math.max(maxImages, 1), 10);
   const canSelectMultiple = allowsMultipleSelection && validMaxImages > 1;
+
+  // Estado para el modal de alerta
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertData, setAlertData] = useState<{title: string, message: string, type: 'warning' | 'error'} | null>(null);
   
   // Solicitar permisos
   const requestPermissions = async (type: 'camera' | 'library') => {
     if (type === 'camera') {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permisos requeridos', 'Se necesitan permisos de cámara para tomar fotos.');
+        setAlertData({ title: 'Permisos requeridos', message: 'Se necesitan permisos de cámara para tomar fotos.', type: 'warning' });
+        setAlertVisible(true);
         return false;
       }
     } else {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permisos requeridos', 'Se necesitan permisos de galería para seleccionar imágenes.');
+        setAlertData({ title: 'Permisos requeridos', message: 'Se necesitan permisos de galería para seleccionar imágenes.', type: 'warning' });
+        setAlertVisible(true);
         return false;
       }
     }
@@ -77,16 +84,19 @@ export default function ImageUploader({
         const limitedImages = result.assets.slice(0, validMaxImages);
         
         if (result.assets.length > validMaxImages) {
-          Alert.alert(
-            'Límite excedido', 
-            `Solo puedes seleccionar máximo ${validMaxImages} imagen${validMaxImages > 1 ? 'es' : ''}.`
-          );
+          setAlertData({
+            title: 'Límite excedido',
+            message: `Solo puedes seleccionar máximo ${validMaxImages} imagen${validMaxImages > 1 ? 'es' : ''}.`,
+            type: 'warning'
+          });
+          setAlertVisible(true);
         }
         
         onImageSelect?.(limitedImages);
       }
     } catch (error) {
-      Alert.alert('Error', 'Error al seleccionar imagen');
+      setAlertData({ title: 'Error', message: 'Error al seleccionar imagen', type: 'error' });
+      setAlertVisible(true);
       console.error('Image picker error:', error);
     }
   };
@@ -163,21 +173,31 @@ export default function ImageUploader({
   };
 
   return (
-    <Pressable 
-      onPress={showSourceOptions}
-      disabled={disabled}
-      className={`rounded border border-gray-300 p-4 shadow-sm ${
-        disabled ? 'opacity-50' : 'active:opacity-70'
-      } ${className}`}
-      activeOpacity={0.7}
-    >
-      <View className="flex flex-row items-center justify-center gap-4">
-        <Text className={`font-medium ${disabled ? 'text-gray-500' : 'text-gray-900'}`}>
-          {displayTitle}
-        </Text>
+    <View>
+      <Pressable 
+        onPress={showSourceOptions}
+        disabled={disabled}
+        className={`rounded border border-gray-300 p-4 shadow-sm ${
+          disabled ? 'opacity-50' : 'active:opacity-70'
+        } ${className}`}
+      >
+        <View className="flex flex-row items-center justify-center gap-4">
+          <Text className={`font-medium ${disabled ? 'text-gray-500' : 'text-gray-900'}`}>
+            {displayTitle}
+          </Text>
 
-        {getIcon()}
-      </View>
-    </Pressable>
+          {getIcon()}
+        </View>
+      </Pressable>
+
+      {/* Modal de Alerta */}
+      <AlertModal
+        visible={alertVisible}
+        type={alertData?.type}
+        title={alertData?.title || ''}
+        message={alertData?.message || ''}
+        onClose={() => setAlertVisible(false)}
+      />
+    </View>
   );
 }

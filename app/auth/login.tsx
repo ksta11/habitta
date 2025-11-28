@@ -13,7 +13,7 @@ export default function LoginPage() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View className="flex-1 justify-center py-8">            
+        <View className="flex-1 justify-center py-0">            
           <ScreenLogin />
         </View>
       </ScrollView>

@@ -14,7 +14,7 @@ module.exports = {
     extend: {
       colors: {
         // Colores personalizados de Habitta (solo violetas y azules)
-        violet: '#531a99', // Color principal original de Habitta
+        violet: '#531A99', // Color principal original de Habitta
         'deep-violet': '#320964',
         'lavender-indigo': '#A346E6',
         'lavender-bright': '#BD93EF',

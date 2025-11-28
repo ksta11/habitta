@@ -1,25 +1,26 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
-import Input from '../../../../components/atoms/Input';
+import { Controller } from 'react-hook-form';
+import { Text, View } from 'react-native';
+import ButtonAtom from '../../../../components/atoms/ButtonAtom';
+import NumericField from '../../../../components/atoms/NumericField';
 import PickerAtom from '../../../../components/atoms/Picker';
 import ProgressBar from '../../../../components/atoms/ProgressBar';
-import ButtonAtom from '../../../../components/atoms/ButtonAtom';
+import ServicesSelector from '../../../../components/molecules/ServicesSelector';
 import { FormStepProps } from '../../../../interfaces/property/types';
 
 export default function ScreenStep2({
-  register,
-  setValue,
-  watch,
+  control,
   formState,
   nextStep,
   prevStep,
   isFirstStep,
   isLastStep,
   onSubmit,
+  onStepPress,
 }: FormStepProps) {
   const { errors } = formState;
   return (
-    <View className="flex-1 bg-white-traffic p-4">
+    <View className="flex-1 bg-white-traffic p-4 mt-10">
       <ProgressBar
         steps={[
           { icon: 'home-outline', title: 'General', description: 'Información básica' },
@@ -27,76 +28,97 @@ export default function ScreenStep2({
           { icon: 'image-outline', title: 'Imágenes', description: 'Sube fotos' },
         ]}
         currentStep={2}
+        onStepPress={onStepPress}
       />
       <Text className="text-2xl font-bold my-4">Nueva Propiedad - Paso 2</Text>
-      <PickerAtom
-        label="Tipo de propiedad"
-        value={watch('type')}
-        onValueChange={value => setValue('type', value as 'house' | 'apartament' | 'store' | 'office' | 'werehouse')}
-        options={[
-          { label: 'Selecciona un tipo', value: '' },
-          { label: 'Casa', value: 'house' },
-          { label: 'Apartamento', value: 'apartament' },
-          { label: 'Tienda', value: 'store' },
-          { label: 'Oficina', value: 'office' },
-          { label: 'Bodega', value: 'werehouse' },
-        ]}
-        error={errors.type?.message}
-        borderColor="#A346E6"
-        backgroundColor="#F6F6F6"
-        labelColor="#A346E6"
-        textColor="#1F1F1F"
+      <Controller
+        name="type"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <PickerAtom
+            label="Tipo de propiedad"
+            value={value}
+            onValueChange={onChange}
+            options={[
+              { label: 'Selecciona un tipo', value: '' },
+              { label: 'Casa', value: 'house' },
+              { label: 'Apartamento', value: 'apartament' },
+              { label: 'Tienda', value: 'store' },
+              { label: 'Oficina', value: 'office' },
+              { label: 'Bodega', value: 'werehouse' },
+            ]}
+            error={errors.type?.message}
+            borderColor="#A346E6"
+            backgroundColor="#F6F6F6"
+            labelColor="#A346E6"
+            textColor="#1F1F1F"
+          />
+        )}
       />
-      <Input
-        label="Área"
-        placeholder="Área (m²)"
-        value={watch('area')?.toString() || ''}
-        onChangeText={text => setValue('area', Number(text))}
-        error={errors.area?.message}
-        keyboardType="numeric"
-        borderColor="#A346E6"
-        backgroundColor="#F6F6F6"
-        labelColor="#A346E6"
-        textColor="#1F1F1F"
-        {...register('area')}
+      <Controller
+        name="area"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <NumericField
+            label="Área"
+            placeholder="Área (m²)"
+            value={value}
+            onChange={onChange}
+            error={errors.area?.message}
+            integer={false}
+            borderColor="#A346E6"
+            backgroundColor="#F6F6F6"
+            labelColor="#A346E6"
+            textColor="#1F1F1F"
+          />
+        )}
       />
-      <Input
-        label="Habitaciones"
-        placeholder="Habitaciones"
-        value={watch('rooms')?.toString() || ''}
-        onChangeText={text => setValue('rooms', Number(text))}
-        error={errors.rooms?.message}
-        keyboardType="numeric"
-        borderColor="#A346E6"
-        backgroundColor="#F6F6F6"
-        labelColor="#A346E6"
-        textColor="#1F1F1F"
-        {...register('rooms')}
+      <Controller
+        name="rooms"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <NumericField
+            label="Habitaciones"
+            placeholder="Habitaciones"
+            value={value}
+            onChange={onChange}
+            error={errors.rooms?.message}
+            integer={true}
+            borderColor="#A346E6"
+            backgroundColor="#F6F6F6"
+            labelColor="#A346E6"
+            textColor="#1F1F1F"
+          />
+        )}
       />
-      <Input
-        label="Baños"
-        placeholder="Baños"
-        value={watch('bathrooms')?.toString() || ''}
-        onChangeText={text => setValue('bathrooms', Number(text))}
-        error={errors.bathrooms?.message}
-        keyboardType="numeric"
-        borderColor="#A346E6"
-        backgroundColor="#F6F6F6"
-        labelColor="#A346E6"
-        textColor="#1F1F1F"
-        {...register('bathrooms')}
+      <Controller
+        name="bathrooms"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <NumericField
+            label="Baños"
+            placeholder="Baños"
+            value={value}
+            onChange={onChange}
+            error={errors.bathrooms?.message}
+            integer={true}
+            borderColor="#A346E6"
+            backgroundColor="#F6F6F6"
+            labelColor="#A346E6"
+            textColor="#1F1F1F"
+          />
+        )}
       />
-      <Input
-        label="Servicios"
-        placeholder="Servicios (ej: agua, luz, internet)"
-        value={watch('services')}
-        onChangeText={text => setValue('services', text)}
-        error={errors.services?.message}
-        borderColor="#A346E6"
-        backgroundColor="#F6F6F6"
-        labelColor="#A346E6"
-        textColor="#1F1F1F"
-        {...register('services')}
+      <Controller
+        name="services"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <ServicesSelector
+            value={value}
+            onChange={onChange}
+            error={errors.services?.message}
+          />
+        )}
       />
       <View className="flex-row justify-between">
         <View className="flex-1 mr-2">
@@ -113,8 +135,8 @@ export default function ScreenStep2({
         <View className="flex-1 ml-2">
           <ButtonAtom
             title="Siguiente"
-            onPress={nextStep}
-            variant="primary"
+            onPress={onSubmit}
+            variant="habitta-primary"
             size="large"
             icon="arrow-forward-outline"
             iconPosition="right"

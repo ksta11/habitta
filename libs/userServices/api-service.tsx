@@ -201,6 +201,93 @@ export const updateUser = async (id: string, userData: UserDTO): Promise<UserDAO
 };
 
 /**
+ * Obtener información de un usuario por su ID
+ */
+export const getUserById = async (userId: string): Promise<UserDAO> => {
+  try {
+    console.log('👤 Obteniendo información del usuario:', userId);
+    
+    // Validar token antes de hacer la petición
+    const tokenValidation = await validateTokenBeforeRequest();
+    if (!tokenValidation.isValid) {
+      return {
+        message: tokenValidation.message || 'Token de autenticación no válido',
+        user: {
+          id: '',
+          name: '',
+          email: '',
+          phone: '',
+          role: '',
+          creation_date: new Date()
+        }
+      };
+    }
+    
+    const token = await getAuthToken();
+    const url = `${API_BASE_URL}/api/users/${userId}`;
+    console.log('🔗 Intentando conectar a:', url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    console.log('✅ Conexión exitosa! Status:', response.status);
+    const data = await response.json();
+    console.log('📦 Response data:', data);
+
+    if (!response.ok) {
+      return await handleAuthError(response, data);
+    }
+
+    // El backend devuelve: { success: true, message: '...', data: user }
+    return {
+      message: data.message || 'Usuario obtenido exitosamente',
+      user: data.data || {
+        id: userId,
+        name: '',
+        email: '',
+        phone: '',
+        role: '',
+        creation_date: new Date()
+      }
+    };
+
+  } catch (error) {
+    console.error('❌ Error getUserById:', error);
+    
+    if (error instanceof TypeError && error.message === 'Network request failed') {
+      return {
+        message: `❌ No se pudo conectar con el servidor en ${API_BASE_URL}. \n\n🔧 Verifica que el backend esté corriendo y accesible desde tu dispositivo.`,
+        user: {
+          id: '',
+          name: '',
+          email: '',
+          phone: '',
+          role: '',
+          creation_date: new Date()
+        }
+      };
+    }
+    
+    return {
+      message: error instanceof Error ? error.message : 'Error de conexión',
+      user: {
+        id: '',
+        name: '',
+        email: '',
+        phone: '',
+        role: '',
+        creation_date: new Date()
+      }
+    };
+  }
+};
+
+/**
  * Obtener perfil del usuario actual
  */
 export const getCurrentUserProfile = async (): Promise<UserDAO> => {

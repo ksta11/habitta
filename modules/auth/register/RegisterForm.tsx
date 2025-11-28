@@ -1,70 +1,40 @@
-import React, { useState, useEffect } from "react";
-import {View,Text,Pressable,Alert,ScrollView,StatusBar as RNStatusBar, Platform} from "react-native";
+import React from "react";
+import {View,Text,Pressable,ScrollView,StatusBar as RNStatusBar, Platform} from "react-native";
 import { Link, router } from "expo-router";
-import { useForm, SubmitHandler, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller } from "react-hook-form";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import { RegisterSchema } from "../../../schemes/RegisterSchema";
-import { RegisterFormDTO } from "../../../interfaces/RegisterInterface";
-import { useAuth } from "../../../contexts/AuthContext";
+
 import LabeledInput from "../../../components/molecules/LabeledInput";
 import PasswordInput from "../../../components/molecules/PasswordInput";
 import ToggleField from "../../../components/molecules/ToggleField";
 import ModernButton from "../../../components/atoms/ModernButton";
+import { useRegister } from "../hooks";
 
 export default function RegisterForm() {
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
-  const { register } = useAuth();
   const insets = useSafeAreaInsets();
 
-  useEffect(() => {
+  // Hook de registro
+  const {
+    control,
+    handleSubmit,
+    errors,
+    isSubmitting,
+    submitError,
+    showPassword,
+    showRepeatPassword,
+    togglePasswordVisibility,
+    toggleRepeatPasswordVisibility,
+  } = useRegister();
+
+  // Configure Android Status Bar (iOS is handled by <StatusBar /> component)
+  React.useEffect(() => {
     if (Platform.OS === "android") {
       RNStatusBar.setBackgroundColor("#7C3AED", true);
       RNStatusBar.setBarStyle("light-content", true);
     }
   }, []);
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<RegisterFormDTO>({
-    resolver: zodResolver(RegisterSchema),
-    defaultValues: {
-      name: "",
-      phone: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      acceptTerms: false,
-    },
-  });
-
-  const onSubmit: SubmitHandler<RegisterFormDTO> = async (data) => {
-    try {
-      setSubmitError(null);
-
-      console.log("📝 Iniciando proceso de registro...");
-      const result = await register(data);
-
-      if (result.success) {
-        Alert.alert(
-          "Registro exitoso",
-          result.message || "Tu cuenta ha sido creada correctamente",
-        );
-      } else {
-        console.log("❌ Registro fallido:", result.message);
-        setSubmitError(result.message || "Error al crear la cuenta");
-      }
-    } catch (error) {
-      console.error("❌ Error en registro:", error);
-      setSubmitError("Error inesperado. Intenta de nuevo.");
-    }
-  };
 
   return (
     <View className="flex-1 w-full bg-violet">
@@ -198,6 +168,7 @@ export default function RegisterForm() {
                   value={value}
                   onChangeText={onChange}
                   keyboardType="phone-pad"
+                  maxLength={20}
                   error={errors.phone?.message}
                 />
               )}
@@ -236,7 +207,7 @@ export default function RegisterForm() {
                   onChangeText={onChange}
                   error={errors.password?.message}
                   showPassword={showPassword}
-                  onTogglePassword={() => setShowPassword(!showPassword)}
+                  onTogglePassword={togglePasswordVisibility}
                 />
               )}
             />
@@ -255,9 +226,7 @@ export default function RegisterForm() {
                   onChangeText={onChange}
                   error={errors.confirmPassword?.message}
                   showPassword={showRepeatPassword}
-                  onTogglePassword={() =>
-                    setShowRepeatPassword(!showRepeatPassword)
-                  }
+                  onTogglePassword={toggleRepeatPasswordVisibility}
                 />
               )}
             />
@@ -285,7 +254,7 @@ export default function RegisterForm() {
           <View className="mb-4">
             <ModernButton
               title={isSubmitting ? "Creating account..." : "Create Account"}
-              onPress={handleSubmit(onSubmit)}
+              onPress={handleSubmit}
               disabled={isSubmitting}
               loading={isSubmitting}
               variant="primary"

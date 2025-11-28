@@ -2,13 +2,33 @@ import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Avatar, AvatarFallback, AvatarImage } from '../../../components/atoms/Avatar';
+import ProfileMenu from "../../../components/molecules/ProfileMenu";
 
-export function DashboardHeader() {
+
+interface HomeHeaderProps {
+  onNavigateToReviews: () => void;
+  userName: string;
+  userEmail?: string;
+  userPhoto?: string;
+  onNavigateToProfile: () => void;
+  onNavigateToSettings: () => void;
+  onLogout: () => void;
+}
+
+export function DashboardHeader( {
+  onNavigateToReviews,
+  userName,
+  userEmail,
+  userPhoto,
+  onNavigateToProfile,
+  onNavigateToSettings,
+  onLogout
+}: HomeHeaderProps) {
   return (
     <View className="flex-row items-center justify-between">
       <View>
         <Text className="text-3xl font-bold text-erie-black">Bienvenido a Habitta</Text>
-        <Text className="text-gray-600 mt-1">Gestiona tus propiedades de manera eficiente</Text>
+        <Text className="text-gray-600 mt-1">Gestiona tus propiedades eficientemente</Text>
       </View>
       <View className="flex-row items-center gap-4">
         <View className="relative">
@@ -22,12 +42,15 @@ export function DashboardHeader() {
             <Text className="text-white text-xs font-medium">3</Text>
           </View>
         </View>
-        <Avatar>
-          <AvatarImage src="/professional-avatar.png" />
-          <AvatarFallback>
-            <Ionicons name="person" size={16} color="#A346E6" />
-          </AvatarFallback>
-        </Avatar>
+        <ProfileMenu
+                  userName={userName}
+                  userEmail={userEmail}
+                  userPhoto={userPhoto}
+                  onNavigateToProfile={onNavigateToProfile}
+                  onNavigateToReviews={onNavigateToReviews}
+                  onNavigateToSettings={onNavigateToSettings}
+                  onLogout={onLogout}
+                />
       </View>
     </View>
   );

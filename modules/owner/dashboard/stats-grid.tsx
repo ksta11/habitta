@@ -8,13 +8,15 @@ interface StatsGridProps {
   pendingApplications: number;
   scheduledMaintenances: number;
   lastMonthIncome: number;
+  occupiedVsTotal: { occupied: number; total: number };
 }
 
 export function StatsGrid({ 
   totalProperties, 
   pendingApplications, 
   scheduledMaintenances, 
-  lastMonthIncome 
+  lastMonthIncome,
+  occupiedVsTotal
 }: StatsGridProps) {
   
   // Formatear el ingreso como moneda
@@ -43,18 +45,25 @@ export function StatsGrid({
       bgColor: "#531a99",
     },
     {
-      title: "Pagos Este Mes",
-      value: formatCurrency(lastMonthIncome),
-      icon: "card" as const,
-      color: "#BD93EF", // lavender-bright
-      bgColor: "#BD93EF",
-    },
-    {
       title: "Mantenimientos",
       value: scheduledMaintenances.toString(),
       icon: "construct" as const,
       color: "#320964", // deep-violet
       bgColor: "#320964",
+    },
+    {
+      title: "Propiedades Ocupadas",
+      value: `${occupiedVsTotal.occupied} / ${occupiedVsTotal.total}`,
+      icon: "people" as const,
+      color: "#7C3AED", // violet-light
+      bgColor: "#7C3AED",
+    },
+    {
+      title: "Pagos Este Mes",
+      value: formatCurrency(lastMonthIncome),
+      icon: "card" as const,
+      color: "#BD93EF", // lavender-bright
+      bgColor: "#BD93EF",
     },
   ];
 

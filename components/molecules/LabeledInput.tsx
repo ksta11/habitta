@@ -10,6 +10,7 @@ interface LabeledInputProps {
   error?: string;
   keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+  maxLength?: number;
 }
 
 export default function LabeledInput({
@@ -19,7 +20,8 @@ export default function LabeledInput({
   onChangeText,
   error,
   keyboardType = 'default',
-  autoCapitalize = 'sentences'
+  autoCapitalize = 'sentences',
+  maxLength
 }: LabeledInputProps) {
   return (
     <View className="mb-3">
@@ -31,6 +33,7 @@ export default function LabeledInput({
         error={error}
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
+        maxLength={maxLength}
         style="modern"
       />
     </View>

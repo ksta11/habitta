@@ -1,0 +1,135 @@
+import { useRouter } from "expo-router";
+import React, { useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { useAuth } from "../../contexts/AuthContext";
+import { hapticFeedback } from '../../utils/haptics';
+import { pressedPrimaryButton, standarPrimaryButton } from '../../utils/TokensDesing';
+import { DashboardHeader } from "./dashboard/dashboard-header";
+import { QuickActions } from "./dashboard/quick-actions";
+import { RecentApplications } from "./dashboard/recent-applications";
+import { RevenueChart } from "./dashboard/revenue-chart";
+import { StatsGrid } from "./dashboard/stats-grid";
+import { useOwnerDashboard } from './hooks/useOwnerDashboard';
+import { useReviewNavigation } from "../user/hooks/useReviewNavigation";
+
+
+export default function Dashboard() {
+  // Estado para el botón presionado
+  const [isPressed, setIsPressed] = useState(false);
+
+  // === HOOK DE DASHBOARD DEL PROPIETARIO ===
+  const {
+    loading,
+    error,
+    totalProperties,
+    pendingApplications,
+    scheduledMaintenances,
+    lastMonthIncome,
+    monthlyIncome,
+    incomePeriod,
+    incomeLoading,
+    setIncomePeriod,
+    recentApplications,
+    occupiedVsTotal,
+    loadOwnerStats,
+  } = useOwnerDashboard();
+
+
+    // Router para navegación
+    const router = useRouter();
+  
+    // Contexto de autenticación
+    const { user, logout } = useAuth();
+    const { navigateToReviewList } = useReviewNavigation();
+    
+
+  // Mostrar loading
+  if (loading) {
+    return (
+      <View className="flex-1 bg-gray-50 justify-center items-center">
+        <ActivityIndicator size="large" color="#3B82F6" />
+        <Text className="mt-4 text-gray-600">Cargando estadísticas...</Text>
+      </View>
+    );
+  }
+
+  // Mostrar error
+  if (error) {
+    return (
+      <View className="flex-1 bg-gray-50 justify-center items-center px-4">
+        <Text className="text-red-600 text-center text-lg mb-4">
+          Error al cargar las estadísticas
+        </Text>
+        <Text className="text-gray-600 text-center mb-4">
+          {error}
+        </Text>
+        <Pressable
+          className={`${isPressed ? pressedPrimaryButton : standarPrimaryButton} rounded-xl py-3 px-6 min-w-[120px]`}
+          onPressIn={() => setIsPressed(true)}
+          onPressOut={() => setIsPressed(false)}
+          onPress={() => {
+            hapticFeedback.buttonPress();
+            loadOwnerStats();
+          }}
+        >
+          <Text className="text-white text-center font-semibold">
+            Reintentar
+          </Text>
+        </Pressable>
+      </View>
+    );
+  }
+
+  return (
+    <View className="flex-1 bg-gray-50">
+        <ScrollView className="flex-1">
+            <View className="px-4 py-6">
+                <DashboardHeader
+                        onNavigateToReviews={navigateToReviewList}
+                          userName={user?.name || user?.email || "Usuario"}
+                          userEmail={user?.email}
+                          userPhoto={undefined} // El tipo User no tiene photoUrl aún
+                          onNavigateToProfile={() => {
+                            hapticFeedback.buttonPressLight();
+                           router.push("/(owner)/(settings)/profile");
+                          }}
+                          onNavigateToSettings={() => {
+                            hapticFeedback.buttonPressLight();
+                            router.push("/(owner)/(settings)");
+                          }}
+                          onLogout={async () => {
+                            hapticFeedback.buttonPress();
+                            await logout();
+                            router.replace("/auth/login");
+                          }}
+                        />
+                <View className="mt-6">
+                    <StatsGrid 
+                      totalProperties={totalProperties}
+                      pendingApplications={pendingApplications}
+                      scheduledMaintenances={scheduledMaintenances}
+                      lastMonthIncome={lastMonthIncome}
+                      occupiedVsTotal={occupiedVsTotal}
+                    />
+                </View>
+                <View>
+                    <View className="mt-6">
+                        <RevenueChart 
+                          monthlyIncome={monthlyIncome} 
+                          selectedPeriod={incomePeriod}
+                          onPeriodChange={setIncomePeriod}
+                          loading={incomeLoading}
+                        />
+                    </View>
+                    <View className="mt-6">
+                        <RecentApplications applications={recentApplications} />
+                    </View>
+                    <View className="mt-6">
+                        <QuickActions />
+                    </View>
+                </View>
+            </View>
+        </ScrollView>
+    </View>
+  )
+}
