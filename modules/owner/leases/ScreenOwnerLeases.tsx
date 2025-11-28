@@ -58,7 +58,7 @@ export default function ScreenOwnerLeases() {
   return (
     <View className="flex-1 bg-white-traffic">
       {/* Header con Stats */}
-      <View className="bg-gray-400 p-6 pt-12">
+      <View className="bg-lavender-indigo p-6 pt-12">
 
         {/* Stats Cards */}
         <View className="flex-row mb-4">
